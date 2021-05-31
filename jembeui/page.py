@@ -1,0 +1,7 @@
+from jembe import Component,config
+
+__all__ = ("JembeUIPage",)
+
+@config(Component.Config(template="jembeui/jembeui.html"))
+class JembeUIPage(Component):
+    pass
