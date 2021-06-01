@@ -1,0 +1,15 @@
+<div class="section notifications">
+{% for noteId, note in notifications.items() %}
+    {% if note.level in ("info", "success") %}
+    <div class="notification is-{{note.level}} is-light" 
+            jmb-on:ready.delay-{{noteId}}.2000ms="notifications['{{noteId}}'] = null;$self.remove();">
+        {{note.message}}
+    </div>
+    {% else %}
+    <div class="notification {% if note.level == 'warn' %}is-warning {% else %}is-danger{% endif %} is-light" >
+        {{note.message}}
+        <button jmb-on:click="notifications['{{noteId}}'] = null;$self.remove();" type="button" class="delete">Close</button>
+    </div>
+    {% endif %}
+{% endfor %}
+</div>

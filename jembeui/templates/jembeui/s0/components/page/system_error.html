@@ -1,0 +1,32 @@
+<div
+    jmb-ignore
+    jmb-local="{show:false, networkError: false}"
+    jmb-on:jembe-update-page-error.camel.window="
+        $refs.title.innerText = '';
+        $refs.content.innerHTML = '';
+        $local.networkError = $event.detail.networkError;
+        if (!$local.networkError){
+            $refs.title.innerText = '!!! Server error: ' + $event.detail.response.status;
+            $event.detail.response.text().then(
+                function(content) {
+                    $refs.content.innerHTML = '<iframe></iframe>';
+                    $refs.content.children[0].contentDocument.write(content);
+                }
+            )
+        } else {
+            $refs.title.innerText = '!!! Network error';
+            $refs.content.innerHTML = '<p>Application server unreachable.<br>Please check your internet connection and/or contact Application Administrator.</p>'
+        }
+        $local.show = true;
+    "
+    jmb-show="$local.show"
+    class="page-system-error"
+    >
+    <div>
+        <div>
+            <div jmb-ref="title"></div>
+            <button jmb-on:click="$local.show=false" type="button" title="Close">X</button>
+        </div>
+        <div jmb-ref="content"></div>
+    </div>
+</div>

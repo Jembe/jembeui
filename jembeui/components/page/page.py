@@ -2,6 +2,7 @@ from typing import Callable, Dict, Iterable, Optional, TYPE_CHECKING, Tuple, Uni
 from ..component import Component
 from .title import CPageTitle
 from .notifications import CPageNotifications
+from .syserror import CPageSystemError
 
 if TYPE_CHECKING:
     import jembe as jmb
@@ -34,6 +35,8 @@ class CPageBase(Component):
                 )
             if "_notifications" not in components:
                 components["_notifications"] = CPageNotifications
+            if "_syserror" not in components:
+                components["_syserror"] = CPageSystemError
 
             super().__init__(
                 title=title,
