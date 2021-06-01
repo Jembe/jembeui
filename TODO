@@ -1,2 +1,18 @@
-✔ page/systemerrors @done(21-06-01 12:51)
-☐ s2 s3 s4 page
+ page/systemerrors: @done(21-06-01 12:51)
+    ✔ s0 @done(21-06-01 13:18)
+    ✔ s1 @done(21-06-01 13:18)
+    ☐ s2
+    ☐ s3
+    ☐ s4
+page/confirmation:
+    ☐ s0
+    ☐ s1
+    ☐ s2
+    ☐ s3
+    ☐ s4
+page/mainmenu:
+    ☐ s0
+    ☐ s1
+    ☐ s2
+    ☐ s3
+    ☐ s4

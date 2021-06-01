@@ -21,7 +21,7 @@
     {% endblock page_content %}
 
     {{component("_notifications")}}
-    {# syserror  #}
+    {{component("_syserror")}}
     {# page_update_indicator  #}
     <script src="{{ url_for('jembe.static', filename='js/jembe.js') }}" defer></script>
     <script defer>
