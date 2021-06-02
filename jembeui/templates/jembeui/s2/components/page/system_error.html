@@ -1,0 +1,40 @@
+<div 
+    jmb-ignore
+    jmb-local="{networkError: false}"
+    jmb-on:jembe-update-page-error.camel.window="
+        $refs.title.innerText = '';
+        $refs.content.innerHTML = '';
+        $local.networkError = $event.detail.networkError;
+        if (!$local.networkError){
+            $refs.title.innerText = 'Server error (' + $event.detail.response.status +')';
+            $event.detail.response.text().then(
+                function(content) {
+                    $refs.content.innerHTML = '<iframe style=&quot;width:100%;height:70vh;border:0;&quot;></iframe>';
+                    $refs.content.children[0].contentDocument.write(content);
+                }
+            )
+        } else {
+            $refs.title.innerText = '!!! Network error';
+            $refs.content.innerHTML = '<p>Application server unreachable.<br>Please check your internet connection and/or contact Application Administrator.</p>'
+        }
+        $self._mdcDialog.open();
+    "
+    class="mdc-dialog system-error">
+  <div class="mdc-dialog__container">
+    <div class="mdc-dialog__surface" jmb-bind:class="{'w-dialog-max':'!$local.networkError'}"
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby="syserror-dialog-title"
+      aria-describedby="syserror-dialog-content">
+      <h2 jmb-ref="title" class="mdc-dialog__title" id="syserror-dialog-title"></h2>
+      <div jmb-ref="content" class="mdc-dialog__content" id="syserror-dialog-content"></div>
+      <div class="mdc-dialog__actions">
+        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="discard" data-mdc-dialog-button-default>
+          <div class="mdc-button__ripple"></div>
+          <span class="mdc-button__label">Dismiss</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="mdc-dialog__scrim"></div>
+</div>

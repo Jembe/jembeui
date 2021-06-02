@@ -1,0 +1,40 @@
+<div>
+{% with sNote=notifications.items()|selectattr("1.level", "in", ("warn", "error"))|first %}
+    {% if sNote %}
+    {%set (noteId, note) = sNote%} 
+<div class="mdc-banner" role="banner"
+    jmb-on:-m-d-c-banner:closed.camel="notifications['{{noteId}}'] = null;">
+  <div class="mdc-banner__content"
+       role="status"
+       aria-live="assertive">
+    <div class="mdc-banner__graphic-text-wrapper">
+      <div class="mdc-banner__graphic" role="img" alt=""><i class="material-icons mdc-banner__icon">{% if note.level == "warn" %}warning_amber{% else %}error_outline{% endif %}</i></div>
+      <div class="mdc-banner__text">
+        {{note.message}}
+      </div>
+    </div>
+    <div class="mdc-banner__actions">
+      <button type="button" class="mdc-button mdc-banner__primary-action">
+        <div class="mdc-button__ripple"></div>
+        <div class="mdc-button__label">Dismiss</div>
+      </button>
+    </div>
+  </div>
+</div>
+    {% endif %}
+{% endwith %}
+{% with sNote=notifications.items()|selectattr("1.level", "in", ("info", "success"))|first %}
+    {% if sNote %}
+    {%set (noteId, note) = sNote%} 
+<div class="mdc-snackbar mdc-snackbar--leading"
+    jmb-on:-m-d-c-snackbar:closed.camel="notifications['{{noteId}}'] = null;"
+    jmb-on:ready.delay-{{noteId}}.2500ms="$self._mdcSnackbar.close();">
+  <div class="mdc-snackbar__surface" role="status" aria-relevant="additions">
+    <div class="mdc-snackbar__label" aria-atomic="false">
+      {{note.message}}
+    </div>
+  </div>
+</div>
+    {% endif %}
+{% endwith %}
+</div>

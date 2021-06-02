@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {{component("_title")}}
+    {# seo tag + description #}
+    <link href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="{{url_for('jembeui.static', filename='jembeui/s2/css/main.css')}}">
+</head>
+<body class="mdc-typography">
+    {{component("_notifications")}}
+    <button class="mdc-button foo-button">
+        <div class="mdc-button__ripple"></div>
+        <span class="mdc-button__label">Button</span>
+    </button>
+    {% block page_content %}
+    {% endblock page_content %}
+
+    {{component("_syserror")}}
+    {# page_update_indicator  #}
+    <script src="{{ url_for('jembeui.static', filename='jembeui/s2/js/main.js') }}" defer></script>
+    <script src="{{ url_for('jembe.static', filename='js/jembe.js') }}" defer></script>
+    <script defer>
+    window.addEventListener('DOMContentLoaded', function(event){
+        window.jembeClient.addXRequestHeaderGenerator(function () {
+            return {'X-CSRFToken': window.jembeClient.getCookie("_csrf_token")};
+        })
+    })
+    </script> 
+    <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
+</body>
+</html>
