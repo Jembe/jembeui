@@ -1,0 +1,31 @@
+{% if confirmation %}
+<div jmb-on:ready="$self._mdcDialog.open()" 
+     jmb-on:-m-d-c-dialog:closed.camel="$jmb.call($event.detail.action)"
+     class="mdc-dialog">
+  <div class="mdc-dialog__container">
+    <div class="mdc-dialog__surface" 
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby="syserror-dialog-title"
+      aria-describedby="syserror-dialog-content">
+      {% if confirmation.title %}
+      <h2 class="mdc-dialog__title" id="syserror-dialog-title">{{confirmation.title}}</h2>
+      {% endif %}
+      {% if confirmation.question %}
+      <div class="mdc-dialog__content" id="syserror-dialog-content">{{confirmation.question}}</div>
+      {% endif %}
+      <div class="mdc-dialog__actions">
+        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="cancel">
+          <div class="mdc-button__ripple"></div>
+          <span class="mdc-button__label">Cancel</span>
+        </button>
+        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-initial-focus data-mdc-dialog-button-default data-mdc-dialog-action="confirm">
+          <div class="mdc-button__ripple"></div>
+          <span class="mdc-button__label">OK</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="mdc-dialog__scrim"></div>
+</div>
+{% endif %}

@@ -20,13 +20,13 @@
         $local.show = true;
     "
     jmb-show="$local.show"
-    class="page-system-error"
+    class="dialog page-system-error"
     >
     <div>
-        <div>
+        <div class="head">
             <div jmb-ref="title"></div>
             <button jmb-on:click="$local.show=false" type="button" title="Close">X</button>
         </div>
-        <div jmb-ref="content"></div>
+        <div jmb-ref="content" class="content"></div>
     </div>
 </div>

@@ -1,6 +1,10 @@
 from typing import TYPE_CHECKING, Callable, Dict, Iterable, Optional, Tuple, Union
 import jembe as jmb
 from flask import current_app
+from jembe.component_config import listener
+
+if TYPE_CHECKING:
+    from jembe import Event
 
 
 __all__ = ("Component",)
@@ -64,3 +68,30 @@ class Component(jmb.Component):
 
     def jui_push_notification(self, message: str, level: str = "info"):
         self.emit("pushPageNotification", message=message, level=level)
+
+    def jui_confirm_action(
+        self,
+        action_name: str,
+        title: str,
+        question: str = "",
+        action_params: Optional[dict] = None,
+    ):
+        from .page.confirmation import Confirmation
+
+        if action_params is None:
+            action_params = dict(confirmed=True)
+
+        self.emit(
+            "requestActionConfirmation",
+            confirmation=Confirmation(
+                title=title,
+                question=question,
+                action_name=action_name,
+                action_params=action_params,
+            ),
+        )
+
+    @listener(event="actionConfirmed")
+    def jui_on_action_confirmed(self, event: "Event"):
+        if hasattr(self, event.action_name):
+            return getattr(self, event.action_name)(**event.action_params)

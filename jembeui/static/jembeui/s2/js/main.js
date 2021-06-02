@@ -28,11 +28,10 @@ function jembeui_s2_init_mui(el) {
   } else if (el.classList.contains('mdc-button') && el._mdcRipple === undefined) {
     // Button Ripple
     el._mdcRipple = mdc.ripple.MDCRipple.attachTo(el);
-  } else if (el.classList.contains('mdc-dialog') && el._mdcDialog === undefined) {
+  } else if (el.classList.contains('mdc-dialog')) {
     // Dialog
     el._mdcDialog = mdc.dialog.MDCDialog.attachTo(el);
-    // system error
-    if (el.classList.contains('system-error')) {
+    if (el.classList.contains('scrim-click-disabled')) {
       el._mdcDialog.scrimClickAction = '';
     }
     // el._mdcDialog.listen('MDCDialog:opened', () => {

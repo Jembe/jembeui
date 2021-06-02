@@ -12,14 +12,12 @@
 </head>
 <body class="mdc-typography">
     {{component("_notifications")}}
-    <button class="mdc-button foo-button">
-        <div class="mdc-button__ripple"></div>
-        <span class="mdc-button__label">Button</span>
-    </button>
+
     {% block page_content %}
     {% endblock page_content %}
 
     {{component("_syserror")}}
+    {{component("_action_confirmation")}}
     {# page_update_indicator  #}
     <script src="{{ url_for('jembeui.static', filename='jembeui/s2/js/main.js') }}" defer></script>
     <script src="{{ url_for('jembe.static', filename='js/jembe.js') }}" defer></script>

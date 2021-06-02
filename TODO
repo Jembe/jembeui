@@ -1,13 +1,13 @@
  page/systemerrors: @done(21-06-01 12:51)
     ✔ s0 @done(21-06-01 13:18)
     ✔ s1 @done(21-06-01 13:18)
-    ☐ s2
+    ✔ s2 @done(21-06-02 09:01)
     ☐ s3
     ☐ s4
 page/confirmation:
-    ☐ s0
-    ☐ s1
-    ☐ s2
+    ✔ s0 @done(21-06-02 10:40)
+    ✔ s1 @done(21-06-02 10:58)
+    ✔ s2 @done(21-06-02 11:52)
     ☐ s3
     ☐ s4
 page/mainmenu:

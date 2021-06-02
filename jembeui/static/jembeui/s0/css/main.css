@@ -84,6 +84,7 @@
 }
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-size: 15px;
 }
 /* Notification */
 .page-notification {
@@ -94,6 +95,12 @@ body {
     display: flex;
     align-items: center;
     margin-bottom: 2px;
+}
+.page-notification svg {
+    width: 16px;
+    height: 16px;
+    margin: 0 4px;
+    fill: currentColor;
 }
 .page-notification.info {
     background-color: var(--grey-20);
@@ -120,45 +127,96 @@ body {
     cursor: pointer;
 }
 .page-notification div {
-    padding: 0 4px;
     flex-grow: 1;
 }
-/* Page System Error */
-.page-system-error {
+/* Dialog */
+.dialog {
     position: absolute;
     inset: 0;
     background-color: var(--grey-90-a60);
 }
-.page-system-error > div {
-    width: 80%;
+.dialog > div {
+    max-width: 80%;
+    min-width: 280px;
     background-color: var(--white-100);
     margin: auto;
     margin-top: 10vh;
 }
-.page-system-error > div > div:first-child {
-    background-color: var(--red-50);
-    color: var(--white-100);
+.dialog .head {
+    background-color: var(--grey-20);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 4px;
+    padding: 0 4px 0 8px;
     line-height: 19px;
     min-height: 32px;
+    font-size: 17px;
+    font-weight: 500;
 }
-.page-system-error > div > div:first-child > button {
+.dialog .head button {
     cursor: pointer;
     border: none;
     background-color: inherit;
     color: inherit;
+    border-radius: 100%;
 }
-.page-system-error > div > div:first-child > button:hover {
-    background-color: var(--red-70);
+.dialog .head button:hover {
+    background-color: var(--grey-90-a20);
 }
-.page-system-error > div > div:last-child {
+.dialog .content {
     padding: 16px;
 }
-.page-system-error > div > div:last-child  iframe{
+.dialog .footer {
+    padding: 16px;
+    text-align: right;
+}
+/* Page System Error */
+.page-system-error > div {
+    width: 80%;
+}
+.page-system-error .head {
+    background-color: var(--red-50);
+    color: var(--white-100);
+}
+.page-system-error .head button:hover {
+    background-color: var(--red-70);
+}
+.page-system-error .content  iframe{
     height: 70vh;
     border: none;
     width: 100%;
+}
+/* Button */
+.button {
+    background-color: var(--grey-90-a10);
+    color: var(--grey-90);
+    border: none;
+    border-radius: 2px;
+    height: 32px;
+    padding: 0 8px;
+    font-size: 13px;
+    min-width: 132px;
+    cursor: pointer;
+}
+.button:hover {
+    background-color: var(--grey-90-a20);
+}
+.button:focus {
+    box-shadow: 0 0 0 1px var(--blue-50) inset, 0 0 0 1px var(--blue-50), 0 0 0 4px var(--blue-50-a30);
+}
+.button:active {
+    background-color: var(--grey-90-a30);
+}
+.button:disabled {
+    opacity: 40%;
+}
+.button.primary {
+    background-color: var(--blue-60);
+    color: var(--white-100);
+}
+.button.primary:hover {
+    background-color: var(--blue-70);
+}
+.button.primary:active {
+    background-color: var(--blue-80);
 }
