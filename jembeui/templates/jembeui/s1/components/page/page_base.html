@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="{{url_for('jembeui.static', filename='jembeui/s1/css/main.css')}}">
 </head>
 <body>
+    {{component("_update_indicator")}}
     <section class="section">
         <div class="container">
             <h1 class="title">Hello World</h1>
@@ -23,7 +24,6 @@
     {{component("_notifications")}}
     {{component("_syserror")}}
     {{component("_action_confirmation")}}
-    {# page_update_indicator  #}
     <script src="{{ url_for('jembe.static', filename='js/jembe.js') }}" defer></script>
     <script defer>
     window.addEventListener('DOMContentLoaded', function(event){

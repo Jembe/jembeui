@@ -1,19 +1,20 @@
-from typing import Dict, Optional, TYPE_CHECKING
-from dataclasses import dataclass
+from typing import Dict, Optional, TYPE_CHECKING, Any
+from dataclasses import dataclass, asdict
 from uuid import uuid1
+
 from ..component import Component
-from jembe import config, listener
+from jembe import config, listener, JembeInitParamSupport
 from flask import current_app
 
 if TYPE_CHECKING:
     from jembe import Event
 
 
-__all__ = ("CPageNotifications")
+__all__ = "CPageNotifications"
 
 
 @dataclass
-class PageNotification:
+class PageNotification(JembeInitParamSupport):
     message: str
     level: str = "info"
 
@@ -26,6 +27,22 @@ class PageNotification:
             )
             self.level = "error"
 
+    @classmethod
+    def dump_init_param(cls, value: "PageNotification") -> Any:
+        print('DUMP', asdict(value))
+        # called to menu 
+        return asdict(value)
+
+    @classmethod
+    def load_init_param(cls, value: Any) -> Any:
+        return (
+            PageNotification(
+                message=value.get("message"),
+                level=value.get("level"),
+            )
+            if value is not None and bool(value)
+            else None
+        )
 
 @config(Component.Config(changes_url=False))
 class CPageNotifications(Component):
@@ -38,7 +55,7 @@ class CPageNotifications(Component):
         if notifications is not None:
             # remove notifications id where notification[id] == None
             self.state.notifications = {
-                id: n for id, n in notifications.items() if n is not None
+                id: n for id, n in notifications.items() if n is not None 
             }
         else:
             self.state.notifications = dict()

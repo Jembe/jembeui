@@ -4,6 +4,7 @@ from .title import CPageTitle
 from .notifications import CPageNotifications
 from .syserror import CPageSystemError
 from .confirmation import CActionConfirmationDialog
+from .update_indicatior import CPageUpdateIndicator
 
 if TYPE_CHECKING:
     import jembe as jmb
@@ -40,6 +41,8 @@ class CPageBase(Component):
                 components["_syserror"] = CPageSystemError
             if "_action_confirmation" not in components:
                 components["_action_confirmation"] = CActionConfirmationDialog
+            if "_update_indicator" not in components:
+                components["_update_indicator"] = CPageUpdateIndicator
 
             super().__init__(
                 title=title,

@@ -15,16 +15,13 @@ window.addEventListener(
 function jembeui_s2_init_mui(el) {
   if (el.classList.contains('mdc-snackbar')) {
     // Snackbar
-    if (el._mdcSnackbar == undefined) {
-      el._mdcSnackbar = mdc.snackbar.MDCSnackbar.attachTo(el);
-      el._mdcSnackbar.timeoutMs = -1;
-    }
-    el._mdcSnackbar.open();
+    el._mdcSnackbar = mdc.snackbar.MDCSnackbar.attachTo(el);
+    // el._mdcSnackbar.timeoutMs = -1;
+    // el._mdcSnackbar.open();
   } else if (el.classList.contains('mdc-banner')) {
     // Banner
     el._mdcBanner = mdc.banner.MDCBanner.attachTo(el);
-    el._mdcBanner.timeoutMs = -1;
-    el._mdcBanner.open();
+    // el._mdcBanner.open();
   } else if (el.classList.contains('mdc-button') && el._mdcRipple === undefined) {
     // Button Ripple
     el._mdcRipple = mdc.ripple.MDCRipple.attachTo(el);
@@ -37,5 +34,9 @@ function jembeui_s2_init_mui(el) {
     // el._mdcDialog.listen('MDCDialog:opened', () => {
     //   el._mdcDialog.layout();
     // });
+  } else if (el.classList.contains('mdc-linear-progress')) {
+    // linear progress bar
+    el._mdcProgress = mdc.linearProgress.MDCLinearProgress.attachTo(el);
   }
+
 }

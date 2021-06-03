@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="{{url_for('jembeui.static', filename='jembeui/s2/css/main.css')}}">
 </head>
 <body class="mdc-typography">
+    {{component("_update_indicator")}}
     {{component("_notifications")}}
 
     {% block page_content %}
@@ -18,7 +19,6 @@
 
     {{component("_syserror")}}
     {{component("_action_confirmation")}}
-    {# page_update_indicator  #}
     <script src="{{ url_for('jembeui.static', filename='jembeui/s2/js/main.js') }}" defer></script>
     <script src="{{ url_for('jembe.static', filename='js/jembe.js') }}" defer></script>
     <script defer>

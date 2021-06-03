@@ -1,0 +1,25 @@
+<div 
+    jmb-local="{requestsInProgress:0}"
+    jmb-on:ready="$el._mdcProgress.close()"
+    jmb-init="$watch('requestsInProgress', function(rip) {
+        if (rip > 0 && $el._mdcProgress.foundation.isClosed()) {$el._mdcProgress.open()}
+        else if (rip <=0 && ! $el._mdcProgress.foundation.isClosed()) {$el._mdcProgress.close()}
+        })"
+    jmb-ignore 
+    jmb-cloak
+    jmb-on:jembe-start-update-page.camel.delay.25ms.window="$local.requestsInProgress += 1;"
+    jmb-on:jembe-update-page.camel.window="if($event.detail.isXUpdate) {$local.requestsInProgress -= 1;}"
+    jmb-on:jembe-update-page-error.camel.window="$local.requestsInProgress = -1"
+    {# jmb-bind:class="{'mdc-linear-progress--closed': $local.requestsInProgress <= 0 }"  #}
+    role="progressbar" class="mdc-linear-progress mdc-linear-progress--indeterminate" aria-label="Progress Bar" aria-valuemin="0" aria-valuemax="1" aria-valuenow="0" >
+  <div class="mdc-linear-progress__buffer">
+    <div class="mdc-linear-progress__buffer-bar"></div>
+    <div class="mdc-linear-progress__buffer-dots"></div>
+  </div>
+  <div class="mdc-linear-progress__bar mdc-linear-progress__primary-bar">
+    <span class="mdc-linear-progress__bar-inner"></span>
+  </div>
+  <div class="mdc-linear-progress__bar mdc-linear-progress__secondary-bar">
+    <span class="mdc-linear-progress__bar-inner"></span>
+  </div>
+</div>

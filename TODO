@@ -10,6 +10,18 @@ page/confirmation:
     ✔ s2 @done(21-06-02 11:52)
     ☐ s3
     ☐ s4
+page/update_inicator:
+    ✔ s0 @done(21-06-03 01:09)
+    ✔ s1 @done(21-06-03 01:09)
+    ✔ s2 @done(21-06-03 01:09)
+    ☐ s3
+    ☐ s4
+✘ cant change $local and regular data in same event handler in alpinejs (make s2 notifications work) @cancelled(21-06-03 02:26)
+    -- cant set proxy object to null but can to {}
+✘ jmb.js add x-on:data-changed or something similar @cancelled(21-06-03 01:13)
+☐ page update must disable inputs puth disabled attribute or whatever
+☐ refreshing single component can be done without blocking all inputs, usefull for notifications or chat
+    -- all other components in response except directly permited will be ignored and not applied to frontend
 page/mainmenu:
     ☐ s0
     ☐ s1
