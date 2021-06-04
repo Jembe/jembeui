@@ -1,7 +1,9 @@
 body {
     margin: 0;
 }
+
 .w-dialog-max { width: 560px; }
+
 [jmb-cloak] {
     display: none;
 }
