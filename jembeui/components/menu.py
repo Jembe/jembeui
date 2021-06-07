@@ -1,4 +1,4 @@
-from typing import Sequence, TYPE_CHECKING, Optional
+from typing import List, Sequence, TYPE_CHECKING, Optional, Tuple
 from abc import ABC, abstractmethod
 from copy import copy
 
@@ -9,9 +9,16 @@ __all__ = ("Link", "URLLink", "ActionLink", "Menu", "CMenu")
 
 
 class Link(ABC):
-    def __init__(self):
+    def __init__(
+        self,
+        active_for_pathnames: Sequence[str] = (),
+        active_for_exec_names: Sequence[str] = (),
+    ):
         self.callable_params: dict = dict()
         self.binded_to: Optional["Component"] = None
+
+        self.extra_pathnames: Tuple[str, ...] = tuple(active_for_pathnames)
+        self.extra_exec_names: Tuple[str, ...] = tuple(active_for_exec_names)
 
     @property
     @abstractmethod
@@ -40,12 +47,12 @@ class Link(ABC):
 
     @property
     @abstractmethod
-    def pathname(self) -> str:
+    def active_for_pathnames(self) -> Sequence[str]:
         raise NotImplementedError()
 
     @property
     @abstractmethod
-    def exec_name(self) -> Optional[str]:
+    def active_for_exec_names(self) -> Sequence[str]:
         raise NotImplementedError()
 
     @property
