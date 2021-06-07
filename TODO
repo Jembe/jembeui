@@ -19,7 +19,7 @@ page/update_inicator:
 ✘ cant change $local and regular data in same event handler in alpinejs (make s2 notifications work) @cancelled(21-06-03 02:26)
     -- cant set proxy object to null but can to {}
 ✘ jmb.js add x-on:data-changed or something similar @cancelled(21-06-03 01:13)
-☐ page update must disable inputs puth disabled attribute or whatever
+✔ page update must disable inputs puth disabled attribute or whatever @done(21-06-07 15:11)
 ✔ refreshing single component can be done without blocking all inputs, usefull for notifications or chat @done(21-06-04 11:45)
     -- all other components in response except directly permited will be ignored and not applied to frontend
 ☐ on.js delay modifier not woring correctly check with s2 notifications
