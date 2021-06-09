@@ -1,0 +1,34 @@
+{# does not extend page_base in order to:
+    - keep block naming consistent
+    - be able to fully integrate _notifications, _update_indicator etc components in 
+      new page layout
+ #}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {{component("_title")}}
+    {# seo tag + description #}
+    <link rel="stylesheet" href="{{url_for('jembeui.static', filename='jembeui/s0/css/main.css')}}">
+</head>
+<body>
+    {{component("_update_indicator")}}
+    {{component("_notifications")}}
+
+    {% block page_content %}
+    {% endblock page_content %}
+
+    {{component("_syserror")}}
+    {{component("_action_confirmation")}}
+    <script src="{{ url_for('jembe.static', filename='js/jembe.js') }}" defer></script>
+    <script defer>
+    window.addEventListener('DOMContentLoaded', function(event){
+        window.jembeClient.addXRequestHeaderGenerator(function () {
+            return {'X-CSRFToken': window.jembeClient.getCookie("_csrf_token")};
+        })
+    })
+    </script> 
+</body>
+</html>

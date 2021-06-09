@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING, Callable, Dict, Iterable, Optional, Tuple, Union
 import jembe as jmb
+import os.path
 from flask import current_app
 from jembe.component_config import listener
 
@@ -16,8 +17,24 @@ class Component(jmb.Component):
     """
 
     class Config(jmb.Component.Config):
-        default_template_exp = "jembeui/{style}/components/component.html"
         default_template: str
+        default_template_exp = "jembeui/{style}/components/component.html"
+        TEMPLATE_VARIANTS: Tuple[str, ...] = ()
+
+        @classmethod
+        def template_variant(cls, variant):
+            if variant not in cls.TEMPLATE_VARIANTS:
+                raise ValueError(
+                    "Invalid template variant '{}'. Valid variatns are: {}".format(
+                        variant, cls.TEMPLATE_VARIANTS
+                    )
+                )
+            dte_split = cls.default_template_exp.split(".")
+            dte_split[-2] = dte_split[-2] + "__" + "{variant}"
+            variant_template_exp = ".".join(dte_split)
+            return variant_template_exp.format(
+                style=current_app.config.get("JEMBEUI_STYLE", "s0"), variant=variant
+            )
 
         default_title = "Jembe Component"
 
@@ -44,6 +61,19 @@ class Component(jmb.Component):
             )
             if template is None:
                 template = ("", self.default_template)
+            elif isinstance(template, str):
+                # if template is one of the variants threat it as default template
+                for variant in self.TEMPLATE_VARIANTS:
+                    if self.template_variant(variant) == template:
+                        tvar = template
+                        template = ("", template, self.default_template)
+                        self.default_template = tvar
+                        break
+                    if template == variant:
+                        tvar = self.template_variant(variant)
+                        template = ("", tvar, self.default_template)
+                        self.default_template = tvar
+                        break
 
             super().__init__(
                 template=template,

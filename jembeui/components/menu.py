@@ -54,6 +54,10 @@ class Link(ABC):
     def binded(self) -> bool:
         return self.binded_to is not None
 
+    def _chek_binded(self):
+        if not self.binded:
+            raise ValueError("Link must be binded to component!")
+
     @property
     @abstractmethod
     def url(self) -> Optional[str]:
@@ -144,8 +148,7 @@ class URLLink(Link):
 
     @property
     def url(self) -> Optional[str]:
-        if not self.binded:
-            raise ValueError("Link is not binded to component!")
+        self._chek_binded()
         if self._url is None:
             return None
         elif isinstance(self._url, str):
@@ -168,18 +171,21 @@ class URLLink(Link):
 
     @property
     def is_accessible(self) -> bool:
+        self._chek_binded()
         if isinstance(self._is_accessible, bool):
             return self._is_accessible
         return self._is_accessible(self, **self.callable_params)  # type:ignore
 
     @property
     def title(self) -> str:
+        self._chek_binded()
         if isinstance(self._title, str):
             return self._title
         return self._title(self, **self.callable_params)  # type:ignore
 
     @property
     def description(self) -> Optional[str]:
+        self._chek_binded()
         if self._description is None:
             return None
         elif isinstance(self._description, str):
@@ -189,6 +195,7 @@ class URLLink(Link):
     @property
     def icon(self) -> Optional[str]:
         """Name of the icon if it is supported by JUI Style"""
+        self._chek_binded()
         if self._icon is None:
             return None
         elif isinstance(self._icon, str):
@@ -202,6 +209,7 @@ class URLLink(Link):
 
         Used only if icon is None
         """
+        self._chek_binded()
         if self._icon_html is None:
             return None
         elif isinstance(self._icon_html, str):
@@ -238,14 +246,10 @@ class ActionLink(Link):
 
     @property
     def url(self) -> Optional[str]:
-        if not self.binded:
-            raise ValueError("Link is not binded to component!")
         return self._component_reference.url
 
     @property
     def jrl(self) -> Optional[str]:
-        if not self.binded:
-            raise ValueError("Link is not binded to component!")
         return self._component_reference.jrl
 
     @property
@@ -262,12 +266,14 @@ class ActionLink(Link):
 
     @property
     def title(self) -> str:
+        self._chek_binded()
         if isinstance(self._title, str):
             return self._title
         return self._title(self, **self.callable_params)  # type:ignore
 
     @property
     def description(self) -> Optional[str]:
+        self._chek_binded()
         if self._description is None:
             return None
         elif isinstance(self._description, str):
@@ -277,6 +283,7 @@ class ActionLink(Link):
     @property
     def icon(self) -> Optional[str]:
         """Name of the icon if it is supported by JUI Style"""
+        self._chek_binded()
         if self._icon is None:
             return None
         elif isinstance(self._icon, str):
@@ -290,6 +297,7 @@ class ActionLink(Link):
 
         Used only if icon is None
         """
+        self._chek_binded()
         if self._icon_html is None:
             return None
         elif isinstance(self._icon_html, str):
@@ -298,6 +306,7 @@ class ActionLink(Link):
 
     @cached_property
     def _component_reference(self) -> "ComponentReference":
+        self._chek_binded()
         to_component: Callable[["Component"], "ComponentReference"] = (
             self._str_to_component_reference_lambda(self._to)
             if isinstance(self._to, str)
@@ -370,14 +379,24 @@ class Menu:
         binded_menu.binded = True
         return binded_menu
 
+    @cached_property
+    def is_accessible(self) -> bool:
+        if not self.binded:
+            raise ValueError("Menu must be binded to component!")
+        for item in self.items:
+            if item.is_accessible:
+                return True
+        return False
+
 
 class CMenu(Component):
     class Config(Component.Config):
         default_template_exp = "jembeui/{style}/components/menu.html"
+        TEMPLATE_VARIANTS = ("page_main", "page_user", "page_system")
 
         def __init__(
             self,
-            menu: Optional[Union["Menu", Sequence[Union["Link", "Menu"]]]],
+            menu: Optional[Union["Menu", Sequence[Union["Link", "Menu"]]]] = None,
             title: Optional[Union[str, Callable[["jmb.Component"], str]]] = None,
             template: Optional[Union[str, Iterable[str]]] = None,
             components: Optional[Dict[str, "jmb.ComponentRef"]] = None,
