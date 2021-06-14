@@ -29,7 +29,6 @@ class PageNotification(JembeInitParamSupport):
 
     @classmethod
     def dump_init_param(cls, value: "PageNotification") -> Any:
-        print('DUMP', asdict(value))
         # called to menu 
         return asdict(value)
 

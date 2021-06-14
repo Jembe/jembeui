@@ -14,11 +14,25 @@
     <link rel="stylesheet" href="{{url_for('jembeui.static', filename='jembeui/s0/css/main.css')}}">
 </head>
 <body>
-    {{component("_update_indicator")}}
-    {{component("_notifications")}}
-
-    {% block page_content %}
-    {% endblock page_content %}
+    <div class="page-layout">
+        <div class="page-layout__top">
+            {{component("_update_indicator")}}
+        </div>
+        <div class="page-layout__header">
+            <div class="page-layout__header__title">
+                <a href="{{url_for('index')}}">{{title}}</a></div>
+            <div class="page-layout__header__menu">System menu User menu</div>
+        </div>
+        <div class="page-layout__main">
+            <div class="page-layout__main__menu">
+                {{component("_main_menu")}}
+            </div>
+            <div class="page-layout__main__content">
+                {{component("_notifications")}}
+                {% block page_content %}{% endblock page_content %}
+            </div>
+        </div>
+    </div>
 
     {{component("_syserror")}}
     {{component("_action_confirmation")}}

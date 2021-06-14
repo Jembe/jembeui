@@ -17,7 +17,7 @@ from .update_indicatior import CPageUpdateIndicator
 from ..menu import CMenu
 
 if TYPE_CHECKING:
-    import jembe as jmb
+    import jembe
     from ..menu import Menu, Link
 
 __all__ = ("CPageBase", "CPage")
@@ -32,13 +32,13 @@ class CPageBase(Component):
 
         def __init__(
             self,
-            title: Optional[Union[str, Callable[["jmb.Component"], str]]] = None,
+            title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
             template: Optional[Union[str, Iterable[str]]] = None,
-            components: Optional[Dict[str, "jmb.ComponentRef"]] = None,
+            components: Optional[Dict[str, "jembe.ComponentRef"]] = None,
             inject_into_components: Optional[
-                Callable[["jmb.Component", "jmb.ComponentConfig"], dict]
+                Callable[["jembe.Component", "jembe.ComponentConfig"], dict]
             ] = None,
-            redisplay: Tuple["jmb.RedisplayFlag", ...] = (),
+            redisplay: Tuple["jembe.RedisplayFlag", ...] = (),
             changes_url: bool = True,
             url_query_params: Optional[Dict[str, str]] = None,
         ):
@@ -81,13 +81,13 @@ class CPage(CPageBase):
                 Union["Menu", Sequence[Union["Link", "Menu"]]]
             ] = None,
             user_menu: Optional[Union["Menu", Sequence[Union["Link", "Menu"]]]] = None,
-            title: Optional[Union[str, Callable[["jmb.Component"], str]]] = None,
+            title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
             template: Optional[Union[str, Iterable[str]]] = None,
-            components: Optional[Dict[str, "jmb.ComponentRef"]] = None,
+            components: Optional[Dict[str, "jembe.ComponentRef"]] = None,
             inject_into_components: Optional[
-                Callable[["jmb.Component", "jmb.ComponentConfig"], dict]
+                Callable[["jembe.Component", "jembe.ComponentConfig"], dict]
             ] = None,
-            redisplay: Tuple["jmb.RedisplayFlag", ...] = (),
+            redisplay: Tuple["jembe.RedisplayFlag", ...] = (),
             changes_url: bool = True,
             url_query_params: Optional[Dict[str, str]] = None,
         ):
@@ -96,22 +96,22 @@ class CPage(CPageBase):
                 components["_main_menu"] = (
                     CMenu,
                     CMenu.Config(
-                        main_menu, template=CMenu.Config.template_variant("page_main")
+                        menu=main_menu, template=CMenu.Config.template_variant("page_main")
                     ),
                 )
             if "_system_menu" not in components:
                 components["_system_menu"] = (
                     CMenu,
                     CMenu.Config(
-                        system_menu,
+                        menu=system_menu,
                         template=CMenu.Config.template_variant("page_system"),
                     ),
                 )
             if "_user_menu" not in components:
-                components["_system_menu"] = (
+                components["_user_menu"] = (
                     CMenu,
                     CMenu.Config(
-                        user_menu, template=CMenu.Config.template_variant("page_user")
+                        menu=user_menu, template=CMenu.Config.template_variant("page_user")
                     ),
                 )
             super().__init__(

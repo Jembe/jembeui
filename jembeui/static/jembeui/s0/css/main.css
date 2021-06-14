@@ -87,6 +87,31 @@ body {
     font-size: 15px;
     margin:0;
     box-sizing: border-box;
+    background-color: var(--grey-10);
+    color: var(--grey-90);
+    -webkit-text-size-adjust: 100%;
+    -webkit-font-feature-settings: "kern" 1;
+    -moz-font-feature-settings: "kern" 1;
+    -o-font-feature-settings: "kern" 1;
+    font-feature-settings: "kern" 1;
+    font-kerning: normal;
+}
+/* Links */
+a {
+    text-decoration: none;
+    color: var(--blue-60);
+}
+a:hover {
+    text-decoration: underline;
+    color: var(--blue-60);
+}
+a:visited {
+    color: var(--blue-70);
+}
+a:focus-visible {
+    box-shadow: 0 0 0 2px var(--blue-50), 0 0 0 6px var(--blue-50-a30);
+    outline: none;
+
 }
 /* Notification */
 .page-notification {
@@ -205,6 +230,7 @@ body {
 }
 .button:focus {
     box-shadow: 0 0 0 1px var(--blue-50) inset, 0 0 0 1px var(--blue-50), 0 0 0 4px var(--blue-50-a30);
+    outline: none;
 }
 .button:active {
     background-color: var(--grey-90-a30);
@@ -253,4 +279,56 @@ body {
   0% { margin-left: 0px; margin-right: 100%; }
   50% { margin-left: 25%; margin-right: 0%; }
   100% { margin-left: 100%; margin-right: 0; }
+}
+
+/* Page layout */
+.page-layout {
+
+}
+.page-layout__top {
+   background-color: var(--grey-50); 
+   height: 4px;
+}
+.page-layout__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    align-content: stretch;
+    flex-direction: row;
+    padding: 0 15px;
+    border-bottom: 1px solid var(--grey-30);
+}
+.page-layout__header__title {
+    font-size: 28px;
+    font-weight: 300;
+    line-height: 44px;
+    letter-spacing: -1px;
+    margin-bottom: 0;
+}
+.page-layout__header__title a {
+    color: var(--grey-50);
+}
+.page-layout__header__menu {
+    display: flex;
+    align-items: center;
+    align-content: stretch;
+    flex-direction: row;
+    justify-content: flex-end;
+}
+.page-layout__main {
+    display: flex;
+    flex-wrap: wrap;
+    
+}
+.page-layout__main__menu {
+    max-width: 300px;
+    min-width: 200px;
+    padding: 0 0 0 15px;
+    flex-grow:0;
+    flex-shrink: 1;
+    overflow: hidden;
+}
+.page-layout__main__content {
+    
+    flex-grow:1;
 }

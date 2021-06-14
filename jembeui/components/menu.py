@@ -1,7 +1,6 @@
 from typing import (
     Callable,
     Iterable,
-    List,
     Sequence,
     TYPE_CHECKING,
     Optional,
@@ -21,8 +20,7 @@ from .component import Component
 from jembe.component import component
 
 if TYPE_CHECKING:
-    from jembe import ComponentReference, DisplayResponse
-    import jembe as jmb
+    import jembe
 
 __all__ = ("Link", "URLLink", "ActionLink", "Menu", "CMenu")
 
@@ -34,7 +32,7 @@ class Link(ABC):
         active_for_exec_names: Sequence[str] = (),
     ):
         self.callable_params: dict = dict()
-        self.binded_to: Optional["Component"] = None
+        self.binded_to: Optional["jembe.Component"] = None
 
         self.extra_pathnames: Tuple[str, ...] = tuple(active_for_pathnames)
         self.extra_exec_names: Tuple[str, ...] = tuple(active_for_exec_names)
@@ -45,7 +43,7 @@ class Link(ABC):
         """True if link is to Jembe Component and/or Action"""
         raise NotImplementedError()
 
-    def bind_to(self, component: "Component") -> "Link":
+    def bind_to(self, component: "jembe.Component") -> "Link":
         blink = copy(self)
         blink.binded_to = component
         return blink
@@ -220,7 +218,7 @@ class URLLink(Link):
 class ActionLink(Link):
     def __init__(
         self,
-        to: Union[str, Callable[["Component"], "ComponentReference"]],
+        to: Union[str, Callable[["jembe.Component"], "jembe.ComponentReference"]],
         title: Union[str, Callable[["Link"], str]],
         description: Optional[Union[str, Callable[["Link"], str]]] = None,
         icon: Optional[Union[str, Callable[["Link"], str]]] = None,
@@ -305,23 +303,23 @@ class ActionLink(Link):
         return self._icon_html(self, **self.callable_params)  # type:ignore
 
     @cached_property
-    def _component_reference(self) -> "ComponentReference":
+    def _component_reference(self) -> "jembe.ComponentReference":
         self._chek_binded()
-        to_component: Callable[["Component"], "ComponentReference"] = (
+        to_component: Callable[["jembe.Component"], "jembe.ComponentReference"] = (
             self._str_to_component_reference_lambda(self._to)
             if isinstance(self._to, str)
             else self._to
         )
-        return to_component(self.binded_to, **self.callable_params)  # type: ignore
+        return to_component(self.binded_to)  # type: ignore
 
     def _str_to_component_reference_lambda(
         self, to_str: str
-    ) -> Callable[["Component"], "ComponentReference"]:
-        def absolute_component_reference(to_str: str):
+    ) -> Callable[["jembe.Component"], "jembe.ComponentReference"]:
+        def absolute_component_reference(to_str: str, comp: "jembe.Component"):
             # support simple exec name of component like /main/dash etc.
             c_names = to_str.split("/")[1:]
             do_reset_params = len(c_names) == 1
-            cr: "ComponentReference" = component(
+            cr: "jembe.ComponentReference" = component(
                 "/{}".format(c_names[0]), do_reset_params
             )
             for index, name in enumerate(c_names[1:]):
@@ -332,9 +330,9 @@ class ActionLink(Link):
             cr.kwargs = self.callable_params.copy()
             return cr
 
-        def relative_component_reference(to_str: str, comp: "Component"):
+        def relative_component_reference(to_str: str, comp: "jembe.Component"):
             c_names = to_str.split("/")
-            cr: "ComponentReference" = (
+            cr: "jembe.ComponentReference" = (
                 comp.component(c_names[0])
                 if not c_names[0].endswith("()")
                 else comp.component().call(c_names[0][:-2])
@@ -347,7 +345,7 @@ class ActionLink(Link):
         if to_str.startswith("/"):
             return partial(absolute_component_reference, to_str)
         else:
-            return partial(relative_component_reference, to_str, self.binded_to)
+            return partial(relative_component_reference, to_str)
 
 
 @dataclass
@@ -365,7 +363,7 @@ class Menu:
     def __post__init__(self):
         self.id = str(uuid4())
 
-    def bind_to(self, component: "Component") -> "Menu":
+    def bind_to(self, component: "jembe.Component") -> "Menu":
         """bind menu to component instance"""
         binded_menu = Menu(
             title=self.title,
@@ -397,13 +395,13 @@ class CMenu(Component):
         def __init__(
             self,
             menu: Optional[Union["Menu", Sequence[Union["Link", "Menu"]]]] = None,
-            title: Optional[Union[str, Callable[["jmb.Component"], str]]] = None,
+            title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
             template: Optional[Union[str, Iterable[str]]] = None,
-            components: Optional[Dict[str, "jmb.ComponentRef"]] = None,
+            components: Optional[Dict[str, "jembe.ComponentRef"]] = None,
             inject_into_components: Optional[
-                Callable[["jmb.Component", "jmb.ComponentConfig"], dict]
+                Callable[["jembe.Component", "jembe.ComponentConfig"], dict]
             ] = None,
-            redisplay: Tuple["jmb.RedisplayFlag", ...] = (),
+            redisplay: Tuple["jembe.RedisplayFlag", ...] = (),
             changes_url: bool = False,
             url_query_params: Optional[Dict[str, str]] = None,
         ):
@@ -424,7 +422,7 @@ class CMenu(Component):
 
     _config: Config
 
-    def display(self) -> "DisplayResponse":
+    def display(self) -> "jembe.DisplayResponse":
         self.menu = self._config.menu.bind_to(self)
         self.is_menu = lambda menu_item: isinstance(menu_item, Menu)
         return super().display()

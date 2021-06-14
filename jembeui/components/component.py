@@ -1,8 +1,7 @@
 from typing import TYPE_CHECKING, Callable, Dict, Iterable, Optional, Tuple, Union
-import jembe as jmb
-import os.path
 from flask import current_app
 from jembe.component_config import listener
+import jembe
 
 if TYPE_CHECKING:
     from jembe import Event
@@ -11,12 +10,12 @@ if TYPE_CHECKING:
 __all__ = ("Component",)
 
 
-class Component(jmb.Component):
+class Component(jembe.Component):
     """
     Base component for all Jembe UI components.
     """
 
-    class Config(jmb.Component.Config):
+    class Config(jembe.Component.Config):
         default_template: str
         default_template_exp = "jembeui/{style}/components/component.html"
         TEMPLATE_VARIANTS: Tuple[str, ...] = ()
@@ -40,13 +39,13 @@ class Component(jmb.Component):
 
         def __init__(
             self,
-            title: Optional[Union[str, Callable[["jmb.Component"], str]]] = None,
+            title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
             template: Optional[Union[str, Iterable[str]]] = None,
-            components: Optional[Dict[str, "jmb.ComponentRef"]] = None,
+            components: Optional[Dict[str, "jembe.ComponentRef"]] = None,
             inject_into_components: Optional[
-                Callable[["jmb.Component", "jmb.ComponentConfig"], dict]
+                Callable[["jembe.Component", "jembe.ComponentConfig"], dict]
             ] = None,
-            redisplay: Tuple["jmb.RedisplayFlag", ...] = (),
+            redisplay: Tuple["jembe.RedisplayFlag", ...] = (),
             changes_url: bool = True,
             url_query_params: Optional[Dict[str, str]] = None,
         ):

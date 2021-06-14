@@ -1,7 +1,6 @@
 from typing import TYPE_CHECKING, Optional
 
-from jinja2.loaders import ChoiceLoader, PackageLoader
-from .components import Component, CPage, CPageBase
+from .components import Component, CPage, CPageBase, CMenu, Link, ActionLink, URLLink, Menu
 
 if TYPE_CHECKING:
     from flask import Flask
@@ -11,6 +10,11 @@ __all__ = (
     "Component",
     "CPage",
     "CPageBase",
+    "CMenu",
+    "Link",
+    "ActionLink",
+    "URLLink",
+    "Menu"
 )
 
 
@@ -23,4 +27,5 @@ class JembeUI:
     def init_app(self, app: "Flask"):
         from jembe.app import jembe
         from .page import JembeUIPage
+
         jembe.add_page("jembeui", JembeUIPage)

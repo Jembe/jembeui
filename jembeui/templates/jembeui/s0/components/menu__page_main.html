@@ -1,31 +1,31 @@
 {% macro display_menu(menu, level=0) -%}
     {% if menu.is_accessible %}
         {% if level > 0 %}
-        <li><strong>{{menu.title}}:</strong>
+        <div class="main-menu__item main-menu__item--sub-menu-container"><strong>{{menu.title}}</strong>
         {% endif %}
-        <ul>
+        <div class="{% if level == 0 %}main-menu{% else %}main-menu__sub-menu main-menu__sub-menu--{{level}}{% endif %}">
         {% for mi in menu.items  %}
             {% if is_menu(mi) %}
-                {{display_menu(mi, level+1)}}
+                {{display_menu(mi, level + 1)}}
             {% else %}
                 {{display_link(mi, level)}}
             {% endif %}
         {% endfor %}
-        </ul>
+        </div>
         {% if level > 0 %}
-        </li>
+        </div>
         {% endif %}
     {% endif %}
 {%- endmacro %}
 
 {% macro display_link(link, level) -%}
     {% if link.is_accessible %}
-    <li>
+    <div class="main-menu__item">
         <a href="{{link.url}}" 
            {% if link.jrl %}jmb-on:click.stop.prevent="{{link.jrl}}"{% endif %}>
            {{link.title}}
         </a>
-    </li>
+    </div>
     {% endif %}
 {%- endmacro %}
 
