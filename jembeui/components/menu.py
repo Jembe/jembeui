@@ -28,14 +28,18 @@ __all__ = ("Link", "URLLink", "ActionLink", "Menu", "CMenu")
 class Link(ABC):
     def __init__(
         self,
-        active_for_pathnames: Sequence[str] = (),
-        active_for_exec_names: Sequence[str] = (),
+        active_for_pathnames: Optional[Sequence[str]] = None,
+        active_for_exec_names: Optional[Sequence[str]] = None,
     ):
         self.callable_params: dict = dict()
         self.binded_to: Optional["jembe.Component"] = None
 
-        self.extra_pathnames: Tuple[str, ...] = tuple(active_for_pathnames)
-        self.extra_exec_names: Tuple[str, ...] = tuple(active_for_exec_names)
+        self._active_for_pathnames: Optional[Tuple[str, ...]] = (
+            tuple(active_for_pathnames) if active_for_pathnames is not None else None
+        )
+        self._active_for_exec_names: Optional[Tuple[str, ...]] = (
+            tuple(active_for_exec_names) if active_for_exec_names is not None else None
+        )
 
     @property
     @abstractmethod
@@ -126,8 +130,8 @@ class URLLink(Link):
         is_accessible: Union[bool, Callable[["Link"], bool]] = True,
         icon: Optional[Union[str, Callable[["Link"], str]]] = None,
         icon_html: Optional[Union[str, Callable[["Link"], str]]] = None,
-        active_for_pathnames: Sequence[str] = (),
-        active_for_exec_names: Sequence[str] = (),
+        active_for_pathnames: Optional[Sequence[str]] = None,
+        active_for_exec_names: Optional[Sequence[str]] = None,
     ):
         self._url = url
         self._title = title
@@ -160,12 +164,17 @@ class URLLink(Link):
 
     @property
     def active_for_pathnames(self) -> Sequence[str]:
-        pathname = str(urlparse(self.url).path)
-        return (pathname,) + self.extra_pathnames
+        if self._active_for_pathnames is None:
+            pathname = str(urlparse(self.url).path)
+            return (pathname,)
+        else:
+            return self._active_for_pathnames
 
     @property
     def active_for_exec_names(self) -> Sequence[str]:
-        return self.extra_exec_names
+        if self._active_for_exec_names is None:
+            return ()
+        return self._active_for_exec_names
 
     @property
     def is_accessible(self) -> bool:
@@ -223,8 +232,8 @@ class ActionLink(Link):
         description: Optional[Union[str, Callable[["Link"], str]]] = None,
         icon: Optional[Union[str, Callable[["Link"], str]]] = None,
         icon_html: Optional[Union[str, Callable[["Link"], str]]] = None,
-        active_for_pathnames: Sequence[str] = (),
-        active_for_exec_names: Sequence[str] = (),
+        active_for_pathnames: Optional[Sequence[str]] = None,
+        active_for_exec_names: Optional[Sequence[str]] = None,
         **callable_params
     ):
         self._to = to
@@ -252,11 +261,16 @@ class ActionLink(Link):
 
     @property
     def active_for_pathnames(self) -> Sequence[str]:
-        return self.extra_pathnames
+        if self._active_for_pathnames is None:
+            return ()
+        return self._active_for_pathnames
 
     @property
     def active_for_exec_names(self) -> Sequence[str]:
-        return (self._component_reference.exec_name) + self.extra_exec_names
+        if self._active_for_exec_names is None:
+            return (self._component_reference.exec_name,)
+        else:
+            return self._active_for_exec_names
 
     @property
     def is_accessible(self) -> bool:
@@ -360,7 +374,7 @@ class Menu:
     id: str = field(default="", init=False)
     binded: bool = field(default=False, init=False)
 
-    def __post__init__(self):
+    def __post_init__(self):
         self.id = str(uuid4())
 
     def bind_to(self, component: "jembe.Component") -> "Menu":
