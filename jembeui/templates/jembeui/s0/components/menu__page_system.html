@@ -1,0 +1,67 @@
+{% macro display_menu_items(menu, level, topMenuId=none) -%}
+    {% for mi in menu.items  %}
+        {% if is_menu(mi) %}
+            {{display_menu(mi, level+1, topMenuId)}}
+        {% else %}
+            {{display_link(mi, level, topMenuId)}}
+        {% endif %}
+    {% endfor %}
+{%- endmacro %}
+
+{% macro display_menu(menu, level=0, topMenuId=none) -%}
+    {% if menu.is_accessible %}
+        {% if level == 0 %}
+            <div class="top-menu">
+                {{display_menu_items(menu, level)}}
+            </div>
+        {% elif level == 1 %}
+            <div class="top-menu__dropdown-container">
+                <div class="top-menu__link"
+                     jmb-bind:class="{'top-menu__link--active': $local.active === '{{menu.id}}'}">
+                    <a href="#" jmb-on:click.prevent="$local.opened = $local.opened !== '{{menu.id}}' ?'{{menu.id}}': null">
+                        {{menu.title}}
+                    </a>
+                </div>
+                <div class="top-menu__dropdown" 
+                     jmb-bind:class="{'top-menu__dropdown--open': $local.opened == '{{menu.id}}'}"
+                     jmb-on:click.away="if ($local.opened === '{{menu.id}}') {$local.opened=null}">
+                    {{display_menu_items(menu, level, menu.id)}}
+                </div>
+            </div>
+        {% else %}
+            <div class="top-menu__dropdown__submenu-title">
+                {{menu.title}}
+            </div>
+            <div class="top-menu__dropdown__submenu">
+                {{display_menu_items(menu, level, topMenuId)}}
+            </div>
+        {% endif %}
+    {% endif %}
+{%- endmacro %}
+
+{% macro display_link(link, level, topMenuId=none) -%}
+    {% if link.is_accessible %}
+        <div class="top-menu__link {% if level > 0 %}top-menu__link--indropdown{% endif %}"
+            jmb-bind:class="{
+             'top-menu__link--active': 
+                (   
+                    {{link.active_for_exec_names|tojson|forceescape}}.some(function(en){return $local.componentsOnPage.includes(en)})
+                    || {{link.active_for_pathnames|tojson|forceescape}}.some(function(pn){return window.location.pathname === pn})
+                ) 
+                {# Add topMenuid to active #}
+                {% if topMenuId is not none  %}
+                && ($local.active = '{{topMenuId}}')
+                {% endif %}
+            }">
+            <a href="{{link.url}}" 
+            {% if link.jrl %}jmb-on:click.prevent="{{link.jrl}}"{% endif %}>
+                {{link.title}}
+            </a>
+        </div>
+    {% endif %}
+{%- endmacro %}
+
+<div jmb-local="{opened:null, active:null, componentsOnPage:[]}"
+     jmb-on:jembe-update-page.camel.window="$local.componentsOnPage = $jmb.componentsOnPage();$local.active = null;">
+{{display_menu(menu)}}
+</div>

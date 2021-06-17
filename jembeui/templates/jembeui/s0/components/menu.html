@@ -22,7 +22,7 @@
     {% if link.is_accessible %}
     <li>
         <a href="{{link.url}}" 
-           {% if link.jrl %}jmb-on:click.stop.prevent="{{link.jrl}}"{% endif %}>
+           {% if link.jrl %}jmb-on:click.prevent="{{link.jrl}}"{% endif %}>
            {{link.title}}
         </a>
     </li>

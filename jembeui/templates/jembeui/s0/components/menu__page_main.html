@@ -3,7 +3,7 @@
         {% if level > 0 %}
         <div class="">
             <a href="#" 
-                jmb-on:click.stop.prevent="
+                jmb-on:click.prevent="
                     mid ='{{menu.id}}'; 
                     if ($local.opened.includes(mid)) {
                         $local.opened = $local.opened.filter(function(id){return id !== mid});
@@ -58,7 +58,7 @@
                 )
         }">
         <a href="{{link.url}}" 
-           {% if link.jrl %}jmb-on:click.stop.prevent="{{link.jrl}}"{% endif %}>
+           {% if link.jrl %}jmb-on:click.prevent="{{link.jrl}}"{% endif %}>
            {{link.title}}
         </a>
     </div>

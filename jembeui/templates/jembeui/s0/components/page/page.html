@@ -22,7 +22,10 @@
         <div class="page-layout__header">
             <div class="page-layout__header__title">
                 <a href="{{url_for('index')}}">{{title}}</a></div>
-            <div class="page-layout__header__menu">System menu User menu</div>
+            <div class="page-layout__header__menu">
+                {{component("_system_menu")}}
+                {{component("_user_menu")}}
+            </div>
         </div>
         <div class="page-layout__main">
             <div class="page-layout__main__menu">

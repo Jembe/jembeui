@@ -165,6 +165,7 @@ a:focus-visible {
 }
 .dialog > div {
     max-width: 80%;
+    width: 650px;
     min-width: 280px;
     background-color: var(--white-100);
     margin: auto;
@@ -315,6 +316,7 @@ a:focus-visible {
     align-content: stretch;
     flex-direction: row;
     justify-content: flex-end;
+    gap: 8px;
 }
 .page-layout__main {
     display: flex;
@@ -367,4 +369,40 @@ a.main-menu__sub-menu__title--active {
 }
 a.main-menu__sub-menu__title:hover {
     text-decoration: none;
+}
+/* Page top menu */
+.top-menu {
+    display: flex;
+    align-items: center;
+    align-content: stretch;
+    flex-direction: row;
+    gap: 8px;
+}
+.top-menu__link a {
+    color: var(--grey-50);
+}
+.top-menu__link--active a {
+    color: var(--grey-60);
+    font-weight: 500;
+}
+.top-menu__dropdown-container {
+    position: relative;
+}
+.top-menu__dropdown {
+    display: none;
+    position: absolute;
+    right: -8px;
+    background-color: var(--white-100);
+    border-radius: 2px;
+    border: solid 1px var(--grey-90-a20);
+    box-shadow: 0 4px 16px var(--grey-90-a10);
+    padding: 8px 16px;
+    white-space:  nowrap;
+
+}
+.top-menu__dropdown--open {
+    display: block;
+}
+.top-menu__link--indropdown {
+    padding: 2px 0;
 }
