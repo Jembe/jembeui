@@ -398,6 +398,24 @@ a.main-menu__sub-menu__title:hover {
     box-shadow: 0 4px 16px var(--grey-90-a10);
     padding: 8px 16px;
     white-space:  nowrap;
+    margin-top: 8px;
+
+}
+
+.top-menu__dropdown::before {
+    content: "";
+    position: absolute;
+    width: 13px;
+    height: 13px;
+    background-color: var(--white-100);
+    box-shadow: 0 4px 16px var(--grey-90-a10);
+    transform: rotate(
+315deg
+);
+    clip-path: polygon( -4px -4px, calc(100% + 4px) -4px, calc(100% + 4px) calc(100% + 4px));
+    top: -7px;
+    right: 18px;
+    border: 1px solid var(--grey-90-a20);
 
 }
 .top-menu__dropdown--open {
