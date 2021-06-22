@@ -1,0 +1,58 @@
+{% macro display_menu_items(menu, level, topMenuId=none, right=false) -%}
+    {% for mi in menu.items  %}
+        {% if mi.is_menu %}
+            {{display_menu(mi, level+1, topMenuId, right=right)}}
+        {% else %}
+            {{display_link(mi, level, topMenuId)}}
+        {% endif %}
+    {% endfor %}
+{%- endmacro %}
+
+{% macro display_menu(menu, level=0, topMenuId=none, right=false) -%}
+    {% if menu.is_accessible %}
+        {% if level == 0 %}
+            {{display_menu_items(menu, level, right=right)}}
+        {% elif level == 1 %}
+            <div class="navbar-item has-dropdown is-hoverable">
+                <div class="navbar-link is-arrowless"
+                     jmb-bind:class="{'is-active': $local.active === '{{menu.id}}'}">
+                    {{menu.title}}
+                </div>
+                <div class="navbar-dropdown{% if right %} is-right{% endif %}">
+                    {{display_menu_items(menu, level, menu.id)}}
+                </div>
+            </div>
+        {% else %}
+            <hr class="navbar-divider">
+            {{display_menu_items(menu, level, topMenuId)}}
+        {% endif %}
+    {% endif %}
+{%- endmacro %}
+
+{% macro display_link(link, level, topMenuId=none) -%}
+    {% if link.is_accessible %}
+    <a class="navbar-item " href="{{link.url}}" 
+        {% if link.jrl %}jmb-on:click.prevent="{{link.jrl}}"{% endif %}
+        jmb-bind:class="{
+            'is-active': 
+            (   
+                {{link.active_for_exec_names|tojson|forceescape}}.some(function(en){return $local.componentsOnPage.includes(en)})
+                || {{link.active_for_pathnames|tojson|forceescape}}.some(function(pn){return window.location.pathname === pn})
+            ) 
+            {# Add topMenuid to active #}
+            {% if topMenuId is not none  %}
+            && ($local.active = '{{topMenuId}}')
+            {% endif %}
+        }">
+        {{link.title}}
+    </a>
+    {% endif %}
+{%- endmacro %}
+
+{% macro display_navbar_menu(menu, right=false) -%}
+<div jmb-local="{opened:null, active:null, componentsOnPage:[]}"
+     jmb-on:jembe-update-page.camel.window="$local.componentsOnPage = $jmb.componentsOnPage();$local.active = null;"
+     style="display:inherit;">
+    {{display_menu(menu, right=right)}}
+</div>
+{%- endmacro %}

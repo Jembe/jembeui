@@ -29,7 +29,7 @@
         {%- endif -%}
         >
         {% for mi in menu.items  %}
-            {% if is_menu(mi) %}
+            {% if mi.is_menu %}
                 {{display_menu(mi, level + 1, menuIds + [menu.id])}}
             {% else %}
                 {{display_link(mi, level, menuIds + [menu.id])}}

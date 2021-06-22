@@ -120,6 +120,10 @@ class Link(ABC):
             link.callable_params[k] = v
         return link
 
+    @property
+    def is_menu(self) ->bool:
+        return False
+
 
 class URLLink(Link):
     def __init__(
@@ -400,6 +404,9 @@ class Menu:
                 return True
         return False
 
+    @property
+    def is_menu(self) ->bool:
+        return True
 
 class CMenu(Component):
     class Config(Component.Config):
@@ -438,5 +445,4 @@ class CMenu(Component):
 
     def display(self) -> "jembe.DisplayResponse":
         self.menu = self._config.menu.bind_to(self)
-        self.is_menu = lambda menu_item: isinstance(menu_item, Menu)
         return super().display()

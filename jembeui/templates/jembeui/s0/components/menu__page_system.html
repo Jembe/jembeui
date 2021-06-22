@@ -1,6 +1,6 @@
 {% macro display_menu_items(menu, level, topMenuId=none) -%}
     {% for mi in menu.items  %}
-        {% if is_menu(mi) %}
+        {% if mi.is_menu %}
             {{display_menu(mi, level+1, topMenuId)}}
         {% else %}
             {{display_link(mi, level, topMenuId)}}
