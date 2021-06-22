@@ -15,16 +15,18 @@
                 {{display_menu_items(menu, level)}}
             </div>
         {% elif level == 1 %}
-            <div class="top-menu__dropdown-container">
+            <div class="top-menu__dropdown-container"
+                jmb-on:mouseleave="if ($local.opened === '{{menu.id}}') {$local.timeout=setTimeout(function(){$local.opened=null}, 50)}" 
+                jmb-on:click.away="if ($local.opened === '{{menu.id}}') {$local.opened=null}"
+                jmb-on:mouseover="clearTimeout($local.timeout); $local.opened = '{{menu.id}}'">
                 <div class="top-menu__link"
                      jmb-bind:class="{'top-menu__link--active': $local.active === '{{menu.id}}'}">
-                    <a href="#" jmb-on:click.prevent="$local.opened = $local.opened !== '{{menu.id}}' ?'{{menu.id}}': null">
+                    <a href="#" jmb-on:click.prevent="$local.opened = '{{menu.id}}'">
                         {{menu.title}}
                     </a>
                 </div>
                 <div class="top-menu__dropdown" 
-                     jmb-bind:class="{'top-menu__dropdown--open': $local.opened == '{{menu.id}}'}"
-                     jmb-on:click.away="if ($local.opened === '{{menu.id}}') {$local.opened=null}">
+                     jmb-bind:class="{'top-menu__dropdown--open': $local.opened == '{{menu.id}}'}">
                     {{display_menu_items(menu, level, menu.id)}}
                 </div>
             </div>
@@ -61,7 +63,7 @@
     {% endif %}
 {%- endmacro %}
 
-<div jmb-local="{opened:null, active:null, componentsOnPage:[]}"
+<div jmb-local="{opened:null, active:null, componentsOnPage:[], timeout:null}"
      jmb-on:jembe-update-page.camel.window="$local.componentsOnPage = $jmb.componentsOnPage();$local.active = null;">
 {{display_menu(menu)}}
 </div>
