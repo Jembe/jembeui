@@ -49,7 +49,7 @@ class CPageNotifications(Component):
         default_template_exp = "jembeui/{style}/components/page/notifications.html"
 
     def __init__(
-        self, notifications: Optional[Dict[str, PageNotification]] = None
+        self, notifications: Optional[Dict[str, Optional[PageNotification]]] = None
     ) -> None:
         if notifications is not None:
             # remove notifications id where notification[id] == None
