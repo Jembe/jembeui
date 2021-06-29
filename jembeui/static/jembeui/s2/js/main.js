@@ -31,7 +31,7 @@ function jembeui_s2_init_mui(el) {
   } else if (el.classList.contains('mdc-linear-progress')) {
     // linear progress bar
     el._mdcProgress = mdc.linearProgress.MDCLinearProgress.attachTo(el);
-  } else if (el.classList.contains('mdc-drawer') && el._mdcDrawer === undefined) {
+  } else if (el.classList.contains('mdc-drawer') && el._mdcDrawer === undefined && el.classList.contains('mdc-drawer--modal')) {
     // Dismisable drawer
     el._mdcDrawer = mdc.drawer.MDCDrawer.attachTo(el);
   } else if (el.classList.contains('mdc-top-app-bar') && el._mdcTopAppBar === undefined) {

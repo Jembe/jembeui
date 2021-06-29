@@ -28,7 +28,7 @@
     {% if sNote %}
     {%set (noteId, note) = sNote%} 
 <div class="mdc-snackbar mdc-snackbar--leading" id="{{noteId}}" jmb-ignore
-    jmb-on:-m-d-c-snackbar:closed.camel="$self._mdcSnackbar.destroy();notifications['{{noteId}}'] = {};"
+    jmb-on:-m-d-c-snackbar:closed.camel.nonblocking="$self._mdcSnackbar.destroy();notifications['{{noteId}}'] = {};"
     jmb-on:ready="$self._mdcSnackbar.open()"
     jmb-on:ready.delay-{{noteId}}.2500ms="$self._mdcSnackbar.close();"
     >
