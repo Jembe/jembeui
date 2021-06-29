@@ -1,6 +1,6 @@
 <div 
     jmb-local="{requestsInProgress:0}"
-    jmb-on:ready="$el._mdcProgress.close()"
+    jmb-on:ready="if ($el._mdcProgress !== undefined) {$el._mdcProgress.close()}"
     jmb-init="$watch('requestsInProgress', function(rip) {
         if (rip > 0 && $el._mdcProgress.foundation.isClosed()) {$el._mdcProgress.open()}
         else if (rip <=0 && ! $el._mdcProgress.foundation.isClosed()) {$el._mdcProgress.close()}
