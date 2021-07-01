@@ -7,25 +7,3 @@ body {
 [jmb-cloak] {
     display: none;
 }
-/* drawer and app layout */
-.mdc-drawer-app-content {
-    display: flex;
-}
-.mdc-drawer.mdc-drawer--standard {
-    height: 100vh;
-}
-.mdc-drawer.mdc-drawer--modal {
-    z-index: 7;
-}
-/* utility */
-.hidden {
-    display: none;
-}
-@media only screen and (min-width: 1444px) {
-    .lg\:block {
-        display: block;
-    }
-    .lg\:hidden {
-        display: none;
-    }
-}

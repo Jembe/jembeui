@@ -31,12 +31,15 @@ function jembeui_s2_init_mui(el) {
   } else if (el.classList.contains('mdc-linear-progress')) {
     // linear progress bar
     el._mdcProgress = mdc.linearProgress.MDCLinearProgress.attachTo(el);
-  } else if (el.classList.contains('mdc-drawer') && el._mdcDrawer === undefined && el.classList.contains('mdc-drawer--modal')) {
-    // Dismisable drawer
+  } else if (el.classList.contains('mdc-drawer') && el.classList.contains('mdc-drawer--modal') && el._mdcDrawer === undefined && el.classList.contains('mdc-drawer--modal')) {
+    // Modal drawer
     el._mdcDrawer = mdc.drawer.MDCDrawer.attachTo(el);
   } else if (el.classList.contains('mdc-top-app-bar') && el._mdcTopAppBar === undefined) {
     // Top App Bar
     el._mdcTopAppBar = mdc.topAppBar.MDCTopAppBar.attachTo(el);
+  } else if (el.classList.contains('mdc-menu') && el._mdcMenu === undefined) {
+    // Menu
+    el._mdcMenu = mdc.menu.MDCMenu.attachTo(el);
   }
   // } else if (el.classList.contains('mdc-list') && el._mdcList === undefined) {
   //   // List
