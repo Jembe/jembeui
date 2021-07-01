@@ -25,6 +25,8 @@ function jembeui_s2_init_mui(el) {
   } else if (el.classList.contains('mdc-dialog')) {
     // Dialog
     el._mdcDialog = mdc.dialog.MDCDialog.attachTo(el);
+    el._mdcDialog.scrimClickAction = 'cancel';
+    el._mdcDialog.escapeKeyAction = 'cancel'
     if (el.classList.contains('scrim-click-disabled')) {
       el._mdcDialog.scrimClickAction = '';
     }
