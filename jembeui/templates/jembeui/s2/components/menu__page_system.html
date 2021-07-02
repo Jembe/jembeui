@@ -1,0 +1,101 @@
+{# <a class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Favorite">settings</a>
+<a class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Search">help</a>
+<a jmb-on:click.prevent.stop="menu=$refs.menu._mdcMenu; if(menu!==undefined) {menu.open = true}"
+        class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Options">more_vert</a>
+<div class="mdc-menu-surface--anchor">
+    <div jmb-ref="menu" class="mdc-menu mdc-menu-surface">
+    <nav class="mdc-list" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1">
+        <a class="mdc-list-item" role="menuitem">
+        <span class="mdc-list-item__ripple"></span>
+        <span class="mdc-list-item__text">A Menu Item</span>
+        </a>
+        <a class="mdc-list-item" role="menuitem">
+        <span class="mdc-list-item__ripple"></span>
+        <span class="mdc-list-item__text">Another Menu Item</span>
+        </a>
+    </nav>
+    </div>
+</div> #}
+{% macro display_menu_items(menu, level) -%}
+    {% for mi in menu.items  %}
+        {% if mi.is_menu %}
+            {{display_menu(mi, level+1)}}
+        {% else %}
+            {{display_link(mi, level)}}
+        {% endif %}
+    {% endfor %}
+{%- endmacro %}
+
+{% macro display_menu(menu, level=0) -%}
+    {% if menu.is_accessible %}
+        {% if level == 0 %}
+            {{display_menu_items(menu, level)}}
+        {% elif level == 1 %}
+        <div>
+        <button jmb-on:click.prevent.stop="menu=$self.nextElementSibling.firstElementChild._mdcMenu; if(menu!==undefined) {menu.open = true}"
+                class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Options">
+                {{menu.icon|default('more_vert', true)}}
+        </button>
+        <div class="mdc-menu-surface--anchor">
+            <div class="mdc-menu mdc-menu-surface">
+            <nav class="mdc-list" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1">
+            {{display_menu_items(menu, level)}}
+            </nav>
+            </div>
+        </div>
+        </div>
+        {% else %}
+            <hr class="mdc-list-divider">
+            {% if menu.title %}
+            <h6 class="mdc-list-group__subheader">
+                {{menu.title}}
+            </h6>
+            {% endif %}
+            {{display_menu_items(menu, level)}}
+        {% endif %}
+    {% endif %}
+{%- endmacro %}
+
+{% macro display_link(link, level ) -%}
+    {% if link.is_accessible %}
+    {% if level == 0 %}
+        <a class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Favorite"
+            href="{{link.url}}" 
+            {% if link.jrl %}jmb-on:click.prevent="{{link.jrl}}"{% endif %}
+            {# jmb-bind:class="{
+            'mdc-list-item--activated': 
+                (   
+                    {{link.active_for_exec_names|tojson|forceescape}}.some(function(en){return $local.componentsOnPage.includes(en)})
+                    || {{link.active_for_pathnames|tojson|forceescape}}.some(function(pn){return window.location.pathname === pn})
+                ) 
+            }" #}
+            >
+            {{link.icon|default('broken_image',true)}}
+        </a>
+    
+    {% else %}
+    <a class="mdc-list-item" role="menuitem"
+        href="{{link.url}}" 
+        {% if link.jrl %}jmb-on:click.prevent="{{link.jrl}}"{% endif %}
+        jmb-bind:class="{
+            'mdc-list-item--activated': 
+            (   
+                {{link.active_for_exec_names|tojson|forceescape}}.some(function(en){return $local.componentsOnPage.includes(en)})
+                || {{link.active_for_pathnames|tojson|forceescape}}.some(function(pn){return window.location.pathname === pn})
+            ) 
+        }">
+        <span class="mdc-list-item__ripple"></span>
+        {% if link.icon %}
+        <i class="material-icons mdc-list-item__graphic" aria-hidden="true">{{link.icon}}</i>
+        {% endif %}
+        <span class="mdc-list-item__text" style="white-space:nowrap;">{{link.title}}</span>
+    </a>
+    {% endif %}
+    {% endif %}
+{%- endmacro %}
+
+<div jmb-local="{componentsOnPage:[]}"
+     jmb-on:jembe-update-page.camel.window="$local.componentsOnPage = $jmb.componentsOnPage();"
+     style="display:inherit;">
+    {{display_menu(menu)}}
+</div>

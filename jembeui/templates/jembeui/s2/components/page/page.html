@@ -21,7 +21,8 @@
         <h3 class="mdc-drawer__title">{{title}}</h3>
         {# <h6 class="mdc-drawer__subtitle">email@material.io</h6> #}
     </div>
-    <div jmb-on:click="listItem = $event.target.closest('.mdc-list-item');if (listItem!==undefined && listItem!==null) {$refs.mdcDrawer._mdcDrawer.open = false}"
+    <div 
+      jmb-on:click="listItem = $event.target.closest('.mdc-list-item');if (listItem!==undefined && listItem!==null) {$refs.mdcDrawer._mdcDrawer.open = false}"
       class="mdc-drawer__content">
       {{component("_main_menu")}}
     </div>
@@ -35,26 +36,8 @@
           <span class="mdc-top-app-bar__title">{{title}}</span>
       </section>
       <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end" role="toolbar">
-          <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Favorite">favorite</button>
-          <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Search">search</button>
-          <div>
-            <button jmb-on:click.prevent.stop="menu=$refs.menu._mdcMenu; if(menu!==undefined) {menu.open = true}"
-                    class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Options">more_vert</button>
-            <div class="mdc-menu-surface--anchor">
-              <div jmb-ref="menu" class="mdc-menu mdc-menu-surface">
-                <ul class="mdc-list" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1">
-                  <li class="mdc-list-item" role="menuitem">
-                    <span class="mdc-list-item__ripple"></span>
-                    <span class="mdc-list-item__text">A Menu Item</span>
-                  </li>
-                  <li class="mdc-list-item" role="menuitem">
-                    <span class="mdc-list-item__ripple"></span>
-                    <span class="mdc-list-item__text">Another Menu Item</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
+        {{component("_system_menu")}}
+        {{component("_user_menu")}}
       </section>
     </div>
     {{component("_update_indicator")}}
