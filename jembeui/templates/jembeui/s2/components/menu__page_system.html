@@ -1,21 +1,3 @@
-{# <a class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Favorite">settings</a>
-<a class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Search">help</a>
-<a jmb-on:click.prevent.stop="menu=$refs.menu._mdcMenu; if(menu!==undefined) {menu.open = true}"
-        class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Options">more_vert</a>
-<div class="mdc-menu-surface--anchor">
-    <div jmb-ref="menu" class="mdc-menu mdc-menu-surface">
-    <nav class="mdc-list" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1">
-        <a class="mdc-list-item" role="menuitem">
-        <span class="mdc-list-item__ripple"></span>
-        <span class="mdc-list-item__text">A Menu Item</span>
-        </a>
-        <a class="mdc-list-item" role="menuitem">
-        <span class="mdc-list-item__ripple"></span>
-        <span class="mdc-list-item__text">Another Menu Item</span>
-        </a>
-    </nav>
-    </div>
-</div> #}
 {% macro display_menu_items(menu, level) -%}
     {% for mi in menu.items  %}
         {% if mi.is_menu %}
@@ -33,7 +15,7 @@
         {% elif level == 1 %}
         <div>
         <button jmb-on:click.prevent.stop="menu=$self.nextElementSibling.firstElementChild._mdcMenu; if(menu!==undefined) {menu.open = true}"
-                class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Options">
+                class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="{{menu.title}}" title="{{menu.title}}">
                 {{menu.icon|default('more_vert', true)}}
         </button>
         <div class="mdc-menu-surface--anchor">
@@ -69,6 +51,7 @@
                     || {{link.active_for_pathnames|tojson|forceescape}}.some(function(pn){return window.location.pathname === pn})
                 ) 
             }" #}
+            title="{{link.title}}"
             >
             {{link.icon|default('broken_image',true)}}
         </a>

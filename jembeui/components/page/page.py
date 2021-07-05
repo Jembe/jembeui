@@ -80,7 +80,6 @@ class CPage(CPageBase):
             system_menu: Optional[
                 Union["Menu", Sequence[Union["Link", "Menu"]]]
             ] = None,
-            user_menu: Optional[Union["Menu", Sequence[Union["Link", "Menu"]]]] = None,
             title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
             template: Optional[Union[str, Iterable[str]]] = None,
             components: Optional[Dict[str, "jembe.ComponentRef"]] = None,
@@ -105,13 +104,6 @@ class CPage(CPageBase):
                     CMenu.Config(
                         menu=system_menu,
                         template=CMenu.Config.template_variant("page_system"),
-                    ),
-                )
-            if "_user_menu" not in components:
-                components["_user_menu"] = (
-                    CMenu,
-                    CMenu.Config(
-                        menu=user_menu, template=CMenu.Config.template_variant("page_user")
                     ),
                 )
             super().__init__(
