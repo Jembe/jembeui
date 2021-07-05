@@ -424,3 +424,10 @@ a.main-menu__sub-menu__title:hover {
 .top-menu__link--indropdown {
     padding: 2px 0;
 }
+.top-menu__dropdown__submenu-title {
+    padding-top: 8px;
+    color: var(--grey-40);
+}
+.top-menu__dropdown__submenu {
+    padding-left: 8px;
+}
