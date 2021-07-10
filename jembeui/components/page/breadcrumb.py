@@ -1,4 +1,5 @@
 from typing import (
+    Any,
     List,
     Sequence,
     TYPE_CHECKING,
@@ -10,7 +11,7 @@ from typing import (
     Union,
 )
 from uuid import uuid4
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 from jembe import JembeInitParamSupport, listener
 from ..component import Component
 
@@ -100,7 +101,7 @@ class Breadcrumb:
 
 
 @dataclass
-class BreadcrumbItem:
+class BreadcrumbItem(JembeInitParamSupport):
     id: str
     title: str
     url: Optional[str]
@@ -110,80 +111,18 @@ class BreadcrumbItem:
     # all_parent_ids: List[str]
     # all_children_ids: List[str]
 
+    @classmethod
+    def dump_init_param(cls, value: "BreadcrumbItem") -> Any:
+        return asdict(value)
 
-# class Breadcrumb:
-#     def __init__(
-#         self,
-#         component_full_name: str,
-#         title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
-#     ) -> None:
-#         self._title: Union[str, Callable[["jembe.Component"], str]] = (
-#             title if title is not None else _get_default_breadcrumb_title
-#         )
-#         self.full_name = component_full_name
-
-#         self._binded_to: Optional["jembe.Component"] = None
-#         super().__init__()
-
-#     def bind_to(self, component: "jembe.Component") -> "Breadcrumb":
-#         bc = Breadcrumb(self.full_name, self._title)
-#         bc._binded_to = component
-#         return bc
-
-#     @property
-#     def title(self) -> str:
-#         if self._binded_to is None:
-#             raise ValueError(
-#                 "Breadcrumb must be binded to component before accessing its title"
-#             )
-#         if isinstance(self._title, str):
-#             return self._title
-#         return self._title(self.bind_to)
-
-#     @property
-#     def url(self) -> str:
-#         if self._binded_to is None:
-#             raise ValueError(
-#                 "Breadcrumb must be binded to component before accessing its url"
-#             )
-
-#         return self._binded_to.url
-
-#     @property
-#     def jrl(self) -> str:
-#         if self._binded_to is None:
-#             raise ValueError(
-#                 "Breadcrumb must be binded to component before accessing its jrl"
-#             )
-#         return self._binded_to.jrl
-
-#     @property
-#     def bclink(self) -> "BreadcrumbLink":
-#         return BreadcrumbLink(self.full_name, self.title, self.url, self.jrl)
-
-
-# class BreadcrumbGroup:
-#     def __init__(self, title: str, *full_names: str):
-#         self.title = title
-#         self.full_names: List[str] = list(full_names)
-
-#         super().__init__()
-
-
-# def breadcrumbs_from_menu(
-#     cls, menu: "Menu"
-# ) -> Sequence[Union["Breadcrumb", "BreadcrumbGroup"]]:
-#     raise NotImplementedError()
-
-
-# class BreadcrumbLink(JembeInitParamSupport):
-#     """Represents rendered breadcrumb link, (resolved breacrumb class instance)"""
-
-#     def __init__(self, full_name: str, title: str, url: str, jrl: str) -> None:
-#         self.full_name = full_name
-#         self.title = title
-#         self.url = url
-#         self.jrl = jrl
+    @classmethod
+    def load_init_param(cls, value: Any) -> Any:
+        return BreadcrumbItem(
+            id=value.get("id"),
+            title=value.get("title"),
+            url=value.get("url"),
+            jrl=value.get("jrl"),
+        )
 
 
 class CBreadcrumb(Component):
