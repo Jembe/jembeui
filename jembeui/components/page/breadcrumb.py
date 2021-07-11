@@ -141,7 +141,7 @@ class CBreadcrumb(Component):
 
         def __init__(
             self,
-            breadcrums: Sequence[Union["Breadcrumb", "BreadcrumbGroup"]],
+            breadcrums: Sequence["Breadcrumb"],
             title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
             template: Optional[Union[str, Iterable[str]]] = None,
             components: Optional[Dict[str, "jembe.ComponentRef"]] = None,
@@ -163,7 +163,7 @@ class CBreadcrumb(Component):
                 url_query_params=url_query_params,
             )
 
-    def __init__(self, bcs: Tuple[BreadcrumbLink, ...] = ()):
+    def __init__(self, bc_items: Tuple[BreadcrumbItem, ...] = ()):
         super().__init__()
 
     @listener(event="_display")
