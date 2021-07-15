@@ -1,6 +1,17 @@
 from typing import TYPE_CHECKING, Optional
 
-from .components import Component, CPage, CPageBase, CMenu, Link, ActionLink, URLLink, Menu
+from .components import (
+    Component,
+    CPage,
+    CPageBase,
+    CMenu,
+    Link,
+    ActionLink,
+    URLLink,
+    Menu,
+    Breadcrumb,
+    CBreadcrumb,
+)
 
 if TYPE_CHECKING:
     from flask import Flask
@@ -14,7 +25,9 @@ __all__ = (
     "Link",
     "ActionLink",
     "URLLink",
-    "Menu"
+    "Menu",
+    "Breadcrumb",
+    "CBreadcrumb",
 )
 
 

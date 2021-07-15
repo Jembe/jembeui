@@ -21,7 +21,7 @@ if TYPE_CHECKING:
     from jembeui import Menu
 
 
-__all__ = ("Bradcrumb", "CBreadcrumb")
+__all__ = ("Breadcrumb", "CBreadcrumb",)
 
 
 def _get_default_breadcrumb_title(component: "jembe.Component") -> str:
@@ -128,7 +128,7 @@ class Breadcrumb:
             )
 
     @classmethod
-    def from_menu(cls, menu: Menu):
+    def from_menu(cls, menu: "Menu"):
         raise NotImplementedError()
 
 
