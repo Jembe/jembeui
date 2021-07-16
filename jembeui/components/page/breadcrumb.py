@@ -274,18 +274,23 @@ class CBreadcrumb(Component):
                 # Ignore non link breadcrumb items
                 pass
             elif self._config.is_parent_breadcrumbitem(new_bitem, bitem):
+                # add in front of breadcrumbs and stop adding
                 bitems_new.append(new_bitem)
                 bitems_new.extend(self.state.bitems)
                 resolved = True
                 break
             elif new_bitem.id == bitem.id:
+                # replace existing bitem
                 bitems_new.append(new_bitem)
                 resolved = True
+                # TODO add all fresh bitem and bitems before freshones
                 break
             elif self._config.is_parent_breadcrumbitem(bitem, new_bitem):
+                # add new_bitem parent items
                 bitems_new.append(bitem)
             else:
-                bitems_new.append(new_bitem)
+                # start with new breadcrumb all together
+                bitems_new = [new_bitem]
                 resolved = True
                 break
 
