@@ -14,6 +14,7 @@ from .notifications import CPageNotifications
 from .syserror import CPageSystemError
 from .confirmation import CActionConfirmationDialog
 from .update_indicatior import CPageUpdateIndicator
+from .breadcrumb import Breadcrumb, CBreadcrumb
 from ..menu import CMenu
 
 if TYPE_CHECKING:
@@ -80,6 +81,7 @@ class CPage(CPageBase):
             system_menu: Optional[
                 Union["Menu", Sequence[Union["Link", "Menu"]]]
             ] = None,
+            breadcrumbs: Optional[Union["Breadcrumb", Sequence["Breadcrumb"]]] = None,
             title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
             template: Optional[Union[str, Iterable[str]]] = None,
             components: Optional[Dict[str, "jembe.ComponentRef"]] = None,
@@ -95,7 +97,8 @@ class CPage(CPageBase):
                 components["_main_menu"] = (
                     CMenu,
                     CMenu.Config(
-                        menu=main_menu, template=CMenu.Config.template_variant("page_main")
+                        menu=main_menu,
+                        template=CMenu.Config.template_variant("page_main"),
                     ),
                 )
             if "_system_menu" not in components:
@@ -105,6 +108,25 @@ class CPage(CPageBase):
                         menu=system_menu,
                         template=CMenu.Config.template_variant("page_system"),
                     ),
+                )
+            if "_breadcrumb" not in components:
+                if breadcrumbs is None:
+                    breadcrumbs = []
+                    try:
+                        breadcrumbs.append(Breadcrumb.from_menu(main_menu))
+                    except (ValueError):
+                        pass
+                    try:
+                        breadcrumbs.append(Breadcrumb.from_menu(system_menu))
+                    except (ValueError):
+                        pass
+
+                if isinstance(breadcrumbs, Breadcrumb):
+                    breadcrumbs = [breadcrumbs]
+
+                components["_breadcrumb"] = (
+                    CBreadcrumb,
+                    CBreadcrumb.Config(breadcrumbs=breadcrumbs),
                 )
             super().__init__(
                 title=title,

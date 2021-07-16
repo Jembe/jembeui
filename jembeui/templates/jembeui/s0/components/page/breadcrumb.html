@@ -1,0 +1,9 @@
+<div>
+    {% for bitem in bitems %}
+        {% if bitem.url %}
+            <a href="{{bitem.url}}" {% if bitem.jrl %}jmb-on:click.prevent="{{bitem.jrl}}"{% endif %}>{{bitem.title}}</a>
+        {% else %}
+            <span>{{bitem.title}}</span>
+        {% endif %}
+    {% endfor %}
+</div>
