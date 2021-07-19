@@ -11,8 +11,8 @@ from typing import (
     Tuple,
     Union,
 )
-from uuid import uuid4
-from dataclasses import asdict, dataclass, field
+from uuid import uuid3, NAMESPACE_DNS
+from dataclasses import dataclass, field
 from jembe import JembeInitParamSupport, listener
 from ..component import Component
 
@@ -49,10 +49,11 @@ class Breadcrumb:
         self.component_init_params = component_init_params
         self._children: List["Breadcrumb"] = list()
 
-        self.id = str(uuid4())
         self._parent: Optional[Breadcrumb] = None
         self._all_parents_ids: Set[str] = set()
         self._all_childrens_ids: Set[str] = set()
+
+        self.id: str = self._calc_id()
 
         if children is not None:
             self.children = children
@@ -61,6 +62,22 @@ class Breadcrumb:
             raise ValueError(
                 "Breadcrumb without component_full_name, can't have callable title!"
             )
+
+    def _calc_id(self) -> str:
+        idstr = "{}:::{}:::{}:::{}".format(
+            self.component_full_name,
+            self.title if isinstance(self.title, str) else "",
+            ",".join(self._all_parents_ids),
+            ",".join(
+                [
+                    c.component_full_name
+                    if c.component_full_name
+                    else (c.title if isinstance(c.title, str) else "")
+                    for c in self.children
+                ]
+            ),
+        )
+        return str(uuid3(NAMESPACE_DNS, idstr))
 
     @property
     def parent(self) -> Optional["Breadcrumb"]:
@@ -79,6 +96,7 @@ class Breadcrumb:
     def _update_all_parents_ids(self):
         self._all_parents_ids = set(self.parent._all_parents_ids)
         self._all_parents_ids.add(self.parent.id)
+        self.id = self._calc_id()
         for c in self.children:
             c._update_all_parents_ids()
 
@@ -165,7 +183,12 @@ class BreadcrumbItem(JembeInitParamSupport):
 
     @classmethod
     def dump_init_param(cls, value: "BreadcrumbItem") -> Any:
-        return asdict(value)
+        return dict(
+            id=value.id,
+            title=value.title,
+            url=value.url,
+            jrl=value.jrl,
+        )
 
     @classmethod
     def load_init_param(cls, value: Any) -> Any:
@@ -260,46 +283,92 @@ class CBreadcrumb(Component):
         if event.source_full_name not in self._config.breadcrumbs_mapping:
             # component that has been displayed does not have associated breadcrumb
             return
-        print("update breadcrumb:", event.source_full_name)
-        # update self.state.bitems remove all bitems after new_bitem
+
         new_bitem = self._config.breadcrumbs_mapping[event.source_full_name].get_item(
             event.source
         )
         new_bitem.fresh = True
         bitems_new: List[BreadcrumbItem] = []
-        resolved = False
-        # from pdb import set_trace; set_trace()
-        for bitem in self.state.bitems:
-            if not self._config.breadcrumbs_flat[bitem.id].is_link:
-                # Ignore non link breadcrumb items
-                pass
-            elif self._config.is_parent_breadcrumbitem(new_bitem, bitem):
-                # add in front of breadcrumbs and stop adding
-                bitems_new.append(new_bitem)
-                bitems_new.extend(self.state.bitems)
-                resolved = True
-                break
-            elif new_bitem.id == bitem.id:
-                # replace existing bitem
-                bitems_new.append(new_bitem)
-                resolved = True
-                # TODO add all fresh bitem and bitems before freshones
-                break
-            elif self._config.is_parent_breadcrumbitem(bitem, new_bitem):
-                # add new_bitem parent items
-                bitems_new.append(bitem)
-            else:
-                # start with new breadcrumb all together
-                bitems_new = [new_bitem]
-                resolved = True
-                break
 
-        if not resolved:
-            if (
-                len(bitems_new) > 0
-                and self._config.is_parent_breadcrumbitem(bitems_new[-1], new_bitem)
-            ) or len(bitems_new) == 0:
+        if len(self.state.bitems) == 0:
+            bitems_new = [new_bitem]
+        elif self._config.is_parent_breadcrumbitem(new_bitem, self.state.bitems[0]):
+            # first item in bitems is child of new_bitem
+            bitems_new = [new_bitem]
+            bitems_new.extend(
+                [
+                    bi
+                    for bi in self.state.bitems
+                    if self._config.breadcrumbs_flat[bi.id].is_link
+                ]
+            )
+        elif self._config.is_parent_breadcrumbitem(self.state.bitems[-1], new_bitem):
+            # last item in bitems is parent of new_bitem
+            bitems_new.extend(
+                [
+                    bi
+                    for bi in self.state.bitems
+                    if self._config.breadcrumbs_flat[bi.id].is_link
+                ]
+            )
+            bitems_new.append(new_bitem)
+        else:
+            # find index of same item in bitems
+            same_index: Optional[int] = None
+            parent_index: Optional[int] = None
+            last_fresh_index: Optional[int] = None
+            for index, bi in enumerate(self.state.bitems):
+                if bi.id == new_bitem.id:
+                    same_index = index
+                elif self._config.is_parent_breadcrumbitem(bi, new_bitem):
+                    parent_index = index
+                if bi.fresh:
+                    last_fresh_index = index
+
+            if same_index is not None:
+                # replace same element and add all elements after it which
+                # are fresh or behind the fresh ones
+                bitems_new.extend(
+                    [
+                        bi
+                        for bi in self.state.bitems[:same_index]
+                        if self._config.breadcrumbs_flat[bi.id].is_link
+                    ]
+                )
                 bitems_new.append(new_bitem)
+                if last_fresh_index is not None:
+                    bitems_new.extend(
+                        [
+                            bi
+                            for bi in self.state.bitems[
+                                same_index + 1 : last_fresh_index + 1
+                            ]
+                            if self._config.breadcrumbs_flat[bi.id].is_link
+                        ]
+                    )
+            elif parent_index is not None:
+                # add new bitem after its parent and dich all other that
+                # was prevously after the parent
+                bitems_new.extend(
+                    [
+                        bi
+                        for bi in self.state.bitems[: parent_index + 1]
+                        if self._config.breadcrumbs_flat[bi.id].is_link
+                    ]
+                )
+                bitems_new.append(new_bitem)
+            else:
+                # new bitem is out of existing breadcrumb context/tree
+                if last_fresh_index is not None:
+                    # dich new one if there are fresh ones in existing breadcrumb
+                    bitems_new = [
+                        bi
+                        for bi in self.state.bitems
+                        if self._config.breadcrumbs_flat[bi.id].is_link
+                    ]
+                else:
+                    # start new breadcrumb if old one does not have fresh ones
+                    bitems_new = [new_bitem]
 
         # add non link breadcrumbs (up to max tree consecutive non link)
         bitems_new_ext: List[BreadcrumbItem] = list()
@@ -318,19 +387,7 @@ class CBreadcrumb(Component):
                     ):
                         non_links.append(bdef.parent.parent.parent.get_item())
                 bitems_new_ext.extend(reversed(non_links))
-            else:
-                bitems_new_ext.append(bitem)
+            bitems_new_ext.append(bitem)
         self.state.bitems = tuple(bitems_new_ext)
 
-    def display(self) -> "jembe.DisplayResponse":
-        #     # init breadcrumbs based on self.state.bcs and add bradcrumb groups in it
-        #     # bindit to components and add parent
-        #     self.breadcrumbs: List[] = []
-        print("Displaying breadcrumb", self.state.bitems)
-        return super().display()
-
-
-# TODO separate breadcrumb config classes from actual breadcrumb items used inside running component
-# Breadcrum component need to have just title:str and full_name nothing more or nothing less
-# parent type navigation should be removed use regular list instead
-#
+# TODO home link dosent reset itself
