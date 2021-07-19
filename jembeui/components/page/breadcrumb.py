@@ -13,7 +13,7 @@ from typing import (
 )
 from uuid import uuid3, NAMESPACE_DNS
 from dataclasses import dataclass, field
-from jembe import JembeInitParamSupport, listener
+from jembe import JembeInitParamSupport, component, listener, ComponentReference
 from ..component import Component
 
 if TYPE_CHECKING:
@@ -129,24 +129,28 @@ class Breadcrumb:
         return self.component_full_name is not None
 
     def get_item(
-        self, component: Optional["jembe.Component"] = None
+        self,
+        from_component: "jembe.Component",
+        to_component: Optional["jembe.Component"] = None,
     ) -> "BreadcrumbItem":
-        if component and component._config.full_name == self.component_full_name:
-            component_reference = (
-                component.component(".", **self.component_init_params)
+        if to_component and to_component._config.full_name == self.component_full_name:
+            component_reference = ComponentReference.factory(
+                caller_exec_name=from_component.exec_name,
+                name=self.component_full_name,
+                kwargs=self.component_init_params
                 if self.component_init_params is not None
-                else component.component_reset(".")
+                else dict(),
             )
             return BreadcrumbItem(
                 self.id,
-                self.title if isinstance(self.title, str) else self.title(component),
+                self.title if isinstance(self.title, str) else self.title(to_component),
                 component_reference.url,
                 component_reference.jrl,
             )
         else:
             return BreadcrumbItem(
                 self.id,
-                self.title if isinstance(self.title, str) else self.title(component),
+                self.title if isinstance(self.title, str) else self.title(to_component),
                 None,
                 None,
             )
@@ -285,7 +289,7 @@ class CBreadcrumb(Component):
             return
 
         new_bitem = self._config.breadcrumbs_mapping[event.source_full_name].get_item(
-            event.source
+            self, event.source
         )
         new_bitem.fresh = True
         bitems_new: List[BreadcrumbItem] = []
@@ -378,16 +382,14 @@ class CBreadcrumb(Component):
                 # support nesting non link breadcrumb witout recursion
                 # (bad programing but i dont care)
                 non_links = []
-                non_links.append(bdef.parent.get_item())
+                non_links.append(bdef.parent.get_item(self))
                 if bdef.parent.parent and not bdef.parent.parent.is_link:
-                    non_links.append(bdef.parent.parent.get_item())
+                    non_links.append(bdef.parent.parent.get_item(self))
                     if (
                         bdef.parent.parent.parent
                         and not bdef.parent.parent.parent.is_link
                     ):
-                        non_links.append(bdef.parent.parent.parent.get_item())
+                        non_links.append(bdef.parent.parent.parent.get_item(self))
                 bitems_new_ext.extend(reversed(non_links))
             bitems_new_ext.append(bitem)
         self.state.bitems = tuple(bitems_new_ext)
-
-# TODO home link dosent reset itself
