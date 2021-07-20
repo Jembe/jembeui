@@ -333,39 +333,12 @@ class ActionLink(Link):
     def _str_to_component_reference_lambda(
         self, to_str: str
     ) -> Callable[["jembe.Component"], "jembe.ComponentReference"]:
-        def absolute_component_reference(to_str: str, comp: "jembe.Component"):
-            return comp.component(to_str, **self.init_params)
-            # support simple exec name of component like /main/dash etc.
-            # c_names = to_str.split("/")[1:]
-            # do_reset_params = len(c_names) == 1
-            # cr: "jembe.ComponentReference" = component(
-            #     "/{}".format(c_names[0]), do_reset_params
-            # )
-            # for index, name in enumerate(c_names[1:]):
-            #     if index == len(c_names) - 2:
-            #         cr = cr.component_reset(name)
-            #     else:
-            #         cr = cr.component(name)
-            # cr.kwargs = self.init_params.copy()
-            # return cr
-
-        def relative_component_reference(to_str: str, comp: "jembe.Component"):
-            # TODO simplify with comp.component(to_string, **self.init_params)
-            c_names = to_str.split("/")
-            cr: "jembe.ComponentReference" = (
-                comp.component(c_names[0])
-                if not c_names[0].endswith("()")
-                else comp.component().call(c_names[0][:-2])
-            )
-            for name in c_names[1:]:
-                cr = cr.component(name)
-            cr.kwargs = self.init_params.copy()
-            return cr
-
-        if to_str.startswith("/"):
-            return partial(absolute_component_reference, to_str)
+        if to_str.endswith("()"):
+            if "/" in to_str:
+                raise ValueError("Action call shortcut cann't be used on subcomponents.")
+            return lambda component: component.component().call(to_str[:-2], **self.init_params)
         else:
-            return partial(relative_component_reference, to_str)
+            return lambda component: component.component(to_str, **self.init_params)
 
 
 @dataclass
