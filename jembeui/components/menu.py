@@ -31,7 +31,7 @@ class Link(ABC):
         active_for_pathnames: Optional[Sequence[str]] = None,
         active_for_exec_names: Optional[Sequence[str]] = None,
     ):
-        self.callable_params: dict = dict()
+        self.params: dict = dict()
         self.binded_to: Optional["jembe.Component"] = None
 
         self._active_for_pathnames: Optional[Tuple[str, ...]] = (
@@ -115,9 +115,9 @@ class Link(ABC):
         """Add additional paramas for callables and resets previous ones"""
         # setting additional params can change link output
         link = copy(self)
-        link.callable_params = dict()
+        link.params = dict()
         for k, v in kwargs.items():
-            link.callable_params[k] = v
+            link.params[k] = v
         return link
 
     @property
@@ -160,7 +160,7 @@ class URLLink(Link):
         elif isinstance(self._url, str):
             return self._url
         else:
-            return self._url(self, **self.callable_params)  # type:ignore
+            return self._url(self)
 
     @property
     def jrl(self) -> Optional[str]:
@@ -185,14 +185,14 @@ class URLLink(Link):
         self._chek_binded()
         if isinstance(self._is_accessible, bool):
             return self._is_accessible
-        return self._is_accessible(self, **self.callable_params)  # type:ignore
+        return self._is_accessible(self)
 
     @property
     def title(self) -> str:
         self._chek_binded()
         if isinstance(self._title, str):
             return self._title
-        return self._title(self, **self.callable_params)  # type:ignore
+        return self._title(self) 
 
     @property
     def description(self) -> Optional[str]:
@@ -201,7 +201,7 @@ class URLLink(Link):
             return None
         elif isinstance(self._description, str):
             return self._description
-        return self._description(self, **self.callable_params)  # type:ignore
+        return self._description(self)
 
     @property
     def icon(self) -> Optional[str]:
@@ -211,7 +211,7 @@ class URLLink(Link):
             return None
         elif isinstance(self._icon, str):
             return self._icon
-        return self._icon(self, **self.callable_params)  # type:ignore
+        return self._icon(self)
 
     @property
     def icon_html(self) -> Optional[str]:
@@ -225,7 +225,7 @@ class URLLink(Link):
             return None
         elif isinstance(self._icon_html, str):
             return self._icon_html
-        return self._icon_html(self, **self.callable_params)  # type:ignore
+        return self._icon_html(self)
 
 
 class ActionLink(Link):
@@ -238,7 +238,7 @@ class ActionLink(Link):
         icon_html: Optional[Union[str, Callable[["Link"], str]]] = None,
         active_for_pathnames: Optional[Sequence[str]] = None,
         active_for_exec_names: Optional[Sequence[str]] = None,
-        **callable_params
+        init_params:Optional[dict] = None
     ):
         self._to = to
         self._title = title
@@ -249,7 +249,7 @@ class ActionLink(Link):
             active_for_pathnames=active_for_pathnames,
             active_for_exec_names=active_for_exec_names,
         )
-        self.callable_params = callable_params
+        self.init_params = init_params if init_params else dict()
 
     @property
     def is_internal(self) -> bool:
@@ -282,29 +282,29 @@ class ActionLink(Link):
 
     @property
     def title(self) -> str:
-        self._chek_binded()
         if isinstance(self._title, str):
             return self._title
-        return self._title(self, **self.callable_params)  # type:ignore
+        self._chek_binded()
+        return self._title(self)
 
     @property
     def description(self) -> Optional[str]:
-        self._chek_binded()
         if self._description is None:
             return None
         elif isinstance(self._description, str):
             return self._description
-        return self._description(self, **self.callable_params)  # type:ignore
+        self._chek_binded()
+        return self._description(self)
 
     @property
     def icon(self) -> Optional[str]:
         """Name of the icon if it is supported by JUI Style"""
-        self._chek_binded()
         if self._icon is None:
             return None
         elif isinstance(self._icon, str):
             return self._icon
-        return self._icon(self, **self.callable_params)  # type:ignore
+        self._chek_binded()
+        return self._icon(self)
 
     @property
     def icon_html(self) -> Optional[str]:
@@ -313,12 +313,12 @@ class ActionLink(Link):
 
         Used only if icon is None
         """
-        self._chek_binded()
         if self._icon_html is None:
             return None
         elif isinstance(self._icon_html, str):
             return self._icon_html
-        return self._icon_html(self, **self.callable_params)  # type:ignore
+        self._chek_binded()
+        return self._icon_html(self)
 
     @cached_property
     def _component_reference(self) -> "jembe.ComponentReference":
@@ -334,21 +334,23 @@ class ActionLink(Link):
         self, to_str: str
     ) -> Callable[["jembe.Component"], "jembe.ComponentReference"]:
         def absolute_component_reference(to_str: str, comp: "jembe.Component"):
+            return comp.component(to_str, **self.init_params)
             # support simple exec name of component like /main/dash etc.
-            c_names = to_str.split("/")[1:]
-            do_reset_params = len(c_names) == 1
-            cr: "jembe.ComponentReference" = component(
-                "/{}".format(c_names[0]), do_reset_params
-            )
-            for index, name in enumerate(c_names[1:]):
-                if index == len(c_names) - 2:
-                    cr = cr.component_reset(name)
-                else:
-                    cr = cr.component(name)
-            cr.kwargs = self.callable_params.copy()
-            return cr
+            # c_names = to_str.split("/")[1:]
+            # do_reset_params = len(c_names) == 1
+            # cr: "jembe.ComponentReference" = component(
+            #     "/{}".format(c_names[0]), do_reset_params
+            # )
+            # for index, name in enumerate(c_names[1:]):
+            #     if index == len(c_names) - 2:
+            #         cr = cr.component_reset(name)
+            #     else:
+            #         cr = cr.component(name)
+            # cr.kwargs = self.init_params.copy()
+            # return cr
 
         def relative_component_reference(to_str: str, comp: "jembe.Component"):
+            # TODO simplify with comp.component(to_string, **self.init_params)
             c_names = to_str.split("/")
             cr: "jembe.ComponentReference" = (
                 comp.component(c_names[0])
@@ -357,7 +359,7 @@ class ActionLink(Link):
             )
             for name in c_names[1:]:
                 cr = cr.component(name)
-            cr.kwargs = self.callable_params.copy()
+            cr.kwargs = self.init_params.copy()
             return cr
 
         if to_str.startswith("/"):
@@ -373,7 +375,7 @@ class Menu:
     description: Optional[Union[str, Callable[["Menu"], str]]] = None
     icon: Optional[Union[str, Callable[["Menu"], str]]] = None
     icon_html: Optional[Union[str, Callable[["Menu"], str]]] = None
-    callable_params: Dict[str, Any] = field(default_factory=dict)
+    params: Dict[str, Any] = field(default_factory=dict)
 
     id: str = field(default="", init=False)
     binded: bool = field(default=False, init=False)
@@ -388,7 +390,7 @@ class Menu:
             description=self.description,
             icon=self.icon,
             icon_html=self.icon_html,
-            callable_params=self.callable_params,
+            params=self.params,
         )
         binded_menu.id = self.id
         binded_menu.items = [item.bind_to(component) for item in self.items]

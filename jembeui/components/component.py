@@ -40,6 +40,7 @@ class Component(jembe.Component):
         def __init__(
             self,
             title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
+            #TODO add breadcrumb resets params
             template: Optional[Union[str, Iterable[str]]] = None,
             components: Optional[Dict[str, "jembe.ComponentRef"]] = None,
             inject_into_components: Optional[

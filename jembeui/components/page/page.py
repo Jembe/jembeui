@@ -112,14 +112,8 @@ class CPage(CPageBase):
             if "_breadcrumb" not in components:
                 if breadcrumbs is None:
                     breadcrumbs = []
-                    try:
-                        breadcrumbs.append(Breadcrumb.from_menu(main_menu))
-                    except (ValueError):
-                        pass
-                    try:
-                        breadcrumbs.append(Breadcrumb.from_menu(system_menu))
-                    except (ValueError):
-                        pass
+                    breadcrumbs.extend(Breadcrumb.from_menu(main_menu, True))
+                    breadcrumbs.extend(Breadcrumb.from_menu(system_menu))
 
                 if isinstance(breadcrumbs, Breadcrumb):
                     breadcrumbs = [breadcrumbs]

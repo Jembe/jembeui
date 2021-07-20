@@ -1,9 +1,9 @@
 from typing import (
+    TYPE_CHECKING,
     Any,
     List,
     Sequence,
     Set,
-    TYPE_CHECKING,
     Callable,
     Dict,
     Iterable,
@@ -13,12 +13,13 @@ from typing import (
 )
 from uuid import uuid3, NAMESPACE_DNS
 from dataclasses import dataclass, field
-from jembe import JembeInitParamSupport, component, listener, ComponentReference
+from jembe import JembeInitParamSupport, listener
 from ..component import Component
+from ..menu import ActionLink, Menu
 
 if TYPE_CHECKING:
     import jembe
-    from jembeui import Menu, Link
+    from jembeui import Link
 
 
 __all__ = (
@@ -134,12 +135,13 @@ class Breadcrumb:
         to_component: Optional["jembe.Component"] = None,
     ) -> "BreadcrumbItem":
         if to_component and to_component._config.full_name == self.component_full_name:
-            component_reference = ComponentReference.factory(
-                caller_exec_name=from_component.exec_name,
-                name=self.component_full_name,
-                kwargs=self.component_init_params
-                if self.component_init_params is not None
-                else dict(),
+            component_reference = from_component.component(
+                self.component_full_name,
+                **(
+                    self.component_init_params
+                    if self.component_init_params is not None
+                    else dict()
+                )
             )
             return BreadcrumbItem(
                 self.id,
@@ -156,8 +158,66 @@ class Breadcrumb:
             )
 
     @classmethod
-    def from_menu(cls, menu: Optional[Union["Menu", Sequence[Union["Link", "Menu"]]]]):
-        raise NotImplementedError()
+    def from_menu(
+        cls,
+        menu: Optional[Union["Menu", Sequence[Union["Link", "Menu"]]]],
+        first_home: bool = False,
+    ) -> Sequence["Breadcrumb"]:
+        if menu is None:
+            return list()
+        menu_source: "Menu" = Menu(menu) if not isinstance(menu, Menu) else menu
+        if not first_home:
+            return cls._from_menu_item(menu_source)
+        else:
+            home_menu = menu_source.items[0]
+            if not isinstance(home_menu, ActionLink):
+                raise ValueError(
+                    "First item in menu must be action link when using first_home=True"
+                )
+            home = cls._from_menu_item(home_menu)[0]
+            children: List["Breadcrumb"] = list()
+            for menu_item in menu_source.items[1:]:
+                children.extend(cls._from_menu_item(menu_item))
+            home.children = children
+            return [home]
+
+    @classmethod
+    def _from_menu_item(cls, menu_item: Union[Menu, "Link"]) -> Sequence["Breadcrumb"]:
+        if isinstance(menu_item, Menu):
+            menu = menu_item
+            parent_bc: Optional["Breadcrumb"] = (
+                Breadcrumb(title=menu.title)
+                if menu.title is not None and isinstance(menu.title, str)
+                else None
+            )
+            children: List["Breadcrumb"] = list()
+            for mi in menu.items:
+                children.extend(cls._from_menu_item(mi))
+            if parent_bc:
+                parent_bc.children = children
+                return [parent_bc]
+            else:
+                return children
+        elif isinstance(menu_item, ActionLink):
+            if not isinstance(menu_item._to, str):
+                raise ValueError(
+                    "ActionLink {}: only component full_name is supported for "
+                    "action_link 'to' parameter, when converting it to breadcrumb".format(
+                        menu_item
+                    )
+                )
+            return [
+                Breadcrumb(
+                    component_full_name=menu_item._to,
+                    component_init_params=menu_item.init_params,
+                    title=menu_item.title
+                    if isinstance(menu_item.title, str)
+                    else lambda component: component.title,
+                )
+            ]
+        else:
+            # ignore URL links
+            return []
 
     def find_by_component(self, component_full_name: str) -> "Breadcrumb":
         """
@@ -165,6 +225,7 @@ class Breadcrumb:
 
         Raises ValueError if matching breadcrumb does not exist.
         """
+        # TODO
         raise NotImplementedError()
 
     def find_by_title(self, title: str) -> "Breadcrumb":
@@ -173,6 +234,7 @@ class Breadcrumb:
 
         Raises ValueError if matching breadcrumb does not exist.
         """
+        # TODO
         raise NotImplementedError()
 
 
