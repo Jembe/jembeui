@@ -21,17 +21,24 @@ if TYPE_CHECKING:
     import jembe
     from ..menu import Menu, Link
 
-__all__ = ("CPageBase", "CPage")
+__all__ = ("CPage",)
 
 
-class CPageBase(Component):
-    """Page Base classes for displaying empty page without navigation and layout"""
+class CPage(Component):
+    """Page with navigation and layoute"""
 
     class Config(Component.Config):
-        default_template_exp = "jembeui/{style}/components/page/page_base.html"
+        default_template_exp = "jembeui/{style}/components/page/page.html"
+        TEMPLATE_VARIANTS = ("clean",)
 
         def __init__(
             self,
+            main_menu: Optional[Union["Menu", Sequence[Union["Link", "Menu"]]]] = None,
+            system_menu: Optional[
+                Union["Menu", Sequence[Union["Link", "Menu"]]]
+            ] = None,
+            breadcrumbs: Optional[Union["Breadcrumb", Sequence["Breadcrumb"]]] = None,
+            main_menu_first_is_breadcrumb_home: bool = True,
             title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
             template: Optional[Union[str, Iterable[str]]] = None,
             components: Optional[Dict[str, "jembe.ComponentRef"]] = None,
@@ -56,43 +63,6 @@ class CPageBase(Component):
                 components["_action_confirmation"] = CActionConfirmationDialog
             if "_update_indicator" not in components:
                 components["_update_indicator"] = CPageUpdateIndicator
-
-            super().__init__(
-                title=title,
-                template=template,
-                components=components,
-                inject_into_components=inject_into_components,
-                redisplay=redisplay,
-                changes_url=changes_url,
-                url_query_params=url_query_params,
-            )
-
-
-class CPage(CPageBase):
-    """Page with navigation and layoute"""
-
-    class Config(CPageBase.Config):
-        default_template_exp = "jembeui/{style}/components/page/page.html"
-
-        def __init__(
-            self,
-            main_menu: Optional[Union["Menu", Sequence[Union["Link", "Menu"]]]] = None,
-            system_menu: Optional[
-                Union["Menu", Sequence[Union["Link", "Menu"]]]
-            ] = None,
-            breadcrumbs: Optional[Union["Breadcrumb", Sequence["Breadcrumb"]]] = None,
-            main_menu_first_is_breadcrumb_home: bool = True,
-            title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
-            template: Optional[Union[str, Iterable[str]]] = None,
-            components: Optional[Dict[str, "jembe.ComponentRef"]] = None,
-            inject_into_components: Optional[
-                Callable[["jembe.Component", "jembe.ComponentConfig"], dict]
-            ] = None,
-            redisplay: Tuple["jembe.RedisplayFlag", ...] = (),
-            changes_url: bool = True,
-            url_query_params: Optional[Dict[str, str]] = None,
-        ):
-            components = components if components is not None else dict()
             if "_main_menu" not in components:
                 components["_main_menu"] = (
                     CMenu,

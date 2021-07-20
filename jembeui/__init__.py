@@ -3,7 +3,6 @@ from typing import TYPE_CHECKING, Optional
 from .components import (
     Component,
     CPage,
-    CPageBase,
     CMenu,
     Link,
     ActionLink,
@@ -20,7 +19,6 @@ __all__ = (
     "JembeUI",
     "Component",
     "CPage",
-    "CPageBase",
     "CMenu",
     "Link",
     "ActionLink",
