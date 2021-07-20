@@ -20,27 +20,10 @@ class Component(jembe.Component):
         default_template_exp = "jembeui/{style}/components/component.html"
         TEMPLATE_VARIANTS: Tuple[str, ...] = ()
 
-        @classmethod
-        def template_variant(cls, variant):
-            if variant not in cls.TEMPLATE_VARIANTS:
-                raise ValueError(
-                    "Invalid template variant '{}'. Valid variatns are: {}".format(
-                        variant, cls.TEMPLATE_VARIANTS
-                    )
-                )
-            dte_split = cls.default_template_exp.split(".")
-            dte_split[-2] = dte_split[-2] + "__" + "{variant}"
-            variant_template_exp = ".".join(dte_split)
-            return variant_template_exp.format(
-                style=current_app.config.get("JEMBEUI_STYLE", "s0"), variant=variant
-            )
-
-        default_title = "Jembe Component"
-
         def __init__(
             self,
             title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
-            #TODO add breadcrumb resets params
+            # TODO add breadcrumb resets params
             template: Optional[Union[str, Iterable[str]]] = None,
             components: Optional[Dict[str, "jembe.ComponentRef"]] = None,
             inject_into_components: Optional[
@@ -83,6 +66,24 @@ class Component(jembe.Component):
                 changes_url=changes_url,
                 url_query_params=url_query_params,
             )
+
+        @classmethod
+        def template_variant(cls, variant):
+            if variant not in cls.TEMPLATE_VARIANTS:
+                raise ValueError(
+                    "Invalid template variant '{}'. Valid variatns are: {}".format(
+                        variant, cls.TEMPLATE_VARIANTS
+                    )
+                )
+            dte_split = cls.default_template_exp.split(".")
+            dte_split[-2] = dte_split[-2] + "__" + "{variant}"
+            variant_template_exp = ".".join(dte_split)
+            return variant_template_exp.format(
+                style=current_app.config.get("JEMBEUI_STYLE", "s0"), variant=variant
+            )
+
+        def default_title(self, component:"jembe.Component") -> str:
+            return self.name.replace("_", " ").title()
 
     _config: Config
 

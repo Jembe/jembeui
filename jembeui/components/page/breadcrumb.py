@@ -199,20 +199,23 @@ class Breadcrumb:
             else:
                 return children
         elif isinstance(menu_item, ActionLink):
-            if not isinstance(menu_item._to, str):
+            # TODO remove this tight dependency
+            if not isinstance(menu_item._to, str) or menu_item._to.endswith("()"):
                 raise ValueError(
                     "ActionLink {}: only component full_name is supported for "
                     "action_link 'to' parameter, when converting it to breadcrumb".format(
                         menu_item
                     )
                 )
+            try:
+                title: Union[str, Callable[["jembe.Component"], str]] = menu_item.title
+            except ValueError:
+                title = lambda component: component.title
             return [
                 Breadcrumb(
                     component_full_name=menu_item._to,
-                    component_init_params=menu_item.init_params,
-                    title=menu_item.title
-                    if isinstance(menu_item.title, str)
-                    else lambda component: component.title,
+                    component_init_params=menu_item.action_params,
+                    title=title,
                 )
             ]
         else:

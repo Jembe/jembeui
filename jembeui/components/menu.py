@@ -232,13 +232,13 @@ class ActionLink(Link):
     def __init__(
         self,
         to: Union[str, Callable[["jembe.Component"], "jembe.ComponentReference"]],
-        title: Union[str, Callable[["Link"], str]],
+        title: Optional[Union[str, Callable[["Link"], str]]] = None,
         description: Optional[Union[str, Callable[["Link"], str]]] = None,
         icon: Optional[Union[str, Callable[["Link"], str]]] = None,
         icon_html: Optional[Union[str, Callable[["Link"], str]]] = None,
         active_for_pathnames: Optional[Sequence[str]] = None,
         active_for_exec_names: Optional[Sequence[str]] = None,
-        init_params:Optional[dict] = None
+        action_params:Optional[dict] = None
     ):
         self._to = to
         self._title = title
@@ -249,7 +249,7 @@ class ActionLink(Link):
             active_for_pathnames=active_for_pathnames,
             active_for_exec_names=active_for_exec_names,
         )
-        self.init_params = init_params if init_params else dict()
+        self.action_params = action_params if action_params else dict()
 
     @property
     def is_internal(self) -> bool:
@@ -285,6 +285,8 @@ class ActionLink(Link):
         if isinstance(self._title, str):
             return self._title
         self._chek_binded()
+        if self._title is None:
+            return self._component_reference.component_instance.title
         return self._title(self)
 
     @property
@@ -336,9 +338,9 @@ class ActionLink(Link):
         if to_str.endswith("()"):
             if "/" in to_str:
                 raise ValueError("Action call shortcut cann't be used on subcomponents.")
-            return lambda component: component.component().call(to_str[:-2], **self.init_params)
+            return lambda component: component.component().call(to_str[:-2], **self.action_params)
         else:
-            return lambda component: component.component(to_str, **self.init_params)
+            return lambda component: component.component(to_str, **self.action_params)
 
 
 @dataclass

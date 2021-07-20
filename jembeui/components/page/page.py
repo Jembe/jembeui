@@ -29,7 +29,6 @@ class CPageBase(Component):
 
     class Config(Component.Config):
         default_template_exp = "jembeui/{style}/components/page/page_base.html"
-        default_title = "JembeUI Page"
 
         def __init__(
             self,
@@ -82,6 +81,7 @@ class CPage(CPageBase):
                 Union["Menu", Sequence[Union["Link", "Menu"]]]
             ] = None,
             breadcrumbs: Optional[Union["Breadcrumb", Sequence["Breadcrumb"]]] = None,
+            main_menu_first_is_breadcrumb_home: bool = True,
             title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
             template: Optional[Union[str, Iterable[str]]] = None,
             components: Optional[Dict[str, "jembe.ComponentRef"]] = None,
@@ -112,7 +112,11 @@ class CPage(CPageBase):
             if "_breadcrumb" not in components:
                 if breadcrumbs is None:
                     breadcrumbs = []
-                    breadcrumbs.extend(Breadcrumb.from_menu(main_menu, True))
+                    breadcrumbs.extend(
+                        Breadcrumb.from_menu(
+                            main_menu, main_menu_first_is_breadcrumb_home
+                        )
+                    )
                     breadcrumbs.extend(Breadcrumb.from_menu(system_menu))
 
                 if isinstance(breadcrumbs, Breadcrumb):
