@@ -9,10 +9,10 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.2/css/bulma.min.css">
     <link rel="stylesheet" href="{{url_for('jembeui.static', filename='jembeui/s1/css/main.css')}}">
 </head>
-<body>
+<body class="has-navbar-fixed-top">
     {{component("_update_indicator")}}
     {# Navigation #}
-    <nav class="navbar has-shadow" role="navigation" aria-label="main navigation">
+    <nav class="navbar container has-shadow is-fixed-top" role="navigation" aria-label="main navigation">
     <div class="navbar-brand">
         <a class="navbar-item has-text-weight-medium is-size-5" href="{{url_for('index')}}">{{title}}</a>
 
@@ -34,6 +34,9 @@
     </div>
     </nav>
 
+    <div class="container my-2 px-3">
+        {{component("_breadcrumb")}}
+    </div>
 
     <section class="section">
         <div class="container">
@@ -42,8 +45,11 @@
         </div>
     </section>
 
-    {% block page_content %}
-    {% endblock page_content %}
+    <section class="section">
+        <div class="container">
+            {% block page_content %}{% endblock page_content %}
+        </div>
+    </section>
 
     {{component("_notifications")}}
     {{component("_syserror")}}

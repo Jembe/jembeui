@@ -1,0 +1,15 @@
+<nav class="breadcrumb is-small" aria-label="breadcrumbs">
+  <ul>
+    {% for bitem in bitems %}
+        {% if bitem.url %}
+        <li {% if loop.last%}class="is-active"{% endif %}>
+            <a href="{{bitem.url}}" {% if bitem.jrl %}jmb-on:click.prevent="{{bitem.jrl}}"{% endif %}>
+                {{bitem.title}}
+            </a>
+        </li>
+        {% else %}
+         <li><span>{{bitem.title}}</span></li>
+        {% endif %}
+    {% endfor %}
+  </ul>
+</nav>
