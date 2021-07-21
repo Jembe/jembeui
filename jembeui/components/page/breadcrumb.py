@@ -199,8 +199,9 @@ class Breadcrumb:
             else:
                 return children
         elif isinstance(menu_item, ActionLink):
-            # TODO remove this tight dependency
-            if not isinstance(menu_item._to, str) or menu_item._to.endswith("()"):
+            try:
+                to_full_name = menu_item.to_full_name
+            except ValueError:
                 raise ValueError(
                     "ActionLink {}: only component full_name is supported for "
                     "action_link 'to' parameter, when converting it to breadcrumb".format(
@@ -213,7 +214,7 @@ class Breadcrumb:
                 title = lambda component: component.title
             return [
                 Breadcrumb(
-                    component_full_name=menu_item._to,
+                    component_full_name=to_full_name,
                     component_init_params=menu_item.action_params,
                     title=title,
                 )

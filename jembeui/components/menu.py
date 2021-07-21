@@ -121,7 +121,7 @@ class Link(ABC):
         return link
 
     @property
-    def is_menu(self) ->bool:
+    def is_menu(self) -> bool:
         return False
 
 
@@ -192,7 +192,7 @@ class URLLink(Link):
         self._chek_binded()
         if isinstance(self._title, str):
             return self._title
-        return self._title(self) 
+        return self._title(self)
 
     @property
     def description(self) -> Optional[str]:
@@ -238,7 +238,7 @@ class ActionLink(Link):
         icon_html: Optional[Union[str, Callable[["Link"], str]]] = None,
         active_for_pathnames: Optional[Sequence[str]] = None,
         active_for_exec_names: Optional[Sequence[str]] = None,
-        action_params:Optional[dict] = None
+        action_params: Optional[dict] = None,
     ):
         self._to = to
         self._title = title
@@ -250,6 +250,18 @@ class ActionLink(Link):
             active_for_exec_names=active_for_exec_names,
         )
         self.action_params = action_params if action_params else dict()
+
+    @property
+    def to_full_name(self) -> str:
+        if (
+            isinstance(self._to, str)
+            and not self._to.endswith("()")
+            and self._to.startswith("/")
+        ):
+            return self._to
+        raise ValueError(
+            "Action Link must be binded in order to get destination full_name"
+        )
 
     @property
     def is_internal(self) -> bool:
@@ -337,8 +349,12 @@ class ActionLink(Link):
     ) -> Callable[["jembe.Component"], "jembe.ComponentReference"]:
         if to_str.endswith("()"):
             if "/" in to_str:
-                raise ValueError("Action call shortcut cann't be used on subcomponents.")
-            return lambda component: component.component().call(to_str[:-2], **self.action_params)
+                raise ValueError(
+                    "Action call shortcut cann't be used on subcomponents."
+                )
+            return lambda component: component.component().call(
+                to_str[:-2], **self.action_params
+            )
         else:
             return lambda component: component.component(to_str, **self.action_params)
 
@@ -382,8 +398,9 @@ class Menu:
         return False
 
     @property
-    def is_menu(self) ->bool:
+    def is_menu(self) -> bool:
         return True
+
 
 class CMenu(Component):
     class Config(Component.Config):

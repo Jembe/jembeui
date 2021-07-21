@@ -1,9 +1,12 @@
-<div>
+<div class="breadcrumb">
     {% for bitem in bitems %}
-        {% if bitem.url %}
+        {% if bitem.url and not loop.last %}
             <a href="{{bitem.url}}" {% if bitem.jrl %}jmb-on:click.prevent="{{bitem.jrl}}"{% endif %}>{{bitem.title}}</a>
         {% else %}
             <span>{{bitem.title}}</span>
+        {% endif %}
+        {% if not loop.last %}
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"><path fill="context-fill" d="M9 6a1 1 0 00-.3-.7l-3-3a1 1 0 00-1.4 1.4L6.6 6 4.3 8.3a1 1 0 001.4 1.4l3-3A1 1 0 009 6z"/></svg>
         {% endif %}
     {% endfor %}
 </div>
