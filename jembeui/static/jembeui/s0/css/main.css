@@ -321,18 +321,17 @@ a:focus-visible {
 .page-layout__main {
     display: flex;
     flex-wrap: wrap;
-    
 }
 .page-layout__main__menu {
-    max-width: 300px;
-    min-width: 200px;
+    max-width: 320px;
+    min-width: 160px;
     padding: 0 0 0 16px;
     flex-grow:0;
     flex-shrink: 1;
     overflow: hidden;
 }
 .page-layout__main__content {
-    
+    padding: 0 0 0 16px;
     flex-grow:1;
 }
 /*Page main menu */
