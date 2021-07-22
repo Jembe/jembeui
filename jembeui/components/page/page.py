@@ -38,7 +38,7 @@ class CPage(Component):
                 Union["Menu", Sequence[Union["Link", "Menu"]]]
             ] = None,
             breadcrumbs: Optional[Union["Breadcrumb", Sequence["Breadcrumb"]]] = None,
-            main_menu_first_is_breadcrumb_home: bool = True,
+            breadcrumb_first_is_home: bool = True,
             title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
             template: Optional[Union[str, Iterable[str]]] = None,
             components: Optional[Dict[str, "jembe.ComponentRef"]] = None,
@@ -84,7 +84,7 @@ class CPage(Component):
                     breadcrumbs = []
                     breadcrumbs.extend(
                         Breadcrumb.from_menu(
-                            main_menu, main_menu_first_is_breadcrumb_home
+                            main_menu, breadcrumb_first_is_home
                         )
                     )
                     breadcrumbs.extend(Breadcrumb.from_menu(system_menu))

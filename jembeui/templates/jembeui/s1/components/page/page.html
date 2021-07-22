@@ -23,7 +23,9 @@
         </a>
     </div>
 
-    <div jmb-bind:class="{'is-active': $local.navbarOpen}" id="navbarBasicExample" class="navbar-menu" >
+    <div jmb-bind:class="{'is-active': $local.navbarOpen}" 
+         jmb-on:click.prevent="$local.navbarOpen = false" 
+         id="navbarBasicExample" class="navbar-menu" >
         <div class="navbar-start">
         {{component('_main_menu')}}
         </div>
@@ -38,12 +40,12 @@
         {{component("_breadcrumb")}}
     </div>
 
-    <section class="section">
+    {# <section class="section">
         <div class="container">
             <h1 class="title">Hello World</h1>
             <p class="subtitle">My first website with Bulma</p>
         </div>
-    </section>
+    </section> #}
 
     <section class="section">
         <div class="container">

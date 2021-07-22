@@ -1,14 +1,15 @@
-{% macro display_menu_items(menu, level) -%}
+{% macro display_menu_items(menu, level, first_link_displayed=false)  -%}
     {% for mi in menu.items  %}
         {% if mi.is_menu %}
-            {{display_menu(mi, level+1)}}
+            {{display_menu(mi, level+1, first_link_displayed)}}
         {% else %}
-            {{display_link(mi, level)}}
+            {{display_link(mi, level, not first_link_displayed)}}
+            {% set first_link_displayed = true%}
         {% endif %}
     {% endfor %}
 {%- endmacro %}
 
-{% macro display_menu(menu, level=0) -%}
+{% macro display_menu(menu, level=0, first_link_displayed=false) -%}
     {% if menu.is_accessible %}
         {% if level > 0 %}
             <hr class="mdc-list-divider">
@@ -18,15 +19,16 @@
             </h6>
             {% endif %}
         {% endif %}
-        {{display_menu_items(menu, level)}}
+        {{display_menu_items(menu, level, first_link_displayed)}}
     {% endif %}
 {%- endmacro %}
 
-{% macro display_link(link, level ) -%}
+{% macro display_link(link, level, is_first_link=false) -%}
     {% if link.is_accessible %}
     <a class="mdc-list-item" 
         href="{{link.url}}" 
         {% if link.jrl %}jmb-on:click.prevent="{{link.jrl}}"{% endif %}
+        {% if is_first_link %}tabindex="0"{%endif%}
         jmb-bind:class="{
             'mdc-list-item--activated': 
             (   
