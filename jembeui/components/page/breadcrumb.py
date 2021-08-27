@@ -129,11 +129,15 @@ class Breadcrumb:
     def is_link(self) -> bool:
         return self.component_full_name is not None
 
-    def get_item(
+    def get_breadcrumb_item(
         self,
         from_component: "jembe.Component",
         to_component: Optional["jembe.Component"] = None,
     ) -> "BreadcrumbItem":
+        """
+            Returns instance of BreadcrumbItem with specific URL and/or JRL attributes, 
+            ready to be displayed.
+        """
         if to_component and to_component._config.full_name == self.component_full_name:
             component_reference = from_component.component(
                 self.component_full_name,
@@ -163,6 +167,7 @@ class Breadcrumb:
         menu: Optional[Union["Menu", Sequence[Union["Link", "Menu"]]]],
         first_home: bool = False,
     ) -> Sequence["Breadcrumb"]:
+        """Generates Breadcrum configuration from Menu configuration"""
         if menu is None:
             return list()
         menu_source: "Menu" = Menu(menu) if not isinstance(menu, Menu) else menu
@@ -354,7 +359,7 @@ class CBreadcrumb(Component):
             # component that has been displayed does not have associated breadcrumb
             return
 
-        new_bitem = self._config.breadcrumbs_mapping[event.source_full_name].get_item(
+        new_bitem = self._config.breadcrumbs_mapping[event.source_full_name].get_breadcrumb_item(
             self, event.source
         )
         new_bitem.fresh = True
@@ -448,14 +453,14 @@ class CBreadcrumb(Component):
                 # support nesting non link breadcrumb witout recursion
                 # (bad programing but i dont care)
                 non_links = []
-                non_links.append(bdef.parent.get_item(self))
+                non_links.append(bdef.parent.get_breadcrumb_item(self))
                 if bdef.parent.parent and not bdef.parent.parent.is_link:
-                    non_links.append(bdef.parent.parent.get_item(self))
+                    non_links.append(bdef.parent.parent.get_breadcrumb_item(self))
                     if (
                         bdef.parent.parent.parent
                         and not bdef.parent.parent.parent.is_link
                     ):
-                        non_links.append(bdef.parent.parent.parent.get_item(self))
+                        non_links.append(bdef.parent.parent.parent.get_breadcrumb_item(self))
                 bitems_new_ext.extend(reversed(non_links))
             bitems_new_ext.append(bitem)
         self.state.bitems = tuple(bitems_new_ext)

@@ -25,9 +25,21 @@ page/update_inicator:
 ✔ on.js delay modifier not woring correctly check with s2 notifications @done(21-06-09 09:56)
 ✔ nonblocking modifier not working in notifications (jembe doesnot see this modifier) in s2 @done(21-06-29 23:58)
 page/mainmenu:
-    ☐ Create test menues for jui_test all links back to main page (main, system, user)
+    ✔ Create test menues for jui_test all links back to main page (main, system, user) @done(21-08-27 11:35)
+    ✔ s0 @done(21-08-27 11:35)
+    ✔ s1 @done(21-08-27 11:35)
+    ✔ s2 @done(21-08-27 11:35)
+    ☐ s3
+    ☐ s4
+☐ Customise s2 style and make it look better
+list:
+    ☐ searchable
+    ☐ paginable
+    ☐ filterable with predefined filters
+    ☐ filterable with custom filters
     ☐ s0
     ☐ s1
     ☐ s2
     ☐ s3
     ☐ s4
+    
