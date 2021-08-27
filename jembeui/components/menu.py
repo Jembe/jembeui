@@ -10,14 +10,13 @@ from typing import (
     Any,
 )
 from abc import ABC, abstractmethod
-from functools import cached_property, partial
+from functools import cached_property 
 from copy import copy
 from urllib.parse import urlparse
 from dataclasses import dataclass, field
 from uuid import uuid4
 
 from .component import Component
-from jembe.component import component
 
 if TYPE_CHECKING:
     import jembe
