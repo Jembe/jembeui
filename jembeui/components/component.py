@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING, Callable, Dict, Iterable, Optional, Tuple, Union
-from flask import current_app
 from jembe.component_config import listener
+from ..settings import settings
 import jembe
 
 if TYPE_CHECKING:
@@ -37,9 +37,7 @@ class Component(jembe.Component):
             self.default_template = (
                 self.default_template
                 if hasattr(self, "default_template")
-                else self.default_template_exp.format(
-                    style=current_app.config.get("JEMBEUI_STYLE", "s0")
-                )
+                else self.default_template_exp.format(style=settings.default_style)
             )
             if template is None:
                 template = ("", self.default_template)
@@ -78,10 +76,10 @@ class Component(jembe.Component):
             dte_split[-2] = dte_split[-2] + "__" + "{variant}"
             variant_template_exp = ".".join(dte_split)
             return variant_template_exp.format(
-                style=current_app.config.get("JEMBEUI_STYLE", "s0"), variant=variant
+                style=settings.default_style, variant=variant
             )
 
-        def default_title(self, component:"jembe.Component") -> str:
+        def default_title(self, component: "jembe.Component") -> str:
             return self.name.replace("_", " ").title()
 
     _config: Config

@@ -1,6 +1,6 @@
-from jembeui.exceptions import JembeUIError
 from typing import TYPE_CHECKING, Optional
 
+from .exceptions import JembeUIError
 from .components import (
     Component,
     CPage,
@@ -55,12 +55,16 @@ class JembeUI:
                 "Jembe extension must be initialised before initialising JembeUI"
             )
         self.app = app
+        if "jembeui" in self.app.extensions:
+            raise JembeUIError("JembeUI can be initialised only once")
         self.app.extensions["jembeui"] = _JembeUIState(self)
 
         if default_db is not None:
             self.default_db = default_db
 
-        jembe_state.jembe.add_page("jembeui", JembeUIPage)
+        jembe_state.jembe.add_page(
+            "jembeui", JembeUIPage
+        )  # if removed jembeui templates will not load
 
     def set_default_db(self, default_db: "SQLAlchemy"):
         self.default_db = default_db

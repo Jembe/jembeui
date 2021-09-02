@@ -1,0 +1,52 @@
+<div style="padding: 2rem 2rem;">
+    {# <div style="display:flex;">
+        <div style="flex-grow:1;">
+            <input jmb-on:input="page=0;search=$self.value;" value="{{search}}" type="text" placeholder="Search..." style="width:16rem;">
+        </div>
+        <div>
+            {% for aname, acref in actions %}
+                {% if acref.is_accessible %}
+                <button type="button" jmb-on:click="{{acref.jrl}}">{{aname}}</button>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div> #}
+    <table style="margin: 1rem 0rem;">
+        <thead>
+            <tr>
+                {% for column in columns if column != "id"  %}
+                <th>{{column|capitalize}}</th>
+                {% endfor %}
+                {% if record_actions %}
+                <th>Actions</th>
+                {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    {% for record in records  %}
+        <tr>    
+            {% for column in columns %}
+            <td>{{record[column]|default("", True)}}</td>
+            {% endfor %}
+            {# {% if record_actions %}
+            <td>
+            {% for raction in record_actions %}
+                {% with (aname, acref)=raction(record) %}
+                {% if acref.is_accessible %}
+                <button type="button" jmb-on:click="{{acref.jrl}}">{{aname}}</button>
+                {% endif %}
+                {% endwith %}
+            {% endfor %}
+            </td> 
+            {% else %}
+            {% endif %} #}
+        </tr>
+    {% endfor %}
+    </table>
+    <nav>
+        <button jmb-on:click="page = page - 1" {% if page == 0 %} disabled {% endif %}>Prev</button>
+        Page {{page + 1 if total_pages > 0 else 0}} of {{total_pages}} ({{total_records}} projects)
+        <button jmb-on:click="page = page + 1" {% if page == total_pages - 1 or total_pages == 0 %} disabled {% endif %}>Next</button>
+    </nav>
+</div>
