@@ -1,4 +1,4 @@
-<div style="padding: 2rem 2rem;">
+<div>
     {# <div style="display:flex;">
         <div style="flex-grow:1;">
             <input jmb-on:input="page=0;search=$self.value;" value="{{search}}" type="text" placeholder="Search..." style="width:16rem;">
@@ -11,10 +11,10 @@
             {% endfor %}
         </div>
     </div> #}
-    <table style="margin: 1rem 0rem;">
+    <table>
         <thead>
             <tr>
-                {% for column in columns if column != "id"  %}
+                {% for column in columns %}
                 <th>{{column|capitalize}}</th>
                 {% endfor %}
                 {% if record_actions %}
