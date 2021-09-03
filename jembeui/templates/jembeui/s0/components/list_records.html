@@ -14,8 +14,8 @@
     <table>
         <thead>
             <tr>
-                {% for column in columns %}
-                <th>{{column|capitalize}}</th>
+                {% for field_title in _config.fields.values() %}
+                <th>{{field_title|capitalize}}</th>
                 {% endfor %}
                 {% if record_actions %}
                 <th>Actions</th>
@@ -26,8 +26,10 @@
         </tbody>
     {% for record in records  %}
         <tr>    
-            {% for column in columns %}
-            <td>{{record[column]|default("", True)}}</td>
+            {% for field_name in _config.fields.keys() %}
+            <td>
+                {{field_values[field_name](record, field_name)|default("", True)}}
+            </td>
             {% endfor %}
             {# {% if record_actions %}
             <td>
