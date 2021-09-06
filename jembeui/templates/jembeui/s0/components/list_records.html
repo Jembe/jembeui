@@ -1,16 +1,39 @@
 <div>
-    {# <div style="display:flex;">
-        <div style="flex-grow:1;">
-            <input jmb-on:input="page=0;search=$self.value;" value="{{search}}" type="text" placeholder="Search..." style="width:16rem;">
+    <div>
+        <div>
+            <input jmb-on:input="page=0;search=$self.value;" value="{{search}}" type="text" placeholder="Search...">
         </div>
         <div>
+            {% for filter_name, choice_filter in _config.choice_filters.items()  %}
+            {% if not loop.first %}
+            <hr>
+            {% endif %}
+            {% for choice in choice_filter.choices  %}
+            <label>
+                <input type="checkbox" jmb-on:change="
+                    if($self.checked) {
+                        jui_apply_choice_filter('{{filter_name}}','{{choice.value_str}}');
+                    }else{
+                        jui_remove_choice_filter('{{filter_name}}','{{choice.value_str}}')
+                    }"  
+                    value="{{choice.value_str}}"
+                    {% if choice_filters and filter_name in choice_filters and choice.value_str in choice_filters[filter_name] %}
+                    checked
+                    {% endif %}
+                    >
+                {{choice.title}}
+            </label> 
+            {% endfor %} 
+            {% endfor %}
+        </div>
+        {# <div>
             {% for aname, acref in actions %}
                 {% if acref.is_accessible %}
                 <button type="button" jmb-on:click="{{acref.jrl}}">{{aname}}</button>
                 {% endif %}
             {% endfor %}
-        </div>
-    </div> #}
+        </div> #}
+    </div>
     <table>
         <thead>
             <tr>

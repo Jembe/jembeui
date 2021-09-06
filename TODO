@@ -33,9 +33,9 @@ page/mainmenu:
     ☐ s4
 ☐ Customise s2 style and make it look better
 list:
-    ☐ searchable
-    ☐ paginable
-    ☐ filterable with predefined filters
+    ✔ searchable @done(21-09-06 15:59)
+    ✔ paginable @done(21-09-06 10:37)
+    ✔ filterable with predefined filters @done(21-09-06 15:58)
     ☐ filterable with custom filters
     ☐ s0
     ☐ s1
