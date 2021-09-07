@@ -3,6 +3,7 @@ from typing import (
     TYPE_CHECKING,
     List,
     Optional,
+    Sequence,
     Union,
     Callable,
     Iterable,
@@ -15,12 +16,14 @@ from functools import partial
 from math import ceil
 from jembe import action
 from .component import Component
+from .menu import Menu
 from jembeui.helpers import get_jembeui
 from jembeui.settings import settings
 from jembeui.exceptions import JembeUIError
 
 if TYPE_CHECKING:
     import jembe
+    from .menu import Link
     from flask_sqlalchemy import SQLAlchemy
     import sqlalchemy as sa
 
@@ -56,7 +59,9 @@ class CListRecords(Component):
                       that user can select to filter list records
             """
             self.expr = expr
-            ListChoiceType = namedtuple("ListChoiceType",['title', 'value_str', 'value'])
+            ListChoiceType = namedtuple(
+                "ListChoiceType", ["title", "value_str", "value"]
+            )
             self.choices: List[Tuple[str, str, Any]] = [
                 ListChoiceType(c[0], c[1], c[2] if len(c) == 3 else c[1])  # type:ignore
                 for c in choices
@@ -92,6 +97,12 @@ class CListRecords(Component):
                 Callable[["sa.orm.Query", str], "sa.orm.Query"]
             ] = None,
             choice_filters: Iterable["CListRecords.ChoiceFilter"] = (),
+            menu: Optional[Union["Menu", Sequence[Union["Link", "Menu"]]]] = None,
+            record_menu: Optional[
+                Callable[
+                    ["Component", Any], Union["Menu", Sequence[Union["Link", "Menu"]]]
+                ]
+            ] = None,
             page_size: int = 0,
             db: Optional["SQLAlchemy"] = None,
             title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
@@ -153,6 +164,14 @@ class CListRecords(Component):
             self.choice_filters = {
                 "cf{}".format(index): cf for index, cf in enumerate(choice_filters)
             }
+            # menu
+            self.menu: "Menu" = (
+                Menu()
+                if menu is None
+                else (Menu(menu) if not isinstance(menu, Menu) else menu)
+            )
+            # record menu
+            self.record_menu = record_menu
 
             # query params
             if url_query_params is None:
@@ -258,7 +277,9 @@ class CListRecords(Component):
                     self.records = cf.expr(self.records, cf.map_values(str_value))
                     try:
                         cleaned_choice_filters[name].append(str_value)
-                        cleaned_choice_filters[name] = list(set(cleaned_choice_filters[name]))
+                        cleaned_choice_filters[name] = list(
+                            set(cleaned_choice_filters[name])
+                        )
                     except KeyError:
                         cleaned_choice_filters[name] = list(str_value)
         if len(cleaned_choice_filters) == 0:
@@ -285,4 +306,17 @@ class CListRecords(Component):
             for field_name, field_value in self._config.field_values.items()
         }
 
+        # menu
+        self.menu = self._config.menu.bind_to(self)
+
+        # record menu
+        self.get_record_menu = self._get_record_menu
+
         return super().display()
+
+    def _get_record_menu(self, record) -> "Menu":
+        if self._config.record_menu is None:
+            raise JembeUIError()
+        raw_menu = self._config.record_menu(self, record)
+        menu = raw_menu if isinstance(raw_menu, Menu) else Menu(raw_menu)
+        return menu.bind_to(self)

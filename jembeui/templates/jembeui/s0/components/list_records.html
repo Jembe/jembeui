@@ -1,3 +1,26 @@
+{% macro display_menu(menu, level=0) -%}
+    {% if menu.is_accessible %}
+        {% if level > 0 %}
+        <strong>{{menu.title}}:</strong>
+        {% endif %}
+        {% for mi in menu.items  %}
+            {% if mi.is_menu %}
+                {{display_menu(mi, level+1)}}
+            {% else %}
+                {{display_link(mi, level)}}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+{%- endmacro %}
+
+{% macro display_link(link, level) -%}
+    {% if link.is_accessible %}
+        <button type="button" jmb-on:click.prevent="{{link.jrl}}">
+           {{link.title}}
+        </button>
+    {% endif %}
+{%- endmacro %}
+
 <div>
     <div>
         <div>
@@ -26,13 +49,11 @@
             {% endfor %} 
             {% endfor %}
         </div>
-        {# <div>
-            {% for aname, acref in actions %}
-                {% if acref.is_accessible %}
-                <button type="button" jmb-on:click="{{acref.jrl}}">{{aname}}</button>
-                {% endif %}
-            {% endfor %}
-        </div> #}
+        {% if menu %}
+        <div>
+        {{display_menu(menu)}} 
+        </div>
+        {% endif %}
     </div>
     <table>
         <thead>
@@ -40,7 +61,7 @@
                 {% for field_title in _config.fields.values() %}
                 <th>{{field_title|capitalize}}</th>
                 {% endfor %}
-                {% if record_actions %}
+                {% if _config.record_menu %}
                 <th>Actions</th>
                 {% endif %}
             </tr>
@@ -54,18 +75,11 @@
                 {{field_values[field_name](record, field_name)|default("", True)}}
             </td>
             {% endfor %}
-            {# {% if record_actions %}
+            {% if _config.record_menu %}
             <td>
-            {% for raction in record_actions %}
-                {% with (aname, acref)=raction(record) %}
-                {% if acref.is_accessible %}
-                <button type="button" jmb-on:click="{{acref.jrl}}">{{aname}}</button>
-                {% endif %}
-                {% endwith %}
-            {% endfor %}
+            {{display_menu(get_record_menu(record))}}
             </td> 
-            {% else %}
-            {% endif %} #}
+            {% endif %}
         </tr>
     {% endfor %}
     </table>

@@ -10,11 +10,12 @@ from typing import (
     Any,
 )
 from abc import ABC, abstractmethod
-from functools import cached_property 
+from functools import cached_property
 from copy import copy
 from urllib.parse import urlparse
 from dataclasses import dataclass, field
 from uuid import uuid4
+from jembe import ComponentReference
 
 from .component import Component
 
@@ -230,7 +231,11 @@ class URLLink(Link):
 class ActionLink(Link):
     def __init__(
         self,
-        to: Union[str, Callable[["jembe.Component"], "jembe.ComponentReference"]],
+        to: Union[
+            str,
+            "jembe.ComponentReference",
+            Callable[["jembe.Component"], "jembe.ComponentReference"],
+        ],
         title: Optional[Union[str, Callable[["Link"], str]]] = None,
         description: Optional[Union[str, Callable[["Link"], str]]] = None,
         icon: Optional[Union[str, Callable[["Link"], str]]] = None,
@@ -336,12 +341,12 @@ class ActionLink(Link):
     @cached_property
     def _component_reference(self) -> "jembe.ComponentReference":
         self._chek_binded()
-        to_component: Callable[["jembe.Component"], "jembe.ComponentReference"] = (
-            self._str_to_component_reference_lambda(self._to)
-            if isinstance(self._to, str)
-            else self._to
-        )
-        return to_component(self.binded_to)  # type: ignore
+        if isinstance(self._to, str):
+            return self._str_to_component_reference_lambda(self._to)(self.binded_to)
+        elif isinstance(self._to, ComponentReference):
+            return self._to
+        else:
+            return self._to(self.binded_to)
 
     def _str_to_component_reference_lambda(
         self, to_str: str
