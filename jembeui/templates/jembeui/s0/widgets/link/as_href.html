@@ -1,0 +1,1 @@
+<a href="{{link.url}}"{% if link.jrl %} jmb-on:click.prevent="{{link.jrl}}"{% endif %}{% for k,v in attrs.items() %} {% if v == True %}{{k}}{% else %}{{k}}="{{v}}"{% endif %}{% endfor %}>{{link.title}}</a>

@@ -1,0 +1,72 @@
+{% macro display_menu_items(menu, level, topMenuId=none) -%}
+    {% for mi in menu.items  %}
+        {% if mi.is_menu %}
+            {{display_menu(mi, level+1, topMenuId)}}
+        {% else %}
+            {{display_link(mi, level, topMenuId)}}
+        {% endif %}
+    {% endfor %}
+{%- endmacro %}
+
+{% macro display_menu(menu, level=0, topMenuId=none) -%}
+    {% if menu.is_accessible %}
+        {% if level == 0 %}
+            <div class="top-menu"
+                 jmb-scope="{opened:null, active:null,  timeout:null}"
+                 jmb-on:jembe-update-page.camel.window="$scope().active = null;"
+            >
+                {{display_menu_items(menu, level)}}
+            </div>
+        {% elif level == 1 %}
+            <div class="top-menu__dropdown-container"
+                jmb-on:mouseleave="if ($scope().opened === '{{menu.id}}') {$scope().timeout=setTimeout(function(){console.log($scope().pened);$scope().opened=null}, 50)}" 
+                jmb-on:click.away="if ($scope().opened === '{{menu.id}}') {$scope().opened=null}"
+                jmb-on:mouseover="clearTimeout($scope().timeout); $scope().opened = '{{menu.id}}'">
+                <div class="top-menu__link"
+                     jmb-bind:class="{'top-menu__link--active': $scope().active === '{{menu.id}}'}">
+                    <a href="#" jmb-on:click.prevent="$scope().opened = '{{menu.id}}'">
+                        {{menu.title}}
+                    </a>
+                </div>
+                <div class="top-menu__dropdown" 
+                     jmb-bind:class="{'top-menu__dropdown--open': $scope().opened == '{{menu.id}}'}">
+                    {{display_menu_items(menu, level, menu.id)}}
+                </div>
+            </div>
+        {% else %}
+            <div class="top-menu__dropdown__submenu-title">
+                {{menu.title}}
+            </div>
+            <div class="top-menu__dropdown__submenu">
+                {{display_menu_items(menu, level, topMenuId)}}
+            </div>
+        {% endif %}
+    {% endif %}
+{%- endmacro %}
+
+{% macro display_link(link, level, topMenuId=none) -%}
+    {% if link.is_accessible %}
+        <div class="top-menu__link {% if level > 0 %}top-menu__link--indropdown{% endif %}"
+            {% if level == 0 %}
+            jmb-on:mouseover="clearTimeout($scope().timeout); $scope().opened = '{{menu.id}}'"
+            {% endif %}
+            jmb-bind:class="{
+             'top-menu__link--active': 
+                (   
+                    {{link.active_for_exec_names|tojson|forceescape}}.some(function(en){return $jmb.componentsOnPage().includes(en)})
+                    || {{link.active_for_pathnames|tojson|forceescape}}.some(function(pn){return window.location.pathname === pn})
+                ) 
+                {# Add topMenuid to active #}
+                {% if topMenuId is not none  %}
+                && ($scope().active = '{{topMenuId}}')
+                {% endif %}
+            }">
+            <a href="{{link.url}}" 
+            {% if link.jrl %}jmb-on:click.prevent="{{link.jrl}}"{% endif %}>
+                {{link.title}}
+            </a>
+        </div>
+    {% endif %}
+{%- endmacro %}
+
+{{display_menu(menu)}}

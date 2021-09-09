@@ -135,8 +135,8 @@ class Breadcrumb:
         to_component: Optional["jembe.Component"] = None,
     ) -> "BreadcrumbItem":
         """
-            Returns instance of BreadcrumbItem with specific URL and/or JRL attributes, 
-            ready to be displayed.
+        Returns instance of BreadcrumbItem with specific URL and/or JRL attributes,
+        ready to be displayed.
         """
         if to_component and to_component._config.full_name == self.component_full_name:
             component_reference = from_component.component(
@@ -359,9 +359,9 @@ class CBreadcrumb(Component):
             # component that has been displayed does not have associated breadcrumb
             return
 
-        new_bitem = self._config.breadcrumbs_mapping[event.source_full_name].get_breadcrumb_item(
-            self, event.source
-        )
+        new_bitem = self._config.breadcrumbs_mapping[
+            event.source_full_name
+        ].get_breadcrumb_item(self, event.source)
         new_bitem.fresh = True
         bitems_new: List[BreadcrumbItem] = []
 
@@ -460,7 +460,9 @@ class CBreadcrumb(Component):
                         bdef.parent.parent.parent
                         and not bdef.parent.parent.parent.is_link
                     ):
-                        non_links.append(bdef.parent.parent.parent.get_breadcrumb_item(self))
+                        non_links.append(
+                            bdef.parent.parent.parent.get_breadcrumb_item(self)
+                        )
                 bitems_new_ext.extend(reversed(non_links))
             bitems_new_ext.append(bitem)
         self.state.bitems = tuple(bitems_new_ext)

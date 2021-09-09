@@ -32,7 +32,7 @@ page/mainmenu:
     ☐ s3
     ☐ s4
 ☐ Customise s2 style and make it look better
-☐ BREADCRUMB BACK NAVIGATION NOT WORKING
+✔ BREADCRUMB BACK NAVIGATION NOT WORKING @done(21-09-09 12:55)
 list:
     ✔ searchable @done(21-09-06 15:59)
     ✔ paginable @done(21-09-06 10:37)

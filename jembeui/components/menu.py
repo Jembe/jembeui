@@ -1,5 +1,6 @@
 from typing import (
     Callable,
+    ClassVar,
     Iterable,
     Sequence,
     TYPE_CHECKING,
@@ -8,7 +9,9 @@ from typing import (
     Union,
     Dict,
     Any,
+    ClassVar,
 )
+from markupsafe import Markup
 from abc import ABC, abstractmethod
 from functools import cached_property
 from copy import copy
@@ -16,8 +19,11 @@ from urllib.parse import urlparse
 from dataclasses import dataclass, field
 from uuid import uuid4
 from jembe import ComponentReference
+from flask import render_template
 
 from .component import Component
+from ..exceptions import JembeUIError
+from ..settings import settings
 
 if TYPE_CHECKING:
     import jembe
@@ -26,13 +32,16 @@ __all__ = ("Link", "URLLink", "ActionLink", "Menu", "CMenu")
 
 
 class Link(ABC):
+    as_href_template = "jembeui/{style}/widgets/link/as_href.html"
+    as_button_template = "jembeui/{style}/widgets/link/as_button.html"
+
     def __init__(
         self,
         active_for_pathnames: Optional[Sequence[str]] = None,
         active_for_exec_names: Optional[Sequence[str]] = None,
     ):
         self.params: dict = dict()
-        self.binded_to: Optional["jembe.Component"] = None
+        self._binded_to: Optional["jembe.Component"] = None
 
         self._active_for_pathnames: Optional[Tuple[str, ...]] = (
             tuple(active_for_pathnames) if active_for_pathnames is not None else None
@@ -49,12 +58,12 @@ class Link(ABC):
 
     def bind_to(self, component: "jembe.Component") -> "Link":
         blink = copy(self)
-        blink.binded_to = component
+        blink._binded_to = component
         return blink
 
     @property
     def binded(self) -> bool:
-        return self.binded_to is not None
+        return self._binded_to is not None
 
     def _chek_binded(self):
         if not self.binded:
@@ -123,6 +132,28 @@ class Link(ABC):
     @property
     def is_menu(self) -> bool:
         return False
+
+    def as_href(self, html_attrs: Optional[dict] = None) -> str:
+        """Renders link as simple regular <a href></a> link"""
+        if not self.is_accessible:
+            return ""
+        html_attrs = dict() if html_attrs is None else html_attrs
+        context = {"link": self, "attrs": html_attrs}
+        template = self.as_href_template.format(style=settings.default_style)
+        return Markup(render_template(template, **context))
+
+    def as_button(
+        self, html_attrs: Optional[dict] = None, show_disabled: bool = False
+    ) -> str:
+        """Renders link as simple regular <button></button>"""
+        if not self.is_accessible and not show_disabled:
+            return ""
+        html_attrs = dict() if html_attrs is None else html_attrs
+        if show_disabled:
+            html_attrs["disabled"] = True
+        context = {"link": self, "attrs": html_attrs}
+        template = self.as_button_template.format(style=settings.default_style)
+        return Markup(render_template(template, **context))
 
 
 class URLLink(Link):
@@ -342,11 +373,11 @@ class ActionLink(Link):
     def _component_reference(self) -> "jembe.ComponentReference":
         self._chek_binded()
         if isinstance(self._to, str):
-            return self._str_to_component_reference_lambda(self._to)(self.binded_to)
+            return self._str_to_component_reference_lambda(self._to)(self._binded_to)
         elif isinstance(self._to, ComponentReference):
             return self._to
         else:
-            return self._to(self.binded_to)
+            return self._to(self._binded_to)
 
     def _str_to_component_reference_lambda(
         self, to_str: str
@@ -374,6 +405,12 @@ class Menu:
 
     id: str = field(default="", init=False)
     binded: bool = field(default=False, init=False)
+
+    template_variants: ClassVar[dict] = dict(
+        default="jembeui/{style}/widgets/menu/default.html",
+        page_menu="jembeui/{style}/widgets/menu/page_menu.html",
+        system_menu="jembeui/{style}/widgets/menu/system_menu.html",
+    )
 
     def __post_init__(self):
         self.id = str(uuid4())
@@ -404,6 +441,27 @@ class Menu:
     @property
     def is_menu(self) -> bool:
         return True
+
+    def as_html(self, variant: str = "default") -> str:
+        if not self.binded:
+            raise JembeUIError(
+                "Menu must be binded to component in order to be rendered to html"
+            )
+        if "/" in variant:
+            # variant is template name
+            template = variant
+        else:
+            if variant not in self.template_variants.keys():
+                raise JembeUIError(
+                    "Menu variant '{}' does not exist! Valid variants are :{}".format(
+                        variant, self.template_variants.keys()
+                    )
+                )
+            template = self.template_variants[variant].format(
+                style=settings.default_style
+            )
+        context = {"menu": self}
+        return Markup(render_template(template, **context))
 
 
 class CMenu(Component):
