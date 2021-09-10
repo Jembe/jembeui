@@ -16,6 +16,7 @@
   --blue-40: #45a1ff;
   --blue-50: #0a84ff;
   --blue-50-a30: rgba(10, 132, 255, 0.3);
+  --blue-55: #0074e8;
   --blue-60: #0060df;
   --blue-70: #003eaa;
   --blue-80: #002275;
@@ -110,9 +111,9 @@ a:hover {
     text-decoration: underline;
     color: var(--blue-60);
 }
-a:visited {
+/* a:visited {
     color: var(--blue-70);
-}
+} */
 a:focus-visible {
     box-shadow: 0 0 0 2px var(--blue-50), 0 0 0 6px var(--blue-50-a30);
     outline: none;
@@ -335,7 +336,7 @@ a:focus-visible {
     overflow: hidden;
 }
 .page-layout__main__content {
-    padding: 0 0 0 16px;
+    padding: 0 16px 32px 16px;
     flex-grow:1;
 }
 /*Page main menu */
@@ -516,9 +517,34 @@ a.main-menu__sub-menu__title:hover {
     color: var(--grey-70);
     border: 1px solid var(--grey-25);
     width: 100%;
+    border-spacing: 0;
 }
-.table td, .table th {
+.table td {
     padding: 8px;
+}
+.table th {
+    font-weight: 400;
+}
+.table__head {
+    background-color: var(--grey-30);
+}
+.table__head__th--selected {
+    background-color: var(--blue-50);
+    color: var(--white-100);
+}
+.table__head__th--selected .table__head__order-link {
+    color: var(--white-100);
+}
+.table__head__order-link {
+    color: var(--grey-90);
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+    padding: 4px 8px;
+}
+.table__body__row:hover {
+    background-color: var(--blue-40);
+    background-color: #d1e8ff;
 }
 .table__body__row--odd {
     background-color: var(--white-100);

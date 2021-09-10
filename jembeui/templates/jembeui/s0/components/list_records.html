@@ -56,20 +56,38 @@
         {% endif %}
     </div>
     <table class="table">
-        <thead>
+        <thead class="table__head">
             <tr>
-                {% for field_title in _config.fields.values() %}
-                <th>{{field_title|capitalize}}</th>
+                {% for field_name,field_title in _config.fields.items() %}
+                {% if field_name in _config.field_order_by %}
+                    {% if order_by == field_name %}
+                    <th class="table__head__th--selected">
+                        <a href="" class="table__head__order-link" jmb-on:click.prevent="order_by='-{{field_name}}'"> {{field_title|capitalize}}<span>&#9650;</span></a>
+                    </th>
+                    {% elif order_by == "-" + field_name %}
+                    <th class="table__head__th--selected">
+                        <a href="" class="table__head__order-link" jmb-on:click.prevent="order_by=null">{{field_title|capitalize}}<span>&#9660;</span></a>
+                    </th>
+                    {% else %}
+                    <th>
+                        <a href="" class="table__head__order-link" jmb-on:click.prevent="order_by='{{field_name}}'">{{field_title|capitalize}}</a>
+                    </th>
+                    {% endif %}
+                {% else %}
+                <th>
+                    {{field_title|capitalize}}
+                </th>
+                {% endif %}
                 {% endfor %}
                 {% if _config.record_menu %}
-                <th>Actions</th>
+                <th><span class="table__head__order-link">Actions</span></th>
                 {% endif %}
             </tr>
         </thead>
         <tbody>
         </tbody>
     {% for record in records  %}
-        <tr class="{{loop.cycle('table__body__row--even','table__body__row--odd')}}">
+        <tr class="table__body__row {{loop.cycle('table__body__row--even','table__body__row--odd')}}">
             {% for field_name in _config.fields.keys() %}
             <td>
                 {{field_values[field_name](record, field_name)|default("", True)}}

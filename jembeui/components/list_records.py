@@ -20,12 +20,12 @@ from .menu import Menu
 from jembeui.helpers import get_jembeui
 from jembeui.settings import settings
 from jembeui.exceptions import JembeUIError
+import sqlalchemy as sa
 
 if TYPE_CHECKING:
     import jembe
     from .menu import Link
     from flask_sqlalchemy import SQLAlchemy
-    import sqlalchemy as sa
 
 __all__ = ("CListRecords",)
 
@@ -43,6 +43,18 @@ def default_field_value(component: "jembe.Component", record, field_name: str) -
         return str(value)  # TODO
     else:
         return str(value)  # type: ignore
+
+
+def default_field_order_by(
+    query: "sa.orm.Query", field_name: str, desc: bool
+) -> "sa.orm.Query":
+    if desc:
+        return query.order_by(None).order_by(
+            sa.desc(field_name.replace("__", ".")), *query._order_by_clauses
+        )
+    return query.order_by(None).order_by(
+        field_name.replace("__", "."), *query._order_by_clauses
+    )
 
 
 class CListRecords(Component):
@@ -84,6 +96,7 @@ class CListRecords(Component):
         default_template_exp = "jembeui/{style}/components/list_records.html"
         # TEMPLATE_VARIANTS = ()
         default_field_value = default_field_value
+        default_field_order_by = default_field_order_by
 
         def __init__(
             self,
@@ -91,6 +104,9 @@ class CListRecords(Component):
             fields: Optional[Dict[str, str]] = None,
             field_values: Optional[
                 Dict[str, Callable[["Component", Any, str], str]]
+            ] = None,
+            field_order_by: Optional[
+                Dict[str, Callable[["sa.orm.Query", str, bool], "sa.orm.Query"]]
             ] = None,
             fields_styling: Optional[Dict[str, dict]] = None,
             search_filter: Optional[
@@ -151,6 +167,16 @@ class CListRecords(Component):
             for field_name in self.fields.keys():
                 if field_name not in self.field_values:
                     self.field_values[field_name] = self.__class__.default_field_value
+            # field order by
+            self.field_order_by = (
+                field_order_by if field_order_by is not None else dict()
+            )
+            for field_name in self.fields.keys():
+                if field_name not in self.field_order_by:
+                    self.field_order_by[
+                        field_name
+                    ] = self.__class__.default_field_order_by
+
             # field stylings
             self.fields_styling = dict()
             fields_styling = fields_styling if fields_styling is not None else dict()
@@ -184,6 +210,8 @@ class CListRecords(Component):
                 url_query_params["s"] = "search"
             if "choice_filters" not in url_query_params.values():
                 url_query_params["cf"] = "choice_filters"
+            if "order_by" not in url_query_params.values():
+                url_query_params["ob"] = "order_by"
 
             super().__init__(
                 title=title,
@@ -215,6 +243,7 @@ class CListRecords(Component):
         page_size: int = 0,
         search: str = "",
         choice_filters: Optional[Dict[str, List[str]]] = None,
+        order_by: Optional[str] = None,
     ):
         if page_size < 1:
             self.state.page_size = self._config.page_size
@@ -286,6 +315,15 @@ class CListRecords(Component):
             self.state.choice_filters = None
         else:
             self.state.choice_filters = cleaned_choice_filters
+
+        # apply order by
+        if self.state.order_by:
+            fname = self.state.order_by.strip("-")
+            is_desc = self.state.order_by.startswith("-")
+            if fname in self._config.fields.keys():
+                self.records = self._config.field_order_by[fname](
+                    self.records, fname, is_desc
+                )
 
         # apply pagination
         self.total_records = self.records.count()
