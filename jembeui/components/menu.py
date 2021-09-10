@@ -19,11 +19,12 @@ from urllib.parse import urlparse
 from dataclasses import dataclass, field
 from uuid import uuid4
 from jembe import ComponentReference
-from flask import render_template
+from flask import render_template, current_app
 
 from .component import Component
 from ..exceptions import JembeUIError
 from ..settings import settings
+from ..helpers import get_widget_variants
 
 if TYPE_CHECKING:
     import jembe
@@ -34,6 +35,7 @@ __all__ = ("Link", "URLLink", "ActionLink", "Menu", "CMenu")
 class Link(ABC):
     as_href_template = "jembeui/{style}/widgets/link/as_href.html"
     as_button_template = "jembeui/{style}/widgets/link/as_button.html"
+    _template_variants: Dict[str, str]
 
     def __init__(
         self,
@@ -133,14 +135,38 @@ class Link(ABC):
     def is_menu(self) -> bool:
         return False
 
+    @property
+    def template_variants(self) -> Dict[str, str]:
+        try:
+            return self.__class__._template_variants
+        except AttributeError:
+            self.__class__._template_variants = get_widget_variants(
+                settings.link_widgets_variants_dirs
+            )
+        return self.__class__._template_variants
+
+    def as_html(self, variant: str = "href", html_attrs: Optional[dict] = None) -> str:
+        if "/" in variant:
+            # variant is template name
+            template = variant
+        else:
+            if variant not in self.template_variants.keys():
+                raise JembeUIError(
+                    "Link variant '{}' does not exist! Valid variants are :{}".format(
+                        variant, self.template_variants.keys()
+                    )
+                )
+            template = self.template_variants[variant]
+
+        html_attrs = dict() if html_attrs is None else html_attrs
+        context = {"link": self, "attrs": html_attrs}
+        return Markup(render_template(template, **context))
+
     def as_href(self, html_attrs: Optional[dict] = None) -> str:
         """Renders link as simple regular <a href></a> link"""
         if not self.is_accessible:
             return ""
-        html_attrs = dict() if html_attrs is None else html_attrs
-        context = {"link": self, "attrs": html_attrs}
-        template = self.as_href_template.format(style=settings.default_style)
-        return Markup(render_template(template, **context))
+        return self.as_html(html_attrs=html_attrs)
 
     def as_button(
         self, html_attrs: Optional[dict] = None, show_disabled: bool = False
@@ -151,9 +177,7 @@ class Link(ABC):
         html_attrs = dict() if html_attrs is None else html_attrs
         if show_disabled:
             html_attrs["disabled"] = True
-        context = {"link": self, "attrs": html_attrs}
-        template = self.as_button_template.format(style=settings.default_style)
-        return Markup(render_template(template, **context))
+        return self.as_html("button", html_attrs=html_attrs)
 
 
 class URLLink(Link):
@@ -406,11 +430,8 @@ class Menu:
     id: str = field(default="", init=False)
     binded: bool = field(default=False, init=False)
 
-    template_variants: ClassVar[dict] = dict(
-        default="jembeui/{style}/widgets/menu/default.html",
-        page_menu="jembeui/{style}/widgets/menu/page_menu.html",
-        system_menu="jembeui/{style}/widgets/menu/system_menu.html",
-    )
+    # template supoprted template variant calculated based on settings.menu_widgets_variants_dirs
+    _template_variants: ClassVar[dict]
 
     def __post_init__(self):
         self.id = str(uuid4())
@@ -442,6 +463,16 @@ class Menu:
     def is_menu(self) -> bool:
         return True
 
+    @property
+    def template_variants(self) -> Dict[str, str]:
+        try:
+            return self.__class__._template_variants
+        except AttributeError:
+            self.__class__._template_variants = get_widget_variants(
+                settings.menu_widgets_variants_dirs
+            )
+        return self.__class__._template_variants
+
     def as_html(self, variant: str = "default") -> str:
         if not self.binded:
             raise JembeUIError(
@@ -457,9 +488,7 @@ class Menu:
                         variant, self.template_variants.keys()
                     )
                 )
-            template = self.template_variants[variant].format(
-                style=settings.default_style
-            )
+            template = self.template_variants[variant]
         context = {"menu": self}
         return Markup(render_template(template, **context))
 

@@ -77,7 +77,7 @@
             {% endfor %}
             {% if _config.record_menu %}
             <td>
-            {{get_record_menu(record).as_html()}}
+            {{get_record_menu(record).as_html('list_record_menu')}}
             </td> 
             {% endif %}
         </tr>

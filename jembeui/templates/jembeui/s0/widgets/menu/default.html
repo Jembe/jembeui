@@ -1,14 +1,14 @@
-{% macro display_menu_items(menu, level, topMenuId=none) -%}
+{% macro display_menu_items(menu, level) -%}
     {% for mi in menu.items  %}
         {% if mi.is_menu %}
-            {{display_menu(mi, level+1, topMenuId)}}
+            {{display_menu(mi, level+1)}}
         {% else %}
-            {{display_link(mi, level, topMenuId)}}
+            {{display_link(mi, level)}}
         {% endif %}
     {% endfor %}
 {%- endmacro %}
 
-{% macro display_menu(menu, level=0, topMenuId=none) -%}
+{% macro display_menu(menu, level=0) -%}
     {% if menu.is_accessible %}
         {% if level == 0 %}
             <div class="default-menu"
@@ -17,18 +17,15 @@
             </div>
         {% elif level == 1 %}
             <div class="default-menu__dropdown-container"
-                {# jmb-on:mouseleave="if ($scope().opened === '{{menu.id}}') {$scope().timeout=setTimeout(function(){$scope().opened=null}, 100)}"  #}
                 jmb-on:click.away="if ($scope().opened === '{{menu.id}}') {$scope().opened=null}">
                 <div class="default-menu__link">
-                     {# jmb-on:click="clearTimeout($scope().timeout); $scope().opened = '{{menu.id}}'"> #}
-                    <a href="#" jmb-on:click.prevent="$scope().opened = '{{menu.id}}'">
+                    <a href="#" jmb-on:click.prevent="if ($scope().opened === '{{menu.id}}'){$scope().opened = null}else{$scope().opened = '{{menu.id}}'}">
                         {{menu.title}}
                     </a>
                 </div>
                 <div class="default-menu__dropdown" 
                      jmb-bind:class="{'default-menu__dropdown--open': $scope().opened == '{{menu.id}}'}">
-                     {# jmb-on:mouseover="clearTimeout($scope().timeout); $scope().opened = '{{menu.id}}'"> #}
-                    {{display_menu_items(menu, level, menu.id)}}
+                    {{display_menu_items(menu, level)}}
                 </div>
             </div>
         {% else %}
@@ -36,13 +33,13 @@
                 {{menu.title}}
             </div>
             <div class="default-menu__dropdown__submenu">
-                {{display_menu_items(menu, level, topMenuId)}}
+                {{display_menu_items(menu, level)}}
             </div>
         {% endif %}
     {% endif %}
 {%- endmacro %}
 
-{% macro display_link(link, level, topMenuId=none) -%}
+{% macro display_link(link, level) -%}
     {% if link.is_accessible %}
         <div class="default-menu__link {% if level > 0 %}default-menu__link--indropdown{% endif %}">
             <a href="{{link.url}}"{% if link.jrl %}jmb-on:click.prevent="{{link.jrl}}"{% endif %}>
