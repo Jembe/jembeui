@@ -37,6 +37,7 @@ list:
     ✔ searchable @done(21-09-06 15:59)
     ✔ paginable @done(21-09-06 10:37)
     ✔ filterable with predefined filters @done(21-09-06 15:58)
+    ☐ Orderable
     ☐ selectable (select, select all, operation on selected)
     ☐ filterable with custom filters
     ☐ s0

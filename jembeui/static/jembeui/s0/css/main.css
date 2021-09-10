@@ -58,6 +58,7 @@
   --grey-10-a60: rgba(249, 249, 250, 0.6);
   --grey-10-a80: rgba(249, 249, 250, 0.8);
   --grey-20: #ededf0;
+  --grey-25: #e0e0e2;
   --grey-30: #d7d7db;
   --grey-40: #b1b1b3;
   --grey-50: #737373;
@@ -393,7 +394,7 @@ a.main-menu__sub-menu__title:hover {
 .top-menu__dropdown {
     display: none;
     position: absolute;
-    right: -22px;
+    right: -16px;
     background-color: var(--white-100);
     border-radius: 2px;
     border: solid 1px var(--grey-90-a20);
@@ -446,7 +447,7 @@ a.main-menu__sub-menu__title:hover {
     z-index: 1000;
     display: none;
     position: absolute;
-    right: -22px;
+    right: -16px;
     background-color: var(--white-100);
     border-radius: 2px;
     border: solid 1px var(--grey-90-a20);
@@ -470,6 +471,12 @@ a.main-menu__sub-menu__title:hover {
     right: 18px;
     border: 1px solid var(--grey-90-a20);
 
+}
+.default-menu__link__icon {
+    fill: currentColor;
+    width: 12px;
+    height: 12px;
+    vertical-align: text-bottom;
 }
 .default-menu__dropdown--open {
     display: block;
@@ -502,4 +509,20 @@ a.main-menu__sub-menu__title:hover {
 }
 .breadcrumb a:visited {
     color: var(--blue-60);
+}
+/* Tables */
+.table {
+    font-size: 15px;
+    color: var(--grey-70);
+    border: 1px solid var(--grey-25);
+    width: 100%;
+}
+.table td, .table th {
+    padding: 8px;
+}
+.table__body__row--odd {
+    background-color: var(--white-100);
+}
+.table__body__row--even {
+    background-color: rgba(0,0,0,0.04);
 }

@@ -55,7 +55,7 @@
         </div>
         {% endif %}
     </div>
-    <table>
+    <table class="table">
         <thead>
             <tr>
                 {% for field_title in _config.fields.values() %}
@@ -69,7 +69,7 @@
         <tbody>
         </tbody>
     {% for record in records  %}
-        <tr>    
+        <tr class="{{loop.cycle('table__body__row--even','table__body__row--odd')}}">
             {% for field_name in _config.fields.keys() %}
             <td>
                 {{field_values[field_name](record, field_name)|default("", True)}}
@@ -77,7 +77,7 @@
             {% endfor %}
             {% if _config.record_menu %}
             <td>
-            {{get_record_menu(record).as_html('list_record_menu')}}
+            {{get_record_menu(record).as_html('simple_links')}}
             </td> 
             {% endif %}
         </tr>
