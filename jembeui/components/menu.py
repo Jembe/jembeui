@@ -33,9 +33,7 @@ __all__ = ("Link", "URLLink", "ActionLink", "Menu", "CMenu")
 
 
 class Link(ABC):
-    as_href_template = "jembeui/{style}/widgets/link/as_href.html"
-    as_button_template = "jembeui/{style}/widgets/link/as_button.html"
-    _template_variants: Dict[str, str]
+    TEMPLATE_VARIANTS: Dict[str, str]
 
     def __init__(
         self,
@@ -138,12 +136,12 @@ class Link(ABC):
     @property
     def template_variants(self) -> Dict[str, str]:
         try:
-            return self.__class__._template_variants
+            return self.__class__.TEMPLATE_VARIANTS
         except AttributeError:
-            self.__class__._template_variants = get_widget_variants(
+            self.__class__.TEMPLATE_VARIANTS = get_widget_variants(
                 settings.link_widgets_variants_dirs
             )
-        return self.__class__._template_variants
+        return self.__class__.TEMPLATE_VARIANTS
 
     def as_html(self, variant: str = "href", html_attrs: Optional[dict] = None) -> str:
         if "/" in variant:
@@ -431,7 +429,7 @@ class Menu:
     binded: bool = field(default=False, init=False)
 
     # template supoprted template variant calculated based on settings.menu_widgets_variants_dirs
-    _template_variants: ClassVar[dict]
+    TEMPLATE_VARIANTS: ClassVar[dict]
 
     def __post_init__(self):
         self.id = str(uuid4())
@@ -466,12 +464,12 @@ class Menu:
     @property
     def template_variants(self) -> Dict[str, str]:
         try:
-            return self.__class__._template_variants
+            return self.__class__.TEMPLATE_VARIANTS
         except AttributeError:
-            self.__class__._template_variants = get_widget_variants(
+            self.__class__.TEMPLATE_VARIANTS = get_widget_variants(
                 settings.menu_widgets_variants_dirs
             )
-        return self.__class__._template_variants
+        return self.__class__.TEMPLATE_VARIANTS
 
     def as_html(self, variant: str = "default") -> str:
         if not self.binded:

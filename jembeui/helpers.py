@@ -15,7 +15,13 @@ def get_jembeui() -> "JembeUI":
         raise JembeUIError("JembeUI is not initialised")
     return jembeui_state.jui
 
-def get_widget_variants(templates_dir_list:List[str])->Dict[str, str]:
+
+def get_widget_variants(templates_dir_list: List[str]) -> Dict[str, str]:
+    """
+    returns dict[  variant_name: template_path]
+    where variant_name is template name without .html extension
+    for all templates found in templates_dir_lists
+    """
     template_variants = dict()
     for tname in current_app.jinja_env.list_templates():
         for tdir in templates_dir_list:
@@ -24,7 +30,5 @@ def get_widget_variants(templates_dir_list:List[str])->Dict[str, str]:
             if tname.startswith(tdir):
                 vname = tname[len(tdir) :].strip("/")
                 if "/" not in vname:
-                    template_variants[
-                        ".".join(vname.split(".")[:-1])
-                    ] = tname
+                    template_variants[".".join(vname.split(".")[:-1])] = tname
     return template_variants

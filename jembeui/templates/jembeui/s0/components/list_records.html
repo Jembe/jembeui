@@ -22,17 +22,23 @@
 {%- endmacro %}
 
 <div>
-    <div>
-        <div>
-            <input jmb-on:input="page=0;search=$self.value;" value="{{search}}" type="text" placeholder="Search...">
+    <div class="list-records__toolbar">
+        <div class="list-records__toolbar__clear-filters">
+            <button type="button" class="button button--ghost button--toolbar" jmb-on:click.prevent="search=''; choice_filters=null" title="Clear all filters">
+                <!-- This SVG Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. that You can obtain one at http://mozilla.org/MPL/2.0/. -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill="context-fill" d="M6.5 12a.5.5 0 0 0 .5-.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 0 .5.5zm2 0a.5.5 0 0 0 .5-.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 0 .5.5zm2 0a.5.5 0 0 0 .5-.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 0 .5.5z"></path><path fill="context-fill" d="M14 2h-3.05a2.5 2.5 0 0 0-4.9 0H3a1 1 0 0 0 0 2v9a3 3 0 0 0 3 3h5a3 3 0 0 0 3-3V4a1 1 0 0 0 0-2zM8.5 1a1.489 1.489 0 0 1 1.391 1H7.109A1.489 1.489 0 0 1 8.5 1zM12 13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4h7z"></path></svg>            
+            </button>
         </div>
-        <div>
+        <div class="list-records__toolbar__search">
+            <input jmb-on:input="page=0;search=$self.value;" value="{{search}}" type="text" placeholder="Search..." class="input input--toolbar">
+        </div>
+        <div class="list-records__toolbar__choice-filters">
             {% for filter_name, choice_filter in _config.choice_filters.items()  %}
-            {% if not loop.first %}
-            <hr>
-            {% endif %}
             {% for choice in choice_filter.choices  %}
-            <label>
+            <label class="button button--micro button--switch button--switch--toolbar
+                {% if choice_filters and filter_name in choice_filters and choice.value_str in choice_filters[filter_name] %}
+                button--switch--on
+                {% endif %}">
                 <input type="checkbox" jmb-on:change="
                     if($self.checked) {
                         jui_apply_choice_filter('{{filter_name}}','{{choice.value_str}}');
@@ -49,8 +55,13 @@
             {% endfor %} 
             {% endfor %}
         </div>
+        <nav class="list-records__toolbar__pagination">
+            <button jmb-on:click="page = page - 1" {% if page == 0 %} disabled {% endif %}>Prev</button>
+            Page {{page + 1 if total_pages > 0 else 0}} of {{total_pages}} ({{total_records}} projects)
+            <button jmb-on:click="page = page + 1" {% if page == total_pages - 1 or total_pages == 0 %} disabled {% endif %}>Next</button>
+        </nav>
         {% if menu %}
-        <div>
+        <div class="list-records__toolbar__menu">
         {{display_menu(menu)}} 
         </div>
         {% endif %}
@@ -101,9 +112,4 @@
         </tr>
     {% endfor %}
     </table>
-    <nav>
-        <button jmb-on:click="page = page - 1" {% if page == 0 %} disabled {% endif %}>Prev</button>
-        Page {{page + 1 if total_pages > 0 else 0}} of {{total_pages}} ({{total_records}} projects)
-        <button jmb-on:click="page = page + 1" {% if page == total_pages - 1 or total_pages == 0 %} disabled {% endif %}>Next</button>
-    </nav>
 </div>

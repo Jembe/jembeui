@@ -62,7 +62,8 @@ class CListRecords(Component):
         def __init__(
             self,
             expr: Callable[["sa.orm.Query", Iterable[Any]], "sa.orm.Query"],
-            *choices: Union[Tuple[str, str], Tuple[str, str, Any]]
+            *choices: Union[Tuple[str, str], Tuple[str, str, Any]],
+            grouped: bool = False
         ):
             """
             expr - python function that accepts query and list of values and
@@ -87,6 +88,8 @@ class CListRecords(Component):
                 raise JembeUIError(
                     "ListRecords.ChoiceFilter can't have duplicate values"
                 )
+
+            self.is_grouped = grouped
 
         def map_values(self, str_values: Iterable[str]) -> Iterable[Any]:
             mapping = {c[1]: c[2] for c in self.choices}
