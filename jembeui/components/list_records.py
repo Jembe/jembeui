@@ -1,4 +1,3 @@
-from collections import namedtuple
 from typing import (
     TYPE_CHECKING,
     List,
@@ -11,8 +10,9 @@ from typing import (
     Tuple,
     Any,
 )
+from collections import namedtuple
 from datetime import date, datetime
-from functools import partial
+from functools import partial, cached_property
 from math import ceil
 from jembe import action
 from .component import Component
@@ -59,11 +59,19 @@ def default_field_order_by(
 
 class CListRecords(Component):
     class ChoiceFilter:
+        ListChoiceType = namedtuple("ListChoiceType", ["title", "value_str", "value"])
+
         def __init__(
             self,
             expr: Callable[["sa.orm.Query", Iterable[Any]], "sa.orm.Query"],
             *choices: Union[Tuple[str, str], Tuple[str, str, Any]],
-            grouped: bool = False
+            grouped: bool = False,
+            dynamic_choices: Optional[
+                Callable[
+                    ["jembe.Component"],
+                    Iterable[Union[Tuple[str, str], Tuple[str, str, Any]]],
+                ]
+            ] = None
         ):
             """
             expr - python function that accepts query and list of values and
@@ -72,13 +80,22 @@ class CListRecords(Component):
                       that user can select to filter list records
             """
             self.expr = expr
-            ListChoiceType = namedtuple(
-                "ListChoiceType", ["title", "value_str", "value"]
-            )
             self.choices: List[Tuple[str, str, Any]] = [
-                ListChoiceType(c[0], c[1], c[2] if len(c) == 3 else c[1])  # type:ignore
+                self.ListChoiceType(
+                    c[0], c[1], c[2] if len(c) == 3 else c[1]  # type:ignore
+                )
                 for c in choices
             ]
+            self.str_values: List[str]
+            self._dynamic_choices = dynamic_choices
+            self._check_for_duplicate_choices()
+            self.is_grouped = grouped
+
+        def map_values(self, str_values: Iterable[str]) -> Iterable[Any]:
+            mapping = {c[1]: c[2] for c in self.choices}
+            return tuple(mapping[v] for v in str_values if v in mapping.keys())
+
+        def _check_for_duplicate_choices(self):
             # check for duplicates
             self.str_values = [c[1] for c in self.choices]
             values = [c[2] for c in self.choices]
@@ -86,14 +103,25 @@ class CListRecords(Component):
                 set(values)
             ):
                 raise JembeUIError(
-                    "ListRecords.ChoiceFilter can't have duplicate values"
+                    "ListRecords.ChoiceFilter can't have duplicate values: {}".format(
+                        values
+                    )
                 )
 
-            self.is_grouped = grouped
-
-        def map_values(self, str_values: Iterable[str]) -> Iterable[Any]:
-            mapping = {c[1]: c[2] for c in self.choices}
-            return tuple(mapping[v] for v in str_values)
+        def mount(self, component: "jembe.Component") -> "CListRecords.ChoiceFilter":
+            if self._dynamic_choices:
+                cfcopy = CListRecords.ChoiceFilter(
+                    self.expr, *self.choices, grouped=self.is_grouped
+                )
+                cfcopy.choices.extend(
+                    self.ListChoiceType(
+                        c[0], c[1], c[2] if len(c) == 3 else c[1]  # type:ignore
+                    )
+                    for c in self._dynamic_choices(component)  # type:ignore
+                )
+                cfcopy._check_for_duplicate_choices()
+                return cfcopy
+            return self
 
     class Config(Component.Config):
         default_template_exp = "jembeui/{style}/components/list_records.html"
@@ -142,9 +170,15 @@ class CListRecords(Component):
             """
 
             self.query = query
-            # use @property self.db to get db so that
-            # defult db can be useds when self._db is None
-            self._db = db
+            # defult db can be useds when db is None
+            self.db = db
+            if self.db is None:
+                self.db = get_jembeui().default_db
+                if self.db is None:
+                    raise JembeUIError(
+                        "Either 'db' for CListRecords.Config or default_db"
+                        " on JembeUI instance must be set"
+                    )
             # page size
             self.page_size = (
                 page_size if page_size > 0 else settings.list_records_page_size
@@ -226,18 +260,6 @@ class CListRecords(Component):
                 url_query_params=url_query_params,
             )
 
-        @property
-        def db(self) -> "SQLAlchemy":
-            if self._db is not None:
-                return self._db
-            self._db = get_jembeui().default_db
-            if self._db is None:
-                raise JembeUIError(
-                    "Either 'db' for CListRecords.Config or default_db"
-                    " on JembeUI instance must be set"
-                )
-            return self._db
-
     _config: "Config"
 
     def __init__(
@@ -255,15 +277,15 @@ class CListRecords(Component):
     @action
     def jui_apply_choice_filter(self, filter_name, filter_value):
         if (
-            filter_name not in self._config.choice_filters
-            or filter_value not in self._config.choice_filters[filter_name].str_values
+            filter_name not in self.choice_filters_config
+            or filter_value not in self.choice_filters_config[filter_name].str_values
         ):
             return
         if self.state.choice_filters is None:
             self.state.choice_filters = dict()
 
         if filter_name not in self.state.choice_filters:
-            self.state.choice_filters[filter_name] = list(filter_value)
+            self.state.choice_filters[filter_name] = [filter_value]
         else:
             self.state.choice_filters[filter_name].append(filter_value)
 
@@ -272,8 +294,8 @@ class CListRecords(Component):
     @action
     def jui_remove_choice_filter(self, filter_name, filter_value):
         if (
-            filter_name not in self._config.choice_filters
-            or filter_value not in self._config.choice_filters[filter_name].str_values
+            filter_name not in self.choice_filters_config
+            or filter_value not in self.choice_filters_config[filter_name].str_values
         ):
             return
         if filter_name not in self.state.choice_filters:
@@ -290,6 +312,12 @@ class CListRecords(Component):
 
         self.state.page = 0
 
+    @cached_property
+    def choice_filters_config(self):
+        return {
+            name: cf.mount(self) for name, cf in self._config.choice_filters.items()
+        }
+
     def display(self):
         self.records = self._config.query.with_session(
             self._config.db.session()
@@ -303,8 +331,8 @@ class CListRecords(Component):
         cleaned_choice_filters = dict()
         if self.state.choice_filters is not None:
             for name in self.state.choice_filters.keys():
-                if name in self._config.choice_filters.keys():
-                    cf = self._config.choice_filters[name]
+                if name in self.choice_filters_config.keys():
+                    cf = self.choice_filters_config[name]
                     str_value = self.state.choice_filters[name]
                     self.records = cf.expr(self.records, cf.map_values(str_value))
                     try:

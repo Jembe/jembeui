@@ -15,7 +15,7 @@
 
 {% macro display_link(link, level) -%}
     {% if link.is_accessible %}
-        <button type="button" jmb-on:click.prevent="{{link.jrl}}">
+        <button type="button" class="button button--toolbar button--primary" jmb-on:click.prevent="{{link.jrl}}">
            {{link.title}}
         </button>
     {% endif %}
@@ -33,7 +33,7 @@
             <input jmb-on:input="page=0;search=$self.value;" value="{{search}}" type="text" placeholder="Search..." class="input input--toolbar">
         </div>
         <div class="list-records__toolbar__choice-filters">
-            {% for filter_name, choice_filter in _config.choice_filters.items()  %}
+            {% for filter_name, choice_filter in choice_filters_config.items()  %}
             {% for choice in choice_filter.choices  %}
             <label class="button button--micro button--switch button--switch--toolbar
                 {% if choice_filters and filter_name in choice_filters and choice.value_str in choice_filters[filter_name] %}

@@ -12,11 +12,13 @@ from .components import (
     Breadcrumb,
     CBreadcrumb,
 )
-from flask import current_app
+
+# from flask import current_app
 
 if TYPE_CHECKING:
     from flask import Flask
     from flask_sqlalchemy import SQLAlchemy
+    from jembe import Jembe
 
 __all__ = (
     "JembeUI",
@@ -39,30 +41,26 @@ class _JembeUIState:
 
 class JembeUI:
     def __init__(
-        self, app: Optional["Flask"] = None, default_db: Optional["SQLAlchemy"] = None
+        self, jembe: Optional["Jembe"] = None, default_db: Optional["SQLAlchemy"] = None
     ) -> None:
-        self.app = app
         self.default_db = default_db
-        if app is not None:
-            self.init_app(app)
+        if jembe is not None and jembe.flask is not None:
+            self.init_app(jembe)
 
-    def init_app(self, app: "Flask", default_db: Optional["SQLAlchemy"] = None):
+    def init_app(self, jembe: "Jembe", default_db: Optional["SQLAlchemy"] = None):
         from .page import JembeUIPage
-
-        jembe_state = current_app.extensions.get("jembe", None)
-        if jembe_state is None:
+        self.__jembe = jembe
+        if jembe.flask is not None:
             raise JembeUIError(
-                "Jembe extension must be initialised before initialising JembeUI"
+                "Jembe UI must be initialised before initialising jembe extension"
             )
-        self.app = app
-        if "jembeui" in self.app.extensions:
-            raise JembeUIError("JembeUI can be initialised only once")
-        self.app.extensions["jembeui"] = _JembeUIState(self)
+
+        self.__jembe.extensions["jembeui"] = _JembeUIState(self)
 
         if default_db is not None:
             self.default_db = default_db
 
-        jembe_state.jembe.add_page(
+        jembe.add_page(
             "jembeui", JembeUIPage
         )  # if removed jembeui templates will not load
 
