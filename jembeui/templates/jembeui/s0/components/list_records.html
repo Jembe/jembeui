@@ -33,7 +33,7 @@
             <input jmb-on:input="page=0;search=$self.value;" value="{{search}}" type="text" placeholder="Search..." class="input input--toolbar">
         </div>
         <div class="list-records__toolbar__choice-filters">
-            {% for filter_name, choice_filter in choice_filters_config.items()  %}
+            {% for filter_name, choice_filter in choice_filters_config.items() if not choice_filter.is_grouped  %}
             {% for choice in choice_filter.choices  %}
             <label class="button button--micro button--switch button--switch--toolbar
                 {% if choice_filters and filter_name in choice_filters and choice.value_str in choice_filters[filter_name] %}
@@ -54,6 +54,38 @@
             </label> 
             {% endfor %} 
             {% endfor %}
+            <div class="list-records__toolbar__choice-filters-other" jmb-scope="{opened:true}" jmb-on:click.away="$scope().opened = false">
+                {% set ns = namespace(other_selected = false) %}
+                <div class="list-records__toolbar__choice-filters-other__dropdown" jmb-show="$scope().opened" jmb-cloak>
+                {% for filter_name, choice_filter in choice_filters_config.items() if choice_filter.is_grouped  %}
+                {% for choice in choice_filter.choices  %}
+                <label class="button button--micro button--switch button--switch--toolbar
+                    {% if choice_filters and filter_name in choice_filters and choice.value_str in choice_filters[filter_name] %}
+                    button--switch--on
+                    {% set ns.other_selected = true %}
+                    {% endif %}">
+                    <input type="checkbox" jmb-on:change="
+                        if($self.checked) {
+                            jui_apply_choice_filter('{{filter_name}}','{{choice.value_str}}');
+                        }else{
+                            jui_remove_choice_filter('{{filter_name}}','{{choice.value_str}}')
+                        }"  
+                        value="{{choice.value_str}}"
+                        {% if choice_filters and filter_name in choice_filters and choice.value_str in choice_filters[filter_name] %}
+                        checked
+                        {% endif %}
+                        >
+                    {{choice.title}}
+                </label> 
+                {% endfor %} 
+                {% endfor %}
+                </div>
+                <button type="button" class="list-records__toolbar__choice-filters-other__button button button--micro button--select--toolbar {%if ns.other_selected%}button--select--toolbar--on{% endif %}" jmb-on:click.prevent="$scope().opened = !$scope().opened; " title="Other filters">
+                    Other
+                    <!-- This SVG Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. that You can obtain one at http://mozilla.org/MPL/2.0/. -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill="context-fill" d="M8 12a1 1 0 0 1-.707-.293l-5-5a1 1 0 0 1 1.414-1.414L8 9.586l4.293-4.293a1 1 0 0 1 1.414 1.414l-5 5A1 1 0 0 1 8 12z"></path></svg>
+                </button>
+            </div>
         </div>
         <nav class="list-records__toolbar__pagination">
             <button jmb-on:click="page = page - 1" {% if page == 0 %} disabled {% endif %}>Prev</button>

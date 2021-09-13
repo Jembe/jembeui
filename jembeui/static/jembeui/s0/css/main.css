@@ -336,6 +336,15 @@ a:focus-visible {
 .button--switch--toolbar.button--switch--on {
     background-color: var(--blue-50-a30);
 }
+.button--select--toolbar svg {
+    vertical-align: middle;
+    width: 12px;
+    height: 12px;
+}
+.button--select--toolbar--on {
+    background-color: var(--blue-40);
+    color: var(--grey-10);
+}
 /* Update indicator */
 .page-update-indicator-container {
     height: 4px;
@@ -660,6 +669,26 @@ a.main-menu__sub-menu__title:hover {
     align-items: center;
     flex-direction: row;
     gap: 4px;
+}
+.list-records__toolbar__choice-filters-other {
+    position: relative;
+}
+.list-records__toolbar__choice-filters-other__dropdown {
+    z-index: 1000;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    max-height: 300px;
+    overflow: auto;
+    white-space: nowrap;
+    background-color: var(--white-100);
+    border-radius: 2px;
+    border: solid 1px var(--grey-90-a20);
+    box-shadow: 0 4px 16px var(--grey-90-a10);
+}
+.list-records__toolbar__choice-filters-other__button {
+    position:relative;
+    top: 0;
 }
 .list-records__toolbar__pagination {
     flex-shrink: 0;
