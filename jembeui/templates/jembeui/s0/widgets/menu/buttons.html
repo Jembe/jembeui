@@ -1,28 +1,3 @@
-{# {% macro display_menu(menu, level=0) -%}
-    {% if menu.is_accessible %}
-        {% if level > 0 %}
-        <button type="button" class="button button--short {{menu.styling.css}}" jmb-on:click.prevent="">
-           {{menu.title|default("", true)}}
-
-        </button>
-        {% endif %}
-        {% for mi in menu.items  %}
-            {% if mi.is_menu %}
-                {{display_menu(mi, level+1)}}
-            {% else %}
-                {{display_link(mi, level)}}
-            {% endif %}
-        {% endfor %}
-    {% endif %}
-{%- endmacro %}
-
-{% macro display_link(link, level) -%}
-    {% if link.is_accessible %}
-        <button type="button" class="button button--short {{link.styling.css}}" jmb-on:click.prevent="{{link.jrl}}">
-           {{link.title}}
-        </button>
-    {% endif %}
-{%- endmacro %} #}
 {% macro display_menu_items(menu, level) -%}
     {% for mi in menu.items  %}
         {% if mi.is_menu %}
@@ -43,7 +18,7 @@
         {% elif level == 1 %}
             <div class="buttons-menu__dropdown-container"
                 jmb-on:click.away="if ($scope().opened === '{{menu.id}}') {$scope().opened=null}">
-                <button class="button {% if menu.title %}button--short{% else %}button--ghost{% endif %} {{menu.styling.button_css|default('', true)}}"
+                <button class="button {% if menu.title %}button--short{% else %}button--ghost{% endif %} {{menu.styling.button_css|default('', true)}}{%if menu.styling.primary%} button--primary{%endif%}"
                         jmb-on:click.prevent="if ($scope().opened === '{{menu.id}}'){$scope().opened = null}else{$scope().opened = '{{menu.id}}'}">
                         {% if menu.title %}
                         {{menu.title}}
@@ -75,7 +50,7 @@
 {% macro display_link(link, level) -%}
     {% if link.is_accessible %}
         {% if level == 0 %}
-        <button type="button" class="button button--short {{link.styling.css|default('', true)}}" jmb-on:click.prevent="{{link.jrl}}">
+        <button type="button" class="button button--short {{link.styling.css|default('', true)}}{%if link.styling.primary%} button--primary{%endif%}" jmb-on:click.prevent="{{link.jrl}}">
                 {{link.title}}
         </button>
         {% else %}
