@@ -342,8 +342,14 @@ a:focus-visible {
     height: 12px;
 }
 .button--select--toolbar--on {
+    background-color: var(--blue-50-a30);
+}
+.button--select--toolbar--on:hover {
     background-color: var(--blue-40);
     color: var(--grey-10);
+}
+.button--select--toolbar--on:focus-visible {
+    box-shadow: 0 0 0 1px var(--blue-40);
 }
 /* Update indicator */
 .page-update-indicator-container {

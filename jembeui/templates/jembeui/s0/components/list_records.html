@@ -54,7 +54,7 @@
             </label> 
             {% endfor %} 
             {% endfor %}
-            <div class="list-records__toolbar__choice-filters-other" jmb-scope="{opened:true}" jmb-on:click.away="$scope().opened = false">
+            <div class="list-records__toolbar__choice-filters-other" jmb-scope="{opened:false}" jmb-on:click.away="$scope().opened = false; ">
                 {% set ns = namespace(other_selected = false) %}
                 <div class="list-records__toolbar__choice-filters-other__dropdown" jmb-show="$scope().opened" jmb-cloak>
                 {% for filter_name, choice_filter in choice_filters_config.items() if choice_filter.is_grouped  %}
@@ -69,7 +69,7 @@
                             jui_apply_choice_filter('{{filter_name}}','{{choice.value_str}}');
                         }else{
                             jui_remove_choice_filter('{{filter_name}}','{{choice.value_str}}')
-                        }"  
+                        };"
                         value="{{choice.value_str}}"
                         {% if choice_filters and filter_name in choice_filters and choice.value_str in choice_filters[filter_name] %}
                         checked
