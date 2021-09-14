@@ -1,27 +1,9 @@
-{% macro display_menu(menu, level=0) -%}
-    {% if menu.is_accessible %}
-        {% if level > 0 %}
-        <strong>{{menu.title}}:</strong>
-        {% endif %}
-        {% for mi in menu.items  %}
-            {% if mi.is_menu %}
-                {{display_menu(mi, level+1)}}
-            {% else %}
-                {{display_link(mi, level)}}
-            {% endif %}
-        {% endfor %}
-    {% endif %}
-{%- endmacro %}
-
-{% macro display_link(link, level) -%}
-    {% if link.is_accessible %}
-        <button type="button" class="button button--toolbar button--primary" jmb-on:click.prevent="{{link.jrl}}">
-           {{link.title}}
-        </button>
-    {% endif %}
-{%- endmacro %}
-
 <div>
+    {% if menu %}
+    <div class="list-records__menu">
+    {{menu.as_html('buttons')}} 
+    </div>
+    {% endif %}
     <div class="list-records__toolbar">
         <div class="list-records__toolbar__clear-filters">
             <button type="button" class="button button--ghost button--toolbar" jmb-on:click.prevent="search=''; choice_filters=null" title="Clear all filters">
@@ -88,15 +70,18 @@
             </div>
         </div>
         <nav class="list-records__toolbar__pagination">
-            <button jmb-on:click="page = page - 1" {% if page == 0 %} disabled {% endif %}>Prev</button>
-            Page {{page + 1 if total_pages > 0 else 0}} of {{total_pages}} ({{total_records}} projects)
-            <button jmb-on:click="page = page + 1" {% if page == total_pages - 1 or total_pages == 0 %} disabled {% endif %}>Next</button>
+            <button type="button" class="button button--ghost button--toolbar" jmb-on:click="page = page - 1" {% if page == 0 %} disabled {% endif %}>
+                <!-- This SVG Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. that You can obtain one at http://mozilla.org/MPL/2.0/. -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill="context-fill" d="M6.414 8l4.293-4.293a1 1 0 0 0-1.414-1.414l-5 5a1 1 0 0 0 0 1.414l5 5a1 1 0 0 0 1.414-1.414z"></path></svg>
+            </button>
+            <div class="list-records__toolbar__pagination__text">
+                {{page + 1 if total_pages > 0 else 0}} / {{total_pages}} (rows: {{total_records}})
+            </div>
+            <button type="button" class="button button--ghost button--toolbar" jmb-on:click="page = page + 1" {% if page == total_pages - 1 or total_pages == 0 %} disabled {% endif %}>
+                <!-- This SVG Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. that You can obtain one at http://mozilla.org/MPL/2.0/. -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill="context-fill" d="M6 14a1 1 0 0 1-.707-1.707L9.586 8 5.293 3.707a1 1 0 0 1 1.414-1.414l5 5a1 1 0 0 1 0 1.414l-5 5A1 1 0 0 1 6 14z"></path></svg>
+            </button>
         </nav>
-        {% if menu %}
-        <div class="list-records__toolbar__menu">
-        {{display_menu(menu)}} 
-        </div>
-        {% endif %}
     </div>
     <table class="table">
         <thead class="table__head">
@@ -105,15 +90,15 @@
                 {% if field_name in _config.field_order_by %}
                     {% if order_by == field_name %}
                     <th class="table__head__th--selected">
-                        <a href="" class="table__head__order-link" jmb-on:click.prevent="order_by='-{{field_name}}'"> {{field_title|capitalize}}<span>&#9650;</span></a>
+                        <a href="" class="table__head__order-link" jmb-on:click.prevent="order_by='-{{field_name}}'; page=0"> {{field_title|capitalize}}<span>&#9650;</span></a>
                     </th>
                     {% elif order_by == "-" + field_name %}
                     <th class="table__head__th--selected">
-                        <a href="" class="table__head__order-link" jmb-on:click.prevent="order_by=null">{{field_title|capitalize}}<span>&#9660;</span></a>
+                        <a href="" class="table__head__order-link" jmb-on:click.prevent="order_by=null; page=0">{{field_title|capitalize}}<span>&#9660;</span></a>
                     </th>
                     {% else %}
                     <th>
-                        <a href="" class="table__head__order-link" jmb-on:click.prevent="order_by='{{field_name}}'">{{field_title|capitalize}}</a>
+                        <a href="" class="table__head__order-link" jmb-on:click.prevent="order_by='{{field_name}}'; page=0">{{field_title|capitalize}}</a>
                     </th>
                     {% endif %}
                 {% else %}
@@ -138,7 +123,7 @@
             {% endfor %}
             {% if _config.record_menu %}
             <td>
-            {{get_record_menu(record).as_html('simple_links')}}
+            {{get_record_menu(record).as_html('links')}}
             </td> 
             {% endif %}
         </tr>

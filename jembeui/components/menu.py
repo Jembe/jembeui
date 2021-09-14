@@ -39,6 +39,7 @@ class Link(ABC):
         self,
         active_for_pathnames: Optional[Sequence[str]] = None,
         active_for_exec_names: Optional[Sequence[str]] = None,
+        styling:Optional[Dict[str, Any]] =None
     ):
         self.params: dict = dict()
         self._binded_to: Optional["jembe.Component"] = None
@@ -49,6 +50,7 @@ class Link(ABC):
         self._active_for_exec_names: Optional[Tuple[str, ...]] = (
             tuple(active_for_exec_names) if active_for_exec_names is not None else None
         )
+        self.styling = styling if styling else dict()
 
     @property
     @abstractmethod
@@ -189,6 +191,7 @@ class URLLink(Link):
         icon_html: Optional[Union[str, Callable[["Link"], str]]] = None,
         active_for_pathnames: Optional[Sequence[str]] = None,
         active_for_exec_names: Optional[Sequence[str]] = None,
+        styling: Optional[Dict[str, Any]] = None
     ):
         self._url = url
         self._title = title
@@ -199,6 +202,7 @@ class URLLink(Link):
         super().__init__(
             active_for_pathnames=active_for_pathnames,
             active_for_exec_names=active_for_exec_names,
+            styling=styling
         )
 
     @property
@@ -296,6 +300,7 @@ class ActionLink(Link):
         active_for_pathnames: Optional[Sequence[str]] = None,
         active_for_exec_names: Optional[Sequence[str]] = None,
         action_params: Optional[dict] = None,
+        styling: Optional[Dict[str, Any]] = None
     ):
         self._to = to
         self._title = title
@@ -305,6 +310,7 @@ class ActionLink(Link):
         super().__init__(
             active_for_pathnames=active_for_pathnames,
             active_for_exec_names=active_for_exec_names,
+            styling=styling
         )
         self.action_params = action_params if action_params else dict()
 
@@ -424,6 +430,7 @@ class Menu:
     icon: Optional[Union[str, Callable[["Menu"], str]]] = None
     icon_html: Optional[Union[str, Callable[["Menu"], str]]] = None
     params: Dict[str, Any] = field(default_factory=dict)
+    styling: Dict[str, Any] = field(default_factory=dict)
 
     id: str = field(default="", init=False)
     binded: bool = field(default=False, init=False)
