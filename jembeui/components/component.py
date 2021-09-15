@@ -4,7 +4,7 @@ from ..settings import settings
 import jembe
 
 if TYPE_CHECKING:
-    from jembe import Event
+    from jembe import Event, DisplayResponse
 
 
 __all__ = ("Component",)
@@ -123,3 +123,10 @@ class Component(jembe.Component):
     def jui_on_action_confirmed(self, event: "Event"):
         if hasattr(self, event.action_name):
             return getattr(self, event.action_name)(**event.action_params)
+
+    def hydrate(self):
+        pass
+
+    def display(self) -> "DisplayResponse":
+        self.hydrate()
+        return super().display()

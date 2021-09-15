@@ -318,7 +318,7 @@ class CListRecords(Component):
             name: cf.mount(self) for name, cf in self._config.choice_filters.items()
         }
 
-    def display(self):
+    def hydrate(self):
         self.records = self._config.query.with_session(
             self._config.db.session()
         ).only_return_tuples(True)
@@ -380,8 +380,6 @@ class CListRecords(Component):
 
         # record menu
         self.get_record_menu = self._get_record_menu
-
-        return super().display()
 
     def _get_record_menu(self, record) -> "Menu":
         if self._config.record_menu is None:

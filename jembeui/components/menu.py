@@ -297,10 +297,10 @@ class ActionLink(Link):
         description: Optional[Union[str, Callable[["Link"], str]]] = None,
         icon: Optional[Union[str, Callable[["Link"], str]]] = None,
         icon_html: Optional[Union[str, Callable[["Link"], str]]] = None,
+        styling: Optional[Dict[str, Any]] = None,
         active_for_pathnames: Optional[Sequence[str]] = None,
         active_for_exec_names: Optional[Sequence[str]] = None,
-        action_params: Optional[dict] = None,
-        styling: Optional[Dict[str, Any]] = None
+        params: Optional[dict] = None,
     ):
         self._to = to
         self._title = title
@@ -312,7 +312,7 @@ class ActionLink(Link):
             active_for_exec_names=active_for_exec_names,
             styling=styling
         )
-        self.action_params = action_params if action_params else dict()
+        self.params = params if params else dict()
 
     @property
     def to_full_name(self) -> str:
@@ -416,10 +416,10 @@ class ActionLink(Link):
                     "Action call shortcut cann't be used on subcomponents."
                 )
             return lambda component: component.component().call(
-                to_str[:-2], **self.action_params
+                to_str[:-2], **self.params
             )
         else:
-            return lambda component: component.component(to_str, **self.action_params)
+            return lambda component: component.component(to_str, **self.params)
 
 
 @dataclass

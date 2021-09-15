@@ -16,6 +16,7 @@ from dataclasses import dataclass, field
 from jembe import JembeInitParamSupport, listener
 from ..component import Component
 from ..menu import ActionLink, Menu
+from ...exceptions import JembeUIError
 
 if TYPE_CHECKING:
     import jembe
@@ -35,6 +36,62 @@ def _get_default_breadcrumb_title(component: "jembe.Component") -> str:
     return component._config.name
 
 
+class BreadcrumbList(List["Breadcrumb"]):
+    def insert_into(
+        self, component_full_name: str, *breadcrumbs: "Breadcrumb"
+    ) -> "BreadcrumbList":
+        """
+        Insert breadcrumbs into existing breadcrumb found inside this breacrumb list
+        returns self
+
+        if breadcrumb with component_full_name can't be found raise JembeUI Exception
+        """
+        # TODO
+
+        breadcrumb = self._find_breadcrumb(
+            self, lambda bc: bc.component_full_name == component_full_name
+        )
+        if breadcrumb is None:
+            raise JembeUIError(
+                "Cant find breadcrumb with component full name equal '{}'".format(
+                    component_full_name
+                )
+            )
+        breadcrumb.children = [*breadcrumb.children, *breadcrumbs]
+        return self
+
+    def insert_into_by_title(
+        self, title: str, *breadcrumbs: "Breadcrumb"
+    ) -> "BreadcrumbList":
+        """
+        Insert breadcrumbs into existing breadcrumb found inside this breacrumb list
+        returns self
+        Finds breadcrumb with equal title and where component_full_name is None
+
+        if breadcrumb with title can't be found raise JembeUI Exception
+        """
+        breadcrumb = self._find_breadcrumb(
+            self, lambda bc: bc.title == title and bc.component_full_name is None
+        )
+        if breadcrumb is None:
+            raise JembeUIError(
+                "Cant find breadcrumb with title equal '{}'".format(title)
+            )
+        breadcrumb.children = [*breadcrumb.children, *breadcrumbs]
+        return self
+
+    def _find_breadcrumb(
+        self, breadcrumbs: List["Breadcrumb"], match: Callable[["Breadcrumb"], bool]
+    ) -> Optional["Breadcrumb"]:
+        for bc in breadcrumbs:
+            if match(bc):
+                return bc
+            cmatch = self._find_breadcrumb(bc.children, match)
+            if cmatch:
+                return cmatch
+        return None
+
+
 class Breadcrumb:
     def __init__(
         self,
@@ -43,6 +100,10 @@ class Breadcrumb:
         title: Union[str, Callable[["jembe.Component"], str]] = "",
         children: Optional[Sequence["Breadcrumb"]] = None,
     ) -> None:
+        """
+        When component_full_name and title are None then this breadcrumb should not be displayed
+        becouse its main purpuse is to hold its children (act as container for other breadcrumbs)
+        """
         self.component_full_name = component_full_name
         self.title = title
         if self.title == "" and self.component_full_name is not None:
@@ -57,11 +118,15 @@ class Breadcrumb:
         self.id: str = self._calc_id()
 
         if children is not None:
-            self.children = children
+            self.children = list(children)
 
         if self.component_full_name is None and not isinstance(self.title, str):
             raise ValueError(
                 "Breadcrumb without component_full_name, can't have callable title!"
+            )
+        if self.component_full_name is None and self.title is None:
+            raise ValueError(
+                "Breadcrumb must have either component_full_name or title set!"
             )
 
     def _calc_id(self) -> str:
@@ -102,11 +167,11 @@ class Breadcrumb:
             c._update_all_parents_ids()
 
     @property
-    def children(self) -> Sequence["Breadcrumb"]:
+    def children(self) -> List["Breadcrumb"]:
         return self._children
 
     @children.setter
-    def children(self, children: Sequence["Breadcrumb"]):
+    def children(self, children: List["Breadcrumb"]):
         for c in children:
             c.parent = self
 
@@ -166,10 +231,10 @@ class Breadcrumb:
         cls,
         menu: Optional[Union["Menu", Sequence[Union["Link", "Menu"]]]],
         first_home: bool = False,
-    ) -> Sequence["Breadcrumb"]:
+    ) -> "BreadcrumbList":
         """Generates Breadcrum configuration from Menu configuration"""
         if menu is None:
-            return list()
+            return BreadcrumbList()
         menu_source: "Menu" = Menu(menu) if not isinstance(menu, Menu) else menu
         if not first_home:
             return cls._from_menu_item(menu_source)
@@ -184,10 +249,10 @@ class Breadcrumb:
             for menu_item in menu_source.items[1:]:
                 children.extend(cls._from_menu_item(menu_item))
             home.children = children
-            return [home]
+            return BreadcrumbList((home,))
 
     @classmethod
-    def _from_menu_item(cls, menu_item: Union[Menu, "Link"]) -> Sequence["Breadcrumb"]:
+    def _from_menu_item(cls, menu_item: Union[Menu, "Link"]) -> "BreadcrumbList":
         if isinstance(menu_item, Menu):
             menu = menu_item
             parent_bc: Optional["Breadcrumb"] = (
@@ -195,12 +260,12 @@ class Breadcrumb:
                 if menu.title is not None and isinstance(menu.title, str)
                 else None
             )
-            children: List["Breadcrumb"] = list()
+            children: "BreadcrumbList" = BreadcrumbList()
             for mi in menu.items:
                 children.extend(cls._from_menu_item(mi))
             if parent_bc:
                 parent_bc.children = children
-                return [parent_bc]
+                return BreadcrumbList((parent_bc,))
             else:
                 return children
         elif isinstance(menu_item, ActionLink):
@@ -217,34 +282,18 @@ class Breadcrumb:
                 title: Union[str, Callable[["jembe.Component"], str]] = menu_item.title
             except ValueError:
                 title = lambda component: component.title
-            return [
-                Breadcrumb(
-                    component_full_name=to_full_name,
-                    component_init_params=menu_item.action_params,
-                    title=title,
+            return BreadcrumbList(
+                (
+                    Breadcrumb(
+                        component_full_name=to_full_name,
+                        component_init_params=menu_item.params,
+                        title=title,
+                    ),
                 )
-            ]
+            )
         else:
             # ignore URL links
-            return []
-
-    def find_by_component(self, component_full_name: str) -> "Breadcrumb":
-        """
-        Returns first breadcrumb in hiearachy with matching component_full_name
-
-        Raises ValueError if matching breadcrumb does not exist.
-        """
-        # TODO
-        raise NotImplementedError()
-
-    def find_by_title(self, title: str) -> "Breadcrumb":
-        """
-        Returns first breadcrumb in hiearachy with matching title and component_full_name is None.
-
-        Raises ValueError if matching breadcrumb does not exist.
-        """
-        # TODO
-        raise NotImplementedError()
+            return BreadcrumbList()
 
 
 @dataclass
