@@ -29,7 +29,6 @@ class CPage(Component):
 
     class Config(Component.Config):
         default_template_exp = "jembeui/{style}/components/page/page.html"
-        TEMPLATE_VARIANTS = ("clean",)
 
         def __init__(
             self,
@@ -68,7 +67,7 @@ class CPage(Component):
                     CMenu,
                     CMenu.Config(
                         menu=main_menu,
-                        template=CMenu.Config.template_variant("page_main"),
+                        template="page_main",
                     ),
                 )
             if "_system_menu" not in components:
@@ -76,7 +75,7 @@ class CPage(Component):
                     CMenu,
                     CMenu.Config(
                         menu=system_menu,
-                        template=CMenu.Config.template_variant("page_system"),
+                        template="page_system",
                     ),
                 )
             if "_breadcrumb" not in components:

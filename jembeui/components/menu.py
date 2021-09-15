@@ -501,7 +501,6 @@ class Menu:
 class CMenu(Component):
     class Config(Component.Config):
         default_template_exp = "jembeui/{style}/components/menu.html"
-        TEMPLATE_VARIANTS = ("page_main", "page_system")
 
         def __init__(
             self,

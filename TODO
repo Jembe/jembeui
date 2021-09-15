@@ -41,13 +41,13 @@ list:
     ☐ selectable (select, select all, operation on selected)
     ☐ filterable with custom filters
     s0:
-        ☐ choice filter grouping
-        ☐ pagination 
-        ☐ menu
+        ✔ choice filter grouping @done(21-09-15 21:59)
+        ✔ pagination @done(21-09-15 21:59)
+        ✔ menu @done(21-09-15 21:59)
     ☐ s1
     ☐ s2
     ☐ s3
     ☐ s4
     
-☐ Add dynamic variants to component (like menu and link)
-☐ Add links to breadcrumb
+✔ Add dynamic variants to component (like menu and link) @done(21-09-15 23:35)
+✔ Add links to breadcrumb @done(21-09-15 21:59)

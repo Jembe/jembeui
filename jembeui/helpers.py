@@ -1,13 +1,14 @@
-from jembeui.exceptions import JembeUIError
 from typing import TYPE_CHECKING, List, Dict
+import re
 from flask import current_app
-from .settings import settings
 from jembe import get_jembe
+from .exceptions import JembeUIError
+from .settings import settings
 
 if TYPE_CHECKING:
     from jembeui import JembeUI
 
-__all__ = ("get_jembeui", "get_widget_variants")
+__all__ = ("get_jembeui", "get_widget_variants", "get_component_template_variants")
 
 
 def get_jembeui() -> "JembeUI":
@@ -33,4 +34,20 @@ def get_widget_variants(templates_dir_list: List[str]) -> Dict[str, str]:
                 vname = tname[len(tdir) :].strip("/")
                 if "/" not in vname:
                     template_variants[".".join(vname.split(".")[:-1])] = tname
+    return template_variants
+
+
+def get_component_template_variants(template_name: str) -> Dict[str, str]:
+    """
+    returns dict[  variant_name: template_path]
+    where variant_name is part of template name after __ (double underscore)
+    and before .html extension
+    """
+    template_variants = dict()
+    tname_start = template_name.split(".")[0]
+    reexp = re.compile("{}__([^\.]+)\.[^\.]+".format(tname_start))
+    for tname in current_app.jinja_env.list_templates():
+        variant_match = reexp.match(tname)
+        if variant_match is not None:
+            template_variants[variant_match[1]] = tname
     return template_variants
