@@ -125,7 +125,6 @@ class CListRecords(Component):
 
     class Config(Component.Config):
         default_template_exp = "jembeui/{style}/components/list_records.html"
-        # TEMPLATE_VARIANTS = ()
         default_field_value = default_field_value
         default_field_order_by = default_field_order_by
 
