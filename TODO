@@ -51,3 +51,17 @@ list:
     
 ✔ Add dynamic variants to component (like menu and link) @done(21-09-15 23:35)
 ✔ Add links to breadcrumb @done(21-09-15 21:59)
+
+form (new, edit, view):
+    ☐ form render itself
+    ☐ view is also form for convinience
+    ☐ fields should be rendered with template macrkups (or widgets with variants like menu/link)
+    CForm supoorts:
+        ☐ menu
+        ☐ emits save and cancel events
+        ☐ support seve(temporary=True) default is False
+    ☐ s0
+    ☐ s1
+    ☐ s2
+    ☐ s3
+    ☐ s4

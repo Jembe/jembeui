@@ -1,0 +1,9 @@
+<div class="dialog" jmb-show="$scope().opened" jmb-scope="{opened:true}">
+    <div>
+        <div class="head">
+            <div jmb-ref="title">{{title}}</div>
+            <button jmb-on:click="$scope().opened = false" type="button" title="Close">X</button>
+        </div>
+        <div class="content">Generic 'modal' variant of component template for <strong>{{exec_name}}</strong></div>
+    </div>
+</div>

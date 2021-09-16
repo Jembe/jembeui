@@ -32,7 +32,8 @@
                         {% endif %}
                 </button>
                 <div class="buttons-menu__dropdown" 
-                     jmb-bind:class="{'buttons-menu__dropdown--open': $scope().opened == '{{menu.id}}'}" jmb-cloak>
+                     jmb-bind:class="{'buttons-menu__dropdown--open': $scope().opened == '{{menu.id}}'}" jmb-cloak
+                     jmb-on:click.prevent="if($event.target.tagName === 'A'){$scope().opened = null}">
                     {{display_menu_items(menu, level)}}
                 </div>
             </div>
