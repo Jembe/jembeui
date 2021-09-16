@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING, Callable, Dict, Iterable, Optional, Tuple, Uni
 from jembe.component_config import listener
 from ..settings import settings
 from ..helpers import get_component_template_variants
+from ..exceptions import JembeUIError
 import jembe
 
 if TYPE_CHECKING:
@@ -17,8 +18,8 @@ class Component(jembe.Component):
     """
 
     class Config(jembe.Component.Config):
-        default_template: str
         default_template_exp = "jembeui/{style}/components/component.html"
+        default_template: str
         TEMPLATE_VARIANTS: Dict[str, str]
 
         def __init__(
@@ -33,31 +34,11 @@ class Component(jembe.Component):
             changes_url: bool = True,
             url_query_params: Optional[Dict[str, str]] = None,
         ):
+            self._init_class_based_config()
+            # regular config params
             self.title = title if title else self.default_title
-            # calculate default template and add it to template
-            self.default_template = (
-                self.default_template
-                if hasattr(self, "default_template")
-                else self.default_template_exp.format(style=settings.default_style)
-            )
-            self.__class__.TEMPLATE_VARIANTS = get_component_template_variants(
-                self.default_template
-            )
             if template is None:
                 template = ("", self.default_template)
-            elif isinstance(template, str):
-                original_template = template
-                # if template is one of the variants threat it as default template
-                if template in self.TEMPLATE_VARIANTS:
-                    template = (
-                        "",
-                        self.TEMPLATE_VARIANTS[template],
-                        self.default_template,
-                    )
-                    self.default_template = self.TEMPLATE_VARIANTS[original_template]
-                elif template in self.TEMPLATE_VARIANTS.values():
-                    template = ("", template, self.default_template)
-                    self.default_template = original_template
 
             super().__init__(
                 template=template,
@@ -68,8 +49,32 @@ class Component(jembe.Component):
                 url_query_params=url_query_params,
             )
 
+        @classmethod
+        def _init_class_based_config(cls):
+            # Initialise default class level values here becouse we need app_context to do that
+            if "default_template" not in cls.__dict__:
+                cls.default_template = cls.default_template_exp.format(
+                    style=settings.default_style
+                )
+            if "TEMPLATE_VARIANTS" not in cls.__dict__:
+                cls.TEMPLATE_VARIANTS = get_component_template_variants(
+                    cls.default_template
+                )
+
         def default_title(self, component: "jembe.Component") -> str:
             return self.name.replace("_", " ").title()
+
+        @classmethod
+        def template_variant(cls, variant_name: str) -> str:
+            """Returns template name for variant_name if exist"""
+            cls._init_class_based_config()
+            if variant_name in cls.TEMPLATE_VARIANTS:
+                return cls.TEMPLATE_VARIANTS[variant_name]
+            raise JembeUIError(
+                "Template variant {} for {} does not exist".format(
+                    variant_name, cls.__name__
+                )
+            )
 
     _config: Config
 

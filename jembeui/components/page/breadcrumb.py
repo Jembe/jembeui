@@ -336,7 +336,6 @@ class CBreadcrumb(Component):
 
     class Config(Component.Config):
         default_template_exp = "jembeui/{style}/components/page/breadcrumb.html"
-        # TEMPLATE_VARIANTS = ()
 
         def __init__(
             self,

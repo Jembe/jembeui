@@ -67,7 +67,7 @@ class CPage(Component):
                     CMenu,
                     CMenu.Config(
                         menu=main_menu,
-                        template="page_main",
+                        template=CMenu.Config.template_variant("page_main"),
                     ),
                 )
             if "_system_menu" not in components:
@@ -75,7 +75,7 @@ class CPage(Component):
                     CMenu,
                     CMenu.Config(
                         menu=system_menu,
-                        template="page_system",
+                        template=CMenu.Config.template_variant("page_system"),
                     ),
                 )
             if "_breadcrumb" not in components:
