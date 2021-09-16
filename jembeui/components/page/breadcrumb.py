@@ -383,10 +383,13 @@ class CBreadcrumb(Component):
             self, bitem1: BreadcrumbItem, bitem2: BreadcrumbItem
         ) -> bool:
             """Returns true if bitem1 is parent of bitem2"""
-            return self.is_parent_breadcrumb(
-                self.breadcrumbs_flat[bitem1.id],
-                self.breadcrumbs_flat[bitem2.id],
-            )
+            try:
+                return self.is_parent_breadcrumb(
+                    self.breadcrumbs_flat[bitem1.id],
+                    self.breadcrumbs_flat[bitem2.id],
+                )
+            except KeyError:
+                return False
 
         def is_parent_breadcrumb(self, b1: Breadcrumb, b2: Breadcrumb) -> bool:
             """Returns true if b1 is parent of b2"""
