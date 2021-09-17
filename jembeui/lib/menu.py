@@ -84,7 +84,7 @@ class Menu:
             raise JembeUIError(
                 "Menu must be binded to component in order to be rendered to html"
             )
-        if "/" in variant:
+        if "/" in variant or "." in variant:
             # variant is template name
             template = variant
         else:
