@@ -84,15 +84,17 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
             self.set_readonly_all()
         return self
 
-    def submit(self, record: Optional["Model"] = None) -> Optional["Model"]:
+    def submit(self, record: Union["Model",dict]) -> Union["Model",dict]:
         # TODO
-        if record is not None:
+        if isinstance(record,dict):
+            raise NotImplementedError()
+            # return record
+        else:
             self.populate_obj(record)
             self.cform.session.add(record)
             return record
-        return None
 
-    def cancel(self, record: Optional["Model"] = None):
+    def cancel(self, record: Union["Model",dict]):
         # TODO
         pass
 
