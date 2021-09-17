@@ -8,7 +8,12 @@ from .settings import settings
 if TYPE_CHECKING:
     from jembeui import JembeUI
 
-__all__ = ("get_jembeui", "get_widget_variants", "get_component_template_variants")
+__all__ = (
+    "get_jembeui",
+    "get_widget_variants",
+    "get_component_template_variants",
+    "camel_to_snake",
+)
 
 
 def get_jembeui() -> "JembeUI":
@@ -51,3 +56,13 @@ def get_component_template_variants(template_name: str) -> Dict[str, str]:
         if variant_match is not None:
             template_variants[variant_match[1]] = tname
     return template_variants
+
+
+_re_cts_1 = re.compile("(.)([A-Z][a-z]+)")
+_re_cts_2 = re.compile("([a-z0-9])([A-Z])")
+
+
+def camel_to_snake(name: str) -> str:
+    global _re_cts_1, _re_cts_2
+    name = _re_cts_1.sub(r"\1_\2", name)
+    return _re_cts_2(r"\1_\2", name).lower()

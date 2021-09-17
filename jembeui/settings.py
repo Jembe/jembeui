@@ -27,6 +27,12 @@ class Settings:
             "JEMBEUI_FORM_WIDGETS_VARIANTS_DIRS",
             ["jembeui/{style}/widgets/form/"],
         )
+    @property
+    def forms_template_dir(self):
+        return current_app.config.get(
+            "JEMBEUI_FORMS_TEMPLATE_DIR",
+            "{style}/forms/",
+        )
 
     @property
     def list_records_page_size(self):
