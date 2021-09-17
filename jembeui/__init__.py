@@ -1,22 +1,23 @@
 from typing import TYPE_CHECKING, Optional
 
 from .exceptions import JembeUIError
-from .components import (
-    Component,
-    CPage,
-    CMenu,
+from .lib import (
     Link,
     ActionLink,
     URLLink,
     Menu,
     Breadcrumb,
+)
+from .components import (
+    Component,
+    CPage,
+    CMenu,
     CBreadcrumb,
 )
 
 # from flask import current_app
 
 if TYPE_CHECKING:
-    from flask import Flask
     from flask_sqlalchemy import SQLAlchemy
     from jembe import Jembe
 
@@ -49,6 +50,7 @@ class JembeUI:
 
     def init_app(self, jembe: "Jembe", default_db: Optional["SQLAlchemy"] = None):
         from .page import JembeUIPage
+
         self.__jembe = jembe
         if jembe.flask is not None:
             raise JembeUIError(
