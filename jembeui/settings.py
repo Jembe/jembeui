@@ -21,17 +21,30 @@ class Settings:
             "JEMBEUI_LINK_WIDGETS_VARIANTS_DIRS",
             ["jembeui/{style}/widgets/link/"],
         )
+
     @property
     def form_widgets_variants_dirs(self):
         return current_app.config.get(
             "JEMBEUI_FORM_WIDGETS_VARIANTS_DIRS",
-            ["jembeui/{style}/widgets/form/"],
+            ["widgets/form/", "{style}/widgets/form/", "jembeui/{style}/widgets/form/"],
         )
+
     @property
-    def forms_template_dir(self):
+    def forms_template_dirs(self):
         return current_app.config.get(
-            "JEMBEUI_FORMS_TEMPLATE_DIR",
-            "{style}/forms/",
+            "JEMBEUI_FORMS_TEMPLATE_DIRS",
+            ["forms/","{style}/forms/"],
+        )
+
+    @property
+    def form_fields_template_dirs(self):
+        return current_app.config.get(
+            "JEMBEUI_FORM_FIELDS_TEMPLATE_DIRS",
+            [
+                "widgets/form_fields",
+                "{style}/widgets/form_fields/",
+                "jembeui/{style}/widgets/form_fields/",
+            ],
         )
 
     @property

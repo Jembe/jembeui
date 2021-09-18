@@ -165,6 +165,7 @@ a:focus-visible {
 }
 /* Dialog */
 .dialog {
+    z-index: 1000;
     position: absolute;
     inset: 0;
     background-color: var(--grey-90-a60);

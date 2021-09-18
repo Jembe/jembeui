@@ -8,11 +8,12 @@ if TYPE_CHECKING:
     from ...lib import Form
     from flask_sqlalchemy import Model, SQLAlchemy
 
-__all__ = ("CEdit",)
+__all__ = ("CEditRecord",)
 
 
 class CEditRecord(CForm):
     class Config(CForm.Config):
+        default_template_exp = "jembeui/{style}/components/crud/edit.html"
         def __init__(
             self,
             form: "Form",
@@ -20,7 +21,6 @@ class CEditRecord(CForm):
                 Callable[["jembe.Component"], Union["Model", dict]]
             ] = None,
             redisplay_on_submit: bool = False,
-            db: Optional["SQLAlchemy"] = None,
             title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
             template: Optional[Union[str, Iterable[str]]] = None,
             components: Optional[Dict[str, "jembe.ComponentRef"]] = None,
@@ -31,10 +31,10 @@ class CEditRecord(CForm):
             changes_url: bool = True,
             url_query_params: Optional[Dict[str, str]] = None,
         ):
+            self.redisplay_on_submit = redisplay_on_submit
             super().__init__(
                 form,
                 get_record=get_record,
-                db=db,
                 title=title,
                 template=template,
                 components=components,
@@ -74,6 +74,7 @@ class CEditRecord(CForm):
                     else submited_record.id,
                 )
                 # TODO info notification if needed formated as needed
+                return self._config.redisplay_on_submit
             except (sa.exc.SQLAlchemyError) as error:
                 # TODO error notificationself.
                 pass

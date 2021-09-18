@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING, Optional, Callable, Union, Dict, Iterable, Tuple, Any
-from abc import abstractmethod
 from jembe import run_only_once
+from sqlalchemy.orm.scoping import scoped_session
 from ..component import Component
 from ...helpers import get_jembeui
 from ...exceptions import JembeUIError
@@ -38,8 +38,9 @@ class CForm(Component):
             self.form = form
             self.get_record_callback = get_record
             # defult db can be useds when db is None
-            self.db = db
-            if self.db is None:
+            if db is not None:
+                self.db: "SQLAlchemy" = db
+            else:
                 self.db = get_jembeui().default_db
                 if self.db is None:
                     raise JembeUIError(
@@ -102,6 +103,10 @@ class CForm(Component):
     def display(self) -> "DisplayResponse":
         self.mount()
         return super().display()
+
+    @property
+    def session(self) -> "scoped_session":
+        return self._config.db.session
 
     # def do_submit_form(self)->Tuple[bool,Optional[str]]:
     #     """

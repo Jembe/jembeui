@@ -33,7 +33,7 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
     """
 
     TEMPLATE_VARIANTS: dict
-    TEMPLATE: Union[str, Iterable[str]]
+    DEFAULT_TEMPLATE: Union[str, Iterable[str]]
 
     def __init__(
         self,
@@ -50,11 +50,6 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
         self._readonly_fields: List["Field"] = []
         self.cform: "CForm"
 
-        self.template = (
-            template
-            if template
-            else self.default_template_exp.format(style=settings.default_style)
-        )
         super().__init__(
             formdata=formdata, obj=obj, prefix=prefix, data=data, meta=meta, **kwargs
         )
@@ -84,9 +79,9 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
             self.set_readonly_all()
         return self
 
-    def submit(self, record: Union["Model",dict]) -> Union["Model",dict]:
+    def submit(self, record: Union["Model", dict]) -> Union["Model", dict]:
         # TODO
-        if isinstance(record,dict):
+        if isinstance(record, dict):
             raise NotImplementedError()
             # return record
         else:
@@ -94,7 +89,7 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
             self.cform.session.add(record)
             return record
 
-    def cancel(self, record: Union["Model",dict]):
+    def cancel(self, record: Union["Model", dict]):
         # TODO
         pass
 
@@ -112,8 +107,48 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
     def set_readonly_all(self):
         self.set_readonly(*[field for field in self])
 
+    def template(
+        self, variant_or_template_name: Optional[str] = None
+    ) -> Union[str, List[str]]:
+        if "DEFAULT_TEMPLATE" not in self.__class__.__dict__:
+            self.__class__.DEFAULT_TEMPLATE = [
+                *self.__jui_my_default_template(),
+                self.__jui_get_template_variant(),
+            ]
+        if variant_or_template_name is None:
+            return [
+                t.format(style=settings.default_style) for t in self.DEFAULT_TEMPLATE
+            ]
+        else:
+            if "." in variant_or_template_name or "/" in variant_or_template_name:
+                return variant_or_template_name.format(style=settings.default_style)
+            else:
+                return [
+                    t.format(style=settings.default_style)
+                    for t in [
+                        *self.__jui_my_default_template(variant_or_template_name),
+                        self.__jui_get_template_variant(variant_or_template_name),
+                        *self.__jui_my_default_template(),
+                        self.__jui_get_template_variant(),
+                    ]
+                ]
+
+    def field_template(self, field: Union[str, "wtf.Field"]) -> Union[str, List[str]]:
+        field_class_name = (
+            getattr(self, field).__class__.__name__
+            if isinstance(field, str)
+            else field.__class__.__name__
+        )
+        return [
+            t.format(style=settings.default_style)
+            for t in [
+                "/".join([d, "{}.html".format(camel_to_snake(field_class_name))])
+                for d in ["widgets/form_fields/", *settings.form_fields_template_dirs]
+            ]
+        ]
+
     @property
-    def _jui_template_variants(self) -> Dict[str, str]:
+    def __jui_template_variants(self) -> Dict[str, str]:
         try:
             return self.__class__.TEMPLATE_VARIANTS
         except AttributeError:
@@ -122,40 +157,9 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
             )
         return self.__class__.TEMPLATE_VARIANTS
 
-    def as_html(self, variant: Optional[str] = None) -> str:
-        if not hasattr(self, "cform"):
-            raise JembeUIError("Form must be mounted in order to be rendered as html")
-        template = self._jui_get_template(variant)
-        context = {"form": self}
-        return Markup(render_template(template, **context))
-
-    def _jui_get_template(
-        self, variant_or_template_name: Optional[str] = None
-    ) -> Union[str, List[str]]:
-        if "TEMPLATE" not in self.__class__.__dict__:
-            self.__class__.TEMPLATE = [
-                self._jui_my_default_template(),
-                self._jui_get_template_variant(),
-            ]
-        if variant_or_template_name is None:
-            return [t.format(style=settings.default_style) for t in self.TEMPLATE]
-        else:
-            if "." in variant_or_template_name or "/" in variant_or_template_name:
-                return variant_or_template_name.format(style=settings.default_style)
-            else:
-                return [
-                    t.format(style=settings.default_style)
-                    for t in [
-                        self._jui_my_default_template(variant_or_template_name),
-                        self._jui_get_template_variant(variant_or_template_name),
-                        self._jui_my_default_template(),
-                        self._jui_get_template_variant(),
-                    ]
-                ]
-
-    def _jui_get_template_variant(self, variant: str = "default") -> str:
+    def __jui_get_template_variant(self, variant: str = "default") -> str:
         try:
-            return self._jui_template_variants[variant]
+            return self.__jui_template_variants[variant]
         except KeyError:
             raise JembeUIError(
                 "Form variant '{}' does not exist! Valid variants are :{}".format(
@@ -163,13 +167,16 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
                 )
             )
 
-    def _jui_my_default_template(self, variant: str = "") -> str:
-        return "/".join(
-            [
-                settings.forms_template_dir.strip("/"),
-                "{name}{variant}.html".format(
-                    name=camel_to_snake(self.__class__.name),
-                    variant="__{}".format(variant) if variant else "",
-                ),
-            ]
-        )
+    def __jui_my_default_template(self, variant: str = "") -> List[str]:
+        return [
+            "/".join(
+                [
+                    d.strip("/"),
+                    "{name}{variant}.html".format(
+                        name=camel_to_snake(self.__class__.__name__),
+                        variant="__{}".format(variant) if variant else "",
+                    ),
+                ]
+            )
+            for d in settings.forms_template_dirs
+        ]

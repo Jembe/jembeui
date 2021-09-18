@@ -170,8 +170,9 @@ class CListRecords(Component):
 
             self.query = query
             # defult db can be useds when db is None
-            self.db = db
-            if self.db is None:
+            if db is not None:
+                self.db = db
+            else:
                 self.db = get_jembeui().default_db
                 if self.db is None:
                     raise JembeUIError(
