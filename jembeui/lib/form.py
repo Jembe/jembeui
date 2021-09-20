@@ -1,7 +1,9 @@
 from typing import TYPE_CHECKING, Any, Dict, Iterable, Optional, List, Union
+from datetime import date, datetime
 from abc import ABCMeta
 from markupsafe import Markup
 import wtforms as wtf
+from flask import json
 from flask import render_template
 from jembe import JembeInitParamSupport
 from ..helpers import get_widget_variants, camel_to_snake
@@ -58,18 +60,30 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
 
     @classmethod
     def dump_init_param(cls, value: Any) -> Any:
+        def dump_param(field_name, value):
+            if isinstance(value, JembeInitParamSupport):
+                return value.dump_init_param(value)
+            elif isinstance(value, (date, datetime)):
+                return value.isoformat()
+            return value
+
         return (
-            {
-                k: v.dump_init_param(v) if isinstance(v, JembeInitParamSupport) else v
-                for k, v in value.data.items()
-            }
+            {k: dump_param(k, v) for k, v in value.data.items()}
             if value is not None
             else dict()
         )
 
     @classmethod
-    def load_init_param(cls, value: Any) -> Any:
-        return cls(data=value)
+    def load_init_param(cls, value: dict) -> Any:
+        def load_param(field_name, value):
+            fc = getattr(cls, field_name).field_class
+            if issubclass(fc, wtf.DateField):
+                return date.fromisoformat(value)
+            elif issubclass(fc, wtf.DateTimeField):
+                return datetime.fromisoformat(value)
+            return value
+
+        return cls(data={k: load_param(k, v) for k, v in value.items()})
 
     def mount(self, cform: "CForm") -> "Form":
         """
@@ -193,27 +207,38 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
                 return self.FIELD_TEMPLATES_CACHE[field_class_name]
         except KeyError:
             pass
-        tdirs = ["widgets/form_fields/", *settings.form_fields_template_dirs]
         if field_class_name not in self.FIELD_TEMPLATES_CACHE:
             self.__class__.FIELD_TEMPLATES_CACHE[field_class_name] = [
                 *[
                     "{}/{}/{}.html".format(
-                        d,
-                        camel_to_snake(self.__class__.name),
-                        camel_to_snake(field_class_name),
-                    )
+                        d.strip("/"),
+                        camel_to_snake(self.__class__.__name__),
+                        camel_to_snake(field if isinstance(field, str) else field.name),
+                    ).format(style=settings.default_style)
                     for d in settings.forms_template_dirs
                 ],
                 *[
                     t.format(style=settings.default_style)
                     for t in [
                         "/".join(
-                            [d, "{}.html".format(camel_to_snake(field_class_name))]
+                            [
+                                d.strip("/"),
+                                "{}.html".format(camel_to_snake(field_class_name)),
+                            ]
                         )
-                        for d in [
-                            "widgets/form_fields/",
-                            *settings.form_fields_template_dirs,
-                        ]
+                        for d in settings.form_fields_template_dirs
+                    ]
+                ],
+                *[
+                    t.format(style=settings.default_style)
+                    for t in [
+                        "/".join(
+                            [
+                                d.strip("/"),
+                                "default.html",
+                            ]
+                        )
+                        for d in settings.form_fields_template_dirs
                     ]
                 ],
             ]
@@ -230,7 +255,7 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
                     t.format(style=settings.default_style)
                     for t in [
                         "/".join([d, "{}.html".format(variant_or_template_name)])
-                        for d in tdirs
+                        for d in settings.form_fields_template_dirs
                     ]
                 ],
                 *self.FIELD_TEMPLATES_CACHE[field_class_name],
@@ -256,8 +281,8 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
             return self.__jui_template_variants[variant]
         except KeyError:
             raise JembeUIError(
-                "Form variant '{}' does not exist! Valid variants are :{}".format(
-                    variant, self.template_variants.keys()
+                "Form variant '{}' does not exist! Valid variants are: {}".format(
+                    variant, list(self.TEMPLATE_VARIANTS.keys())
                 )
             )
 

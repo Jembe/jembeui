@@ -1,12 +1,12 @@
 from typing import TYPE_CHECKING, Optional, Union, Callable, Iterable, Tuple, Dict
-from .form import CForm
-from jembe import action
 import sqlalchemy as sa
+from flask_sqlalchemy import Model
+from jembe import action
+from .form import CForm
+from ...lib import Form
 
 if TYPE_CHECKING:
     import jembe
-    from ...lib import Form
-    from flask_sqlalchemy import Model, SQLAlchemy
 
 __all__ = ("CEditRecord",)
 
@@ -14,6 +14,7 @@ __all__ = ("CEditRecord",)
 class CEditRecord(CForm):
     class Config(CForm.Config):
         default_template_exp = "jembeui/{style}/components/crud/edit.html"
+
         def __init__(
             self,
             form: "Form",
@@ -49,9 +50,9 @@ class CEditRecord(CForm):
     def __init__(
         self,
         id: int,
-        form: Optional["Form"] = None,
+        form: Optional[Form] = None,
         is_modified: bool = False,
-        _record: Optional[Union["Model", dict]] = None,
+        _record: Optional[Union[Model, dict]] = None,
     ):
         if _record is not None and (
             _record["id"] == id if isinstance(_record, dict) else _record.id == id

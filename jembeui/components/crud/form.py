@@ -59,7 +59,7 @@ class CForm(Component):
 
     _config: Config
 
-    def __init__(self, form: Optional["Form"] = None):
+    def __init__(self, form: Optional[Form] = None):
         self._record: Union["Model", dict]
         super().__init__()
 

@@ -65,4 +65,4 @@ _re_cts_2 = re.compile("([a-z0-9])([A-Z])")
 def camel_to_snake(name: str) -> str:
     global _re_cts_1, _re_cts_2
     name = _re_cts_1.sub(r"\1_\2", name)
-    return _re_cts_2(r"\1_\2", name).lower()
+    return _re_cts_2.sub(r"\1_\2", name).lower()

@@ -53,6 +53,11 @@ list:
 ✔ Add links to breadcrumb @done(21-09-15 21:59)
 
 form (new, edit, view):
+    edit:
+        ☐ display
+        ☐ submit
+        ☐ cancel
+        ☐ modal
     ☐ form render itself
     ☐ view is also form for convinience
     ☐ fields should be rendered with template macrkups (or widgets with variants like menu/link)
