@@ -33,7 +33,10 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
     """
 
     TEMPLATE_VARIANTS: dict
-    DEFAULT_TEMPLATE: Union[str, Iterable[str]]
+    TEMPLATE_VARIANTS_CACHE: dict
+    DEFAULT_TEMPLATE: Union[str, List[str]]
+    FIELD_TEMPLATES_CACHE: dict
+    FIELD_TEMPLATES_VARIANTS_CACHE: dict
 
     def __init__(
         self,
@@ -43,7 +46,6 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
         data=None,
         meta=None,
         readonly: bool = False,
-        template: Optional[str] = None,
         **kwargs
     ):
         self.is_readonly = readonly
@@ -82,7 +84,9 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
     def submit(self, record: Union["Model", dict]) -> Union["Model", dict]:
         # TODO
         if isinstance(record, dict):
-            raise NotImplementedError()
+            raise JembeUIError(
+                "You must provide submit logic for form when record is dict by overriding 'submit' method"
+            )
             # return record
         else:
             self.populate_obj(record)
@@ -107,54 +111,144 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
     def set_readonly_all(self):
         self.set_readonly(*[field for field in self])
 
-    def template(
+    def as_html(self, variant_or_template_name: Optional[str] = None) -> str:
+        template = self._jui_template(variant_or_template_name)
+        context = self.cform._get_default_template_context()
+        return Markup(render_template(template, **context))
+
+    def field_as_html(
+        self,
+        field: Union[str, "wtf.Field"],
+        variant_or_template_name: Optional[str] = None,
+    ) -> str:
+        template = self._jui_field_template(field, variant_or_template_name)
+        context = self.cform._get_default_template_context()
+        if "form_field" in context:
+            raise JembeUIError(
+                "form_field var already exist in CForm context and "
+                "Form.field_as_html can't be used"
+            )
+        context["form_field"] = (
+            getattr(self, field) if isinstance(field, str) else field
+        )
+        return Markup(render_template(template, **context))
+
+    def _jui_template(
         self, variant_or_template_name: Optional[str] = None
     ) -> Union[str, List[str]]:
         if "DEFAULT_TEMPLATE" not in self.__class__.__dict__:
             self.__class__.DEFAULT_TEMPLATE = [
-                *self.__jui_my_default_template(),
-                self.__jui_get_template_variant(),
+                t.format(style=settings.default_style)
+                for t in [
+                    *self.__jui_my_default_template(),
+                    self.__jui_get_template_variant(),
+                ]
             ]
         if variant_or_template_name is None:
-            return [
-                t.format(style=settings.default_style) for t in self.DEFAULT_TEMPLATE
-            ]
+            return self.DEFAULT_TEMPLATE
         else:
             if "." in variant_or_template_name or "/" in variant_or_template_name:
                 return variant_or_template_name.format(style=settings.default_style)
-            else:
-                return [
-                    t.format(style=settings.default_style)
-                    for t in [
-                        *self.__jui_my_default_template(variant_or_template_name),
-                        self.__jui_get_template_variant(variant_or_template_name),
-                        *self.__jui_my_default_template(),
-                        self.__jui_get_template_variant(),
-                    ]
+            if "TEMPLATE_VARIANTS_CACHE" not in self.__class__.__dict__:
+                self.__class__.TEMPLATE_VARIANTS_CACHE = dict()
+            try:
+                return self.__class__.TEMPLATE_VARIANTS_CACHE[variant_or_template_name]
+            except KeyError:
+                pass
+            self.__class__.TEMPLATE_VARIANTS_CACHE[variant_or_template_name] = [
+                t.format(style=settings.default_style)
+                for t in [
+                    *self.__jui_my_default_template(variant_or_template_name),
+                    self.__jui_get_template_variant(variant_or_template_name),
+                    *self.__jui_my_default_template(),
+                    self.__jui_get_template_variant(),
                 ]
+            ]
+            return self.TEMPLATE_VARIANTS_CACHE[variant_or_template_name]
 
-    def field_template(self, field: Union[str, "wtf.Field"]) -> Union[str, List[str]]:
+    def _jui_field_template(
+        self,
+        field: Union[str, "wtf.Field"],
+        variant_or_template_name: Optional[str] = None,
+    ) -> Union[str, List[str]]:
+        if variant_or_template_name and (
+            "." in variant_or_template_name or "/" in variant_or_template_name
+        ):
+            return variant_or_template_name.format(style=settings.default_style)
+        if "FIELD_TEMPLATES_CACHE" not in self.__class__.__dict__:
+            self.__class__.FIELD_TEMPLATES_CACHE = dict()
+        if "FIELD_TEMPLATES_VARIANTS_CACHE" not in self.__class__.__dict__:
+            self.__class__.FIELD_TEMPLATES_VARIANTS_CACHE = dict()
         field_class_name = (
             getattr(self, field).__class__.__name__
             if isinstance(field, str)
             else field.__class__.__name__
         )
-        return [
-            t.format(style=settings.default_style)
-            for t in [
-                "/".join([d, "{}.html".format(camel_to_snake(field_class_name))])
-                for d in ["widgets/form_fields/", *settings.form_fields_template_dirs]
+        try:
+            if variant_or_template_name:
+                return self.FIELD_TEMPLATES_VARIANTS_CACHE[field_class_name][
+                    variant_or_template_name
+                ]
+            else:
+                return self.FIELD_TEMPLATES_CACHE[field_class_name]
+        except KeyError:
+            pass
+        tdirs = ["widgets/form_fields/", *settings.form_fields_template_dirs]
+        if field_class_name not in self.FIELD_TEMPLATES_CACHE:
+            self.__class__.FIELD_TEMPLATES_CACHE[field_class_name] = [
+                *[
+                    "{}/{}/{}.html".format(
+                        d,
+                        camel_to_snake(self.__class__.name),
+                        camel_to_snake(field_class_name),
+                    )
+                    for d in settings.forms_template_dirs
+                ],
+                *[
+                    t.format(style=settings.default_style)
+                    for t in [
+                        "/".join(
+                            [d, "{}.html".format(camel_to_snake(field_class_name))]
+                        )
+                        for d in [
+                            "widgets/form_fields/",
+                            *settings.form_fields_template_dirs,
+                        ]
+                    ]
+                ],
             ]
-        ]
+        if field_class_name not in self.FIELD_TEMPLATES_VARIANTS_CACHE:
+            self.__class__.FIELD_TEMPLATES_VARIANTS_CACHE[field_class_name] = dict()
+        if (
+            variant_or_template_name
+            not in self.FIELD_TEMPLATES_VARIANTS_CACHE[field_class_name]
+        ):
+            self.__class__.FIELD_TEMPLATES_VARIANTS_CACHE[field_class_name][
+                variant_or_template_name
+            ] = [
+                *[
+                    t.format(style=settings.default_style)
+                    for t in [
+                        "/".join([d, "{}.html".format(variant_or_template_name)])
+                        for d in tdirs
+                    ]
+                ],
+                *self.FIELD_TEMPLATES_CACHE[field_class_name],
+            ]
+        if variant_or_template_name:
+            return self.FIELD_TEMPLATES_VARIANTS_CACHE[field_class_name][
+                variant_or_template_name
+            ]
+        else:
+            return self.FIELD_TEMPLATES_CACHE[field_class_name]
 
     @property
     def __jui_template_variants(self) -> Dict[str, str]:
-        try:
+        if "TEMPLATE_VARIANTS" in self.__class__.__dict__:
             return self.__class__.TEMPLATE_VARIANTS
-        except AttributeError:
-            self.__class__.TEMPLATE_VARIANTS = get_widget_variants(
-                settings.form_widgets_variants_dirs
-            )
+        self.__class__.TEMPLATE_VARIANTS = get_widget_variants(
+            settings.form_widgets_variants_dirs
+        )
         return self.__class__.TEMPLATE_VARIANTS
 
     def __jui_get_template_variant(self, variant: str = "default") -> str:
