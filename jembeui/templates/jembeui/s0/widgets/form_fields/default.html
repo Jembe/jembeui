@@ -1,2 +1,2 @@
 {# check if field is readonly and dont add jmb-on:change #}
-{{form_field(**{"jmb-on:change":"form." + form_field.name + " =  $self.value;is_modified=true", "id":false})}}
+{{form_field(**{"jmb-on:change.defer":"form." + form_field.name + " =  $self.value;is_modified=true", "id":false})}}

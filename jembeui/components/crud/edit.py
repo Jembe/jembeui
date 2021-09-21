@@ -1,14 +1,28 @@
-from typing import TYPE_CHECKING, Optional, Union, Callable, Iterable, Tuple, Dict
+from jembeui.lib.link import ActionLink
+from typing import (
+    TYPE_CHECKING,
+    Optional,
+    Union,
+    Callable,
+    Iterable,
+    Tuple,
+    Dict,
+    Sequence,
+)
 import sqlalchemy as sa
 from flask_sqlalchemy import Model
 from jembe import action
 from .form import CForm
-from ...lib import Form
+from ...lib import Form, Menu, Link, ActionLink
 
 if TYPE_CHECKING:
     import jembe
 
 __all__ = ("CEditRecord",)
+
+
+def default_submit_message(c: "jembe.Component", r: Union["Model", str]):
+    return "Saved sucessefuly"
 
 
 class CEditRecord(CForm):
@@ -22,6 +36,10 @@ class CEditRecord(CForm):
                 Callable[["jembe.Component"], Union["Model", dict]]
             ] = None,
             redisplay_on_submit: bool = False,
+            menu: Optional[Union["Menu", Sequence[Union["Link", "Menu"]]]] = None,
+            submit_message: Optional[
+                Callable[["jembe.Component", Union["Model", dict]], str]
+            ] = default_submit_message,
             title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
             template: Optional[Union[str, Iterable[str]]] = None,
             components: Optional[Dict[str, "jembe.ComponentRef"]] = None,
@@ -33,6 +51,17 @@ class CEditRecord(CForm):
             url_query_params: Optional[Dict[str, str]] = None,
         ):
             self.redisplay_on_submit = redisplay_on_submit
+            self.menu: "Menu" = (
+                Menu(
+                    [
+                        ActionLink("submit()", "Save", styling=dict(primary=True)),
+                        ActionLink("cancel()", "Cancel"),
+                    ]
+                )
+                if menu is None
+                else (Menu(menu) if not isinstance(menu, Menu) else menu)
+            )
+            self.submit_message = submit_message
             super().__init__(
                 form,
                 get_record=get_record,
@@ -74,10 +103,34 @@ class CEditRecord(CForm):
                     if isinstance(submited_record, dict)
                     else submited_record.id,
                 )
-                # TODO info notification if needed formated as needed
+                if self._config.submit_message:
+                    self.jui_push_notification(
+                        self._config.submit_message(self, submited_record), "success"
+                    )
                 return self._config.redisplay_on_submit
             except (sa.exc.SQLAlchemyError) as error:
-                # TODO error notificationself.
-                pass
-        self.session.roolback()
+                self.jui_push_notification(
+                    str(getattr(error, "orig", error))
+                    if isinstance(error, sa.exc.SQLAlchemyError)
+                    else str(error),
+                    "error",
+                )
+        self.session.rollback()
         return True
+
+    @action
+    def cancel(self, confirmed:bool=False):
+        if confirmed or not self.state.is_modified:
+            self.emit(
+                "cancel",
+                record=self.record,
+                record_id=self.record["id"]
+                if isinstance(self.record, dict)
+                else self.record.id,
+            )
+        else:
+            self.jui_confirm_action('cancel', "Unsaved changes", "You have unsaved changes that will be lost.")
+
+    def hydrate(self):
+        self.menu = self._config.menu.bind_to(self)
+        return super().hydrate()
