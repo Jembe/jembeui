@@ -214,7 +214,4 @@ class CBreadcrumb(Component):
                         )
                 bitems_new_ext.extend(reversed(non_links))
             bitems_new_ext.append(bitem)
-        print(self.state.bitems)
-        print(tuple(bitems_new_ext))
-        print(tuple(bitems_new_ext)== self.state.bitems)
         self.state.bitems = tuple(bitems_new_ext)
