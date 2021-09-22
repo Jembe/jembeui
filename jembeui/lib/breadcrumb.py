@@ -322,3 +322,13 @@ class BreadcrumbItem(JembeInitParamSupport):
             url=value.get("url"),
             jrl=value.get("jrl"),
         )
+
+    def __eq__(self, o: object) -> bool:
+        if not isinstance(o, BreadcrumbItem):
+            return False
+        return (
+            self.id == o.id
+            and self.title == o.title
+            and self.url == o.url
+            and self.jrl == o.jrl
+        )
