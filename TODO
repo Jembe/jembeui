@@ -54,13 +54,15 @@ list:
 
 form (new, edit, view):
     edit:
-        ☐ display
-        ☐ submit
-        ☐ cancel
+        ✔ display @done(21-09-24 14:37)
+        ✔ submit @done(21-09-24 14:37)
+        ✔ cancel @done(21-09-24 14:37)
         ☐ modal
-    ☐ form render itself
+    ✔ form render itself @done(21-09-24 14:37)
     ☐ view is also form for convinience
-    ☐ fields should be rendered with template macrkups (or widgets with variants like menu/link)
+    ✔ fields should be rendered with template macrkups (or widgets with variants like menu/link) @done(21-09-24 14:37)
+    ☐ Customize form input apperance
+    ☐ Add support for image and files with dropdown 
     CForm supoorts:
         ☐ menu
         ☐ emits save and cancel events

@@ -21,8 +21,26 @@ if TYPE_CHECKING:
 __all__ = ("CEditRecord",)
 
 
-def default_submit_message(c: "jembe.Component", r: Union["Model", str]):
-    return "Saved sucessefuly"
+def default_on_submit(c: "CEditRecord", r: Union["Model", str]):
+    c.jui_push_notification("Saved sucessefuly", "success")
+
+
+def default_on_invalid_form(c: "CEditRecord"):
+    # TODO chek are they errors not associated with field and display it
+    c.jui_push_notification("Form is invalid", "warn")
+
+
+def default_on_submit_exception(c: "CEditRecord", error: "Exception"):
+    if isinstance(error, sa.exc.SQLAlchemyError):
+        c.jui_push_notification(
+            str(getattr(error, "orig", error))
+            if isinstance(error, sa.exc.SQLAlchemyError)
+            else str(error),
+            "error",
+        )
+    else:
+        c.jui_push_notification(str(error), "error")
+    return ("Saved sucessefuly", "error")
 
 
 class CEditRecord(CForm):
@@ -33,13 +51,20 @@ class CEditRecord(CForm):
             self,
             form: "Form",
             get_record: Optional[
-                Callable[["jembe.Component"], Union["Model", dict]]
+                Callable[["CEditRecord"], Union["Model", dict]]
             ] = None,
             redisplay_on_submit: bool = False,
             menu: Optional[Union["Menu", Sequence[Union["Link", "Menu"]]]] = None,
-            submit_message: Optional[
-                Callable[["jembe.Component", Union["Model", dict]], str]
-            ] = default_submit_message,
+            on_submit: Optional[
+                Callable[["CEditRecord", Union["Model", dict]], None]
+            ] = default_on_submit,
+            on_invalid_form: Optional[
+                Callable[["CEditRecord"], None]
+            ] = default_on_invalid_form,
+            on_submit_exception: Optional[
+                Callable[["CEditRecord", "Exception"], None]
+            ] = default_on_submit_exception,
+            on_cancel: Optional[Callable[["CEditRecord"], None]] = None,
             title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
             template: Optional[Union[str, Iterable[str]]] = None,
             components: Optional[Dict[str, "jembe.ComponentRef"]] = None,
@@ -61,7 +86,10 @@ class CEditRecord(CForm):
                 if menu is None
                 else (Menu(menu) if not isinstance(menu, Menu) else menu)
             )
-            self.submit_message = submit_message
+            self.on_submit = on_submit
+            self.on_invalid_form = on_invalid_form
+            self.on_submit_exception = on_submit_exception
+            self.on_cancel = on_cancel
             super().__init__(
                 form,
                 get_record=get_record,
@@ -103,24 +131,23 @@ class CEditRecord(CForm):
                     if isinstance(submited_record, dict)
                     else submited_record.id,
                 )
-                if self._config.submit_message:
-                    self.jui_push_notification(
-                        self._config.submit_message(self, submited_record), "success"
-                    )
+                if self._config.on_submit:
+                    self._config.on_submit(self, submited_record)
                 return self._config.redisplay_on_submit
-            except (sa.exc.SQLAlchemyError) as error:
-                self.jui_push_notification(
-                    str(getattr(error, "orig", error))
-                    if isinstance(error, sa.exc.SQLAlchemyError)
-                    else str(error),
-                    "error",
-                )
+            except Exception as error:
+                if self._config.on_submit_exception:
+                    self._config.on_submit_exception(self, error)
+        else:
+            if self._config.on_invalid_form:
+                self._config.on_invalid_form(self)
         self.session.rollback()
         return True
 
     @action
-    def cancel(self, confirmed:bool=False):
+    def cancel(self, confirmed: bool = False):
         if confirmed or not self.state.is_modified:
+            if self._config.on_cancel:
+                self._config.on_cancel(self)
             self.emit(
                 "cancel",
                 record=self.record,
@@ -129,7 +156,11 @@ class CEditRecord(CForm):
                 else self.record.id,
             )
         else:
-            self.jui_confirm_action('cancel', "Unsaved changes", "You have unsaved changes that will be lost.")
+            self.jui_confirm_action(
+                "cancel",
+                "Unsaved changes",
+                "You have unsaved changes in {} that will be lost.".format(self.title),
+            )
 
     def hydrate(self):
         self.menu = self._config.menu.bind_to(self)

@@ -121,6 +121,14 @@ a:focus-visible {
 
 }
 /* Notification */
+.page-notification-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10000;
+    padding: 8px 25% 0;
+}
 .page-notification {
     width: auto;
     border-radius: 4px;
