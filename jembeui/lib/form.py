@@ -1,10 +1,9 @@
-from typing import TYPE_CHECKING, Any, Dict, Iterable, Optional, List, Union
+from typing import TYPE_CHECKING, Any, Dict, Optional, List, Union
 from datetime import date, datetime
 from abc import ABCMeta
 from markupsafe import Markup
 import wtforms as wtf
-from flask import json
-from flask import render_template
+from flask import render_template, current_app
 from jembe import JembeInitParamSupport
 from ..helpers import get_widget_variants, camel_to_snake
 from ..settings import settings
@@ -78,9 +77,9 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
         def load_param(field_name, value):
             fc = getattr(cls, field_name).field_class
             if issubclass(fc, wtf.DateField):
-                return date.fromisoformat(value)
+                return date.fromisoformat(value) if value is not None else None
             elif issubclass(fc, wtf.DateTimeField):
-                return datetime.fromisoformat(value)
+                return datetime.fromisoformat(value) if value is not None else None
             return value
 
         return cls(data={k: load_param(k, v) for k, v in value.items()})

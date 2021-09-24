@@ -18,19 +18,19 @@ from ...lib import Form, Menu, Link, ActionLink
 if TYPE_CHECKING:
     import jembe
 
-__all__ = ("CEditRecord",)
+__all__ = ("CUpdateRecord",)
 
 
-def default_on_submit(c: "CEditRecord", r: Union["Model", str]):
+def default_on_submit(c: "CUpdateRecord", r: Union["Model", str]):
     c.jui_push_notification("Saved sucessefuly", "success")
 
 
-def default_on_invalid_form(c: "CEditRecord"):
+def default_on_invalid_form(c: "CUpdateRecord"):
     # TODO chek are they errors not associated with field and display it
     c.jui_push_notification("Form is invalid", "warn")
 
 
-def default_on_submit_exception(c: "CEditRecord", error: "Exception"):
+def default_on_submit_exception(c: "CUpdateRecord", error: "Exception"):
     if isinstance(error, sa.exc.SQLAlchemyError):
         c.jui_push_notification(
             str(getattr(error, "orig", error))
@@ -40,31 +40,30 @@ def default_on_submit_exception(c: "CEditRecord", error: "Exception"):
         )
     else:
         c.jui_push_notification(str(error), "error")
-    return ("Saved sucessefuly", "error")
 
 
-class CEditRecord(CForm):
+class CUpdateRecord(CForm):
     class Config(CForm.Config):
-        default_template_exp = "jembeui/{style}/components/crud/edit.html"
+        default_template_exp = "jembeui/{style}/components/crud/update.html"
 
         def __init__(
             self,
             form: "Form",
             get_record: Optional[
-                Callable[["CEditRecord"], Union["Model", dict]]
+                Callable[["CUpdateRecord"], Union["Model", dict]]
             ] = None,
             redisplay_on_submit: bool = False,
             menu: Optional[Union["Menu", Sequence[Union["Link", "Menu"]]]] = None,
             on_submit: Optional[
-                Callable[["CEditRecord", Union["Model", dict]], None]
+                Callable[["CUpdateRecord", Union["Model", dict]], None]
             ] = default_on_submit,
             on_invalid_form: Optional[
-                Callable[["CEditRecord"], None]
+                Callable[["CUpdateRecord"], None]
             ] = default_on_invalid_form,
             on_submit_exception: Optional[
-                Callable[["CEditRecord", "Exception"], None]
+                Callable[["CUpdateRecord", "Exception"], None]
             ] = default_on_submit_exception,
-            on_cancel: Optional[Callable[["CEditRecord"], None]] = None,
+            on_cancel: Optional[Callable[["CUpdateRecord"], None]] = None,
             title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
             template: Optional[Union[str, Iterable[str]]] = None,
             components: Optional[Dict[str, "jembe.ComponentRef"]] = None,

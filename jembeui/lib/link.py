@@ -13,7 +13,7 @@ from abc import ABC, abstractmethod
 from functools import cached_property
 from copy import copy
 from urllib.parse import urlparse
-from jembe import ComponentReference
+from jembe import ComponentReference, ComponentConfig
 from flask import render_template
 
 from ..exceptions import JembeUIError
@@ -23,7 +23,11 @@ from ..helpers import get_widget_variants
 if TYPE_CHECKING:
     import jembe
 
-__all__ = ("Link", "URLLink", "ActionLink",)
+__all__ = (
+    "Link",
+    "URLLink",
+    "ActionLink",
+)
 
 
 class Link(ABC):
@@ -355,6 +359,11 @@ class ActionLink(Link):
             return self._title
         self._chek_binded()
         if self._title is None:
+            if (
+                self._component_reference.action
+                != ComponentConfig.DEFAULT_DISPLAY_ACTION
+            ):
+                return self._component_reference.action.title()
             return self._component_reference.component_instance.title
         return self._title(self)
 

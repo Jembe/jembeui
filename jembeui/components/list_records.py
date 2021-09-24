@@ -42,7 +42,7 @@ def default_field_value(component: "jembe.Component", record, field_name: str) -
     elif isinstance(value, bool):
         return str(value)  # TODO
     else:
-        return str(value)  # type: ignore
+        return str(value) if value is not None else ""  # type: ignore
 
 
 def default_field_order_by(
