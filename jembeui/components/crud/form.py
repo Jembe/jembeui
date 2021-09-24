@@ -1,5 +1,4 @@
 from typing import TYPE_CHECKING, Optional, Callable, Union, Dict, Iterable, Tuple, Any
-from jembe import run_only_once
 from sqlalchemy.orm.scoping import scoped_session
 from ..component import Component
 from ...helpers import get_jembeui
@@ -11,10 +10,10 @@ if TYPE_CHECKING:
     from jembe import DisplayResponse
     from flask_sqlalchemy import SQLAlchemy, Model
 
-__all__ = ("CForm",)
+__all__ = ("CFormBase", "CForm")
 
 
-class CForm(Component):
+class CFormBase(Component):
     class Config(Component.Config):
         default_template_exp = "jembeui/{style}/components/crud/form.html"
 
@@ -59,7 +58,7 @@ class CForm(Component):
 
     _config: Config
 
-    def __init__(self, form: Optional[Form] = None):
+    def __init__(self):
         self._record: Union["Model", dict]
         super().__init__()
 
@@ -71,17 +70,6 @@ class CForm(Component):
         if name == "form":
             return config.form.load_init_param(value)
         return super().load_init_param(config, name, value)
-
-    @run_only_once
-    def mount(self):
-        if self.state.form is None:
-            self.state.form = (
-                self._config.form(data=self.record)
-                if isinstance(self.record, dict)
-                else self._config.form(obj=self.record)
-            )
-
-        self.state.form.mount(self)
 
     def get_record(self) -> Union["Model", dict]:
         if self._config.get_record_callback is None:
@@ -100,27 +88,22 @@ class CForm(Component):
             self._record = self.get_record()
         return self._record
 
-    def display(self) -> "DisplayResponse":
-        self.mount()
-        return super().display()
-
     @property
     def session(self) -> "scoped_session":
         return self._config.db.session
 
-    # def do_submit_form(self)->Tuple[bool,Optional[str]]:
-    #     """
-    #         Returns (true, None) if submit is sucessfull
-    #         Otherwise returns (False, "Error message") when submit is
-    #         unsucessfull
-    #     """
-    #     raise NotImplementedError()
-    #     self.mount()
-    #     if self.state.form.validate():
-    #         self.state.form.submit(self.record)
-    #     return (False, None)
 
-    # def do_cancel_form(self):
-    #     self.mount()
-    #     self.state.form.cancel(self.record)
-    #     raise NotImplementedError()
+class CForm(CFormBase):
+    class Config(CFormBase.Config):
+        pass
+
+    def __init__(self, form: Optional[Form] = None):
+        if self.state.form is None:
+            self.state.form = (
+                self._config.form(data=self.record)
+                if isinstance(self.record, dict)
+                else self._config.form(obj=self.record)
+            )
+
+        self.state.form.mount(self)
+        super().__init__()

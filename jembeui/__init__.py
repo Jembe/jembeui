@@ -11,7 +11,17 @@ from .lib import (
     JembeFileField,
     JembeImageField,
 )
-from .components import Component, CPage, CMenu, CBreadcrumb, CListRecords, CForm, CUpdateRecord, CCreateRecord
+from .components import (
+    Component,
+    CPage,
+    CMenu,
+    CBreadcrumb,
+    CListRecords,
+    CForm,
+    CUpdateRecord,
+    CCreateRecord,
+    CViewRecord,
+)
 
 if TYPE_CHECKING:
     from flask_sqlalchemy import SQLAlchemy
@@ -35,6 +45,7 @@ __all__ = (
     "CForm",
     "CUpdateRecord",
     "CCreateRecord",
+    "CViewRecord",
 )
 
 

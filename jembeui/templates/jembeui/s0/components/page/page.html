@@ -31,8 +31,10 @@
                 {{component("_main_menu")}}
             </div>
             <div class="page-layout__main__content">
-                {{component("_breadcrumb")}}
-                {{component("_notifications")}}
+                <div class="page-layout__main__content__top-bar">
+                    {{component("_breadcrumb")}}
+                    {{component("_notifications")}}
+                </div>
                 {% block page_content %}{% endblock page_content %}
             </div>
         </div>

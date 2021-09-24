@@ -118,7 +118,6 @@ class CUpdateRecord(CForm):
 
     @action
     def submit(self) -> Optional[bool]:
-        self.mount()
         if self.state.form.validate():
             try:
                 submited_record = self.state.form.submit(self.record)

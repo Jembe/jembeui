@@ -57,10 +57,13 @@ form (new, edit, view):
         ✔ display @done(21-09-24 14:37)
         ✔ submit @done(21-09-24 14:37)
         ✔ cancel @done(21-09-24 14:37)
-        ☐ modal
+        ☐ modal !
     ✔ form render itself @done(21-09-24 14:37)
-    ☐ view is also form for convinience
+    ✔ view is also form for convinience @done(21-09-25 01:01)
     ✔ fields should be rendered with template macrkups (or widgets with variants like menu/link) @done(21-09-24 14:37)
+    ☐ Delete action make it universal
+    view:
+        ☐ back and forth navigation
     ☐ Customize form input apperance
     ☐ Add support for image and files with dropdown 
     CForm supoorts:

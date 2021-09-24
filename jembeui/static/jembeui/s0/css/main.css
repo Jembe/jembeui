@@ -121,14 +121,6 @@ a:focus-visible {
 
 }
 /* Notification */
-.page-notification-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 10000;
-    padding: 8px 25% 0;
-}
 .page-notification {
     width: auto;
     border-radius: 4px;
@@ -137,6 +129,7 @@ a:focus-visible {
     display: flex;
     align-items: center;
     margin-bottom: 2px;
+    padding: 0 16px;
 }
 .page-notification svg {
     width: 16px;
@@ -445,6 +438,12 @@ a:focus-visible {
 .page-layout__main__content {
     padding: 0 16px 32px 16px;
     flex-grow:1;
+}
+.page-layout__main__content__top-bar {
+    display:flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
 }
 /*Page main menu */
 .main-menu {

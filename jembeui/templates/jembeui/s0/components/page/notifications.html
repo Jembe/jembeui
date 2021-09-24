@@ -1,4 +1,4 @@
-<div class="page-notification-container">
+<div>
 {% for noteId, note in notifications.items() %}
     {% if note.level in ("info", "success", "warn") %}
     <div class="page-notification {{note.level}}" 
