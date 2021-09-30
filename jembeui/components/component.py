@@ -72,7 +72,7 @@ class Component(jembe.Component):
                 return cls.TEMPLATE_VARIANTS[variant_name]
             raise JembeUIError(
                 "Template variant {} for {} does not exist".format(
-                    variant_name, cls.__name__
+                    variant_name, cls.default_template_exp
                 )
             )
 

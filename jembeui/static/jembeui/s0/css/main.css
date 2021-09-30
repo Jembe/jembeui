@@ -621,6 +621,9 @@ a.main-menu__sub-menu__title:hover {
     display: flex;
     gap: 4px;
 }
+.buttons-menu--modal {
+    flex-direction: row-reverse;
+}
 .buttons-menu__dropdown-container {
     position: relative;
 }
