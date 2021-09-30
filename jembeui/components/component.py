@@ -39,6 +39,9 @@ class Component(jembe.Component):
             self.title = title if title else self.default_title
             if template is None:
                 template = ("", self.default_template)
+            elif isinstance(template, str) and template in self.TEMPLATE_VARIANTS.values():
+                self.default_template = template
+                template = ("", template)
 
             super().__init__(
                 template=template,
