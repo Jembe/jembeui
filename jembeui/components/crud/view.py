@@ -8,9 +8,11 @@ from typing import (
     Dict,
     Sequence,
 )
-from flask_sqlalchemy import Model
+from jembe import action
+from flask_sqlalchemy import Model, SQLAlchemy
 from .form import CFormBase
 from ...lib import Form, Menu, Link
+
 
 if TYPE_CHECKING:
     import jembe
@@ -29,6 +31,7 @@ class CViewRecord(CFormBase):
                 Callable[["CViewRecord"], Union["Model", dict]]
             ] = None,
             menu: Optional[Union["Menu", Sequence[Union["Link", "Menu"]]]] = None,
+            db: Optional["SQLAlchemy"] = None,
             title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
             template: Optional[Union[str, Iterable[str]]] = None,
             components: Optional[Dict[str, "jembe.ComponentRef"]] = None,
@@ -47,6 +50,7 @@ class CViewRecord(CFormBase):
             super().__init__(
                 form,
                 get_record=get_record,
+                db=db,
                 title=title,
                 template=template,
                 components=components,
@@ -67,7 +71,7 @@ class CViewRecord(CFormBase):
             _record["id"] == id if isinstance(_record, dict) else _record.id == id
         ):
             self._record = _record
-        self.form:Form = (
+        self.form: Form = (
             self._config.form(data=self.record)
             if isinstance(self.record, dict)
             else self._config.form(obj=self.record)
@@ -75,6 +79,10 @@ class CViewRecord(CFormBase):
         self.form.set_readonly_all()
         self.form.mount(self)
         super().__init__()
+
+    @action
+    def cancel(self):
+        self.emit("cancel", id=self.record.id, record=self.record)
 
     def hydrate(self):
         self.menu = self._config.menu.bind_to(self)

@@ -21,6 +21,7 @@ from .components import (
     CUpdateRecord,
     CCreateRecord,
     CViewRecord,
+    CDeleteRecord,
 )
 
 if TYPE_CHECKING:
@@ -46,6 +47,7 @@ __all__ = (
     "CUpdateRecord",
     "CCreateRecord",
     "CViewRecord",
+    "CDeleteRecord",
 )
 
 

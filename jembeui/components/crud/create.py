@@ -10,7 +10,7 @@ from typing import (
     Sequence,
 )
 import sqlalchemy as sa
-from flask_sqlalchemy import Model
+from flask_sqlalchemy import Model, SQLAlchemy
 from jembe import action
 from .form import CForm
 from ...lib import Form, Menu, Link, ActionLink
@@ -64,6 +64,7 @@ class CCreateRecord(CForm):
                 Callable[["CCreateRecord", "Exception"], None]
             ] = default_on_submit_exception,
             on_cancel: Optional[Callable[["CCreateRecord"], None]] = None,
+            db: Optional["SQLAlchemy"] = None,
             title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
             template: Optional[Union[str, Iterable[str]]] = None,
             components: Optional[Dict[str, "jembe.ComponentRef"]] = None,
@@ -92,6 +93,7 @@ class CCreateRecord(CForm):
             super().__init__(
                 form,
                 get_record=get_record,
+                db=db,
                 title=title,
                 template=template,
                 components=components,

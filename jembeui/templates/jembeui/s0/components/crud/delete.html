@@ -1,0 +1,13 @@
+<div class="dialog">
+    <div>
+        <div class="head">
+            <div jmb-ref="title">Delete record!</div>
+            <button jmb-on:click="cancel()" type="button" title="Close">X</button>
+        </div>
+        <div class="content">Are You sure to delete '{{record}}'?</div>
+        <div class="footer">
+            <button jmb-on:click="cancel()" type="button" class="button">Cancel</button>
+            <button jmb-on:click="submit()" jmb-on:ready="$self.focus()" type="button" class="button button--danger">Delete</button>
+        </div>
+    </div>
+</div>
