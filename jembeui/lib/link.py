@@ -22,6 +22,7 @@ from ..helpers import get_widget_variants
 
 if TYPE_CHECKING:
     import jembe
+    import jembeui
 
 __all__ = (
     "Link",
@@ -181,12 +182,12 @@ class Link(ABC):
 class URLLink(Link):
     def __init__(
         self,
-        url: Union[str, Callable[["Link"], str]],
-        title: Union[str, Callable[["Link"], str]],
-        description: Optional[Union[str, Callable[["Link"], str]]] = None,
-        is_accessible: Union[bool, Callable[["Link"], bool]] = True,
-        icon: Optional[Union[str, Callable[["Link"], str]]] = None,
-        icon_html: Optional[Union[str, Callable[["Link"], str]]] = None,
+        url: Union[str, Callable[["jembeui.Link"], str]],
+        title: Union[str, Callable[["jembeui.Link"], str]],
+        description: Optional[Union[str, Callable[["jembeui.Link"], str]]] = None,
+        is_accessible: Union[bool, Callable[["jembeui.Link"], bool]] = True,
+        icon: Optional[Union[str, Callable[["jembeui.Link"], str]]] = None,
+        icon_html: Optional[Union[str, Callable[["jembeui.Link"], str]]] = None,
         active_for_pathnames: Optional[Sequence[str]] = None,
         active_for_exec_names: Optional[Sequence[str]] = None,
         styling: Optional[Dict[str, Any]] = None,
@@ -291,10 +292,10 @@ class ActionLink(Link):
             "jembe.ComponentReference",
             Callable[["jembe.Component"], "jembe.ComponentReference"],
         ],
-        title: Optional[Union[str, Callable[["Link"], str]]] = None,
-        description: Optional[Union[str, Callable[["Link"], str]]] = None,
-        icon: Optional[Union[str, Callable[["Link"], str]]] = None,
-        icon_html: Optional[Union[str, Callable[["Link"], str]]] = None,
+        title: Optional[Union[str, Callable[["jembeui.Link"], str]]] = None,
+        description: Optional[Union[str, Callable[["jembeui.Link"], str]]] = None,
+        icon: Optional[Union[str, Callable[["jembeui.Link"], str]]] = None,
+        icon_html: Optional[Union[str, Callable[["jembeui.Link"], str]]] = None,
         styling: Optional[Dict[str, Any]] = None,
         active_for_pathnames: Optional[Sequence[str]] = None,
         active_for_exec_names: Optional[Sequence[str]] = None,

@@ -6,7 +6,7 @@ from ..exceptions import JembeUIError
 import jembe
 
 if TYPE_CHECKING:
-    from jembe import Event, DisplayResponse
+    import jembe
 
 
 __all__ = ("Component",)
@@ -39,7 +39,10 @@ class Component(jembe.Component):
             self.title = title if title else self.default_title
             if template is None:
                 template = ("", self.default_template)
-            elif isinstance(template, str) and template in self.TEMPLATE_VARIANTS.values():
+            elif (
+                isinstance(template, str)
+                and template in self.TEMPLATE_VARIANTS.values()
+            ):
                 self.default_template = template
                 template = ("", template)
 
@@ -117,13 +120,13 @@ class Component(jembe.Component):
         )
 
     @listener(event="actionConfirmed")
-    def jui_on_action_confirmed(self, event: "Event"):
+    def jui_on_action_confirmed(self, event: "jembe.Event"):
         if hasattr(self, event.action_name):
             return getattr(self, event.action_name)(**event.action_params)
 
     def hydrate(self):
         pass
 
-    def display(self) -> "DisplayResponse":
+    def display(self) -> "jembe.DisplayResponse":
         self.hydrate()
         return super().display()

@@ -17,7 +17,7 @@ from ..exceptions import JembeUIError
 
 if TYPE_CHECKING:
     import jembe
-    from jembeui import Link
+    import jembeui
 
 
 __all__ = (
@@ -38,8 +38,8 @@ def _get_default_breadcrumb_title(component: "jembe.Component") -> str:
 
 class BreadcrumbList(List["Breadcrumb"]):
     def insert_into(
-        self, component_full_name: str, *breadcrumbs: "Breadcrumb"
-    ) -> "BreadcrumbList":
+        self, component_full_name: str, *breadcrumbs: "jembeui.Breadcrumb"
+    ) -> "jembeui.BreadcrumbList":
         """
         Insert breadcrumbs into existing breadcrumb found inside this breacrumb list
         returns self
@@ -61,8 +61,8 @@ class BreadcrumbList(List["Breadcrumb"]):
         return self
 
     def insert_into_by_title(
-        self, title: str, *breadcrumbs: "Breadcrumb"
-    ) -> "BreadcrumbList":
+        self, title: str, *breadcrumbs: "jembeui.Breadcrumb"
+    ) -> "jembeui.BreadcrumbList":
         """
         Insert breadcrumbs into existing breadcrumb found inside this breacrumb list
         returns self
@@ -81,8 +81,10 @@ class BreadcrumbList(List["Breadcrumb"]):
         return self
 
     def _find_breadcrumb(
-        self, breadcrumbs: List["Breadcrumb"], match: Callable[["Breadcrumb"], bool]
-    ) -> Optional["Breadcrumb"]:
+        self,
+        breadcrumbs: List["jembeui.Breadcrumb"],
+        match: Callable[["jembeui.Breadcrumb"], bool],
+    ) -> Optional["jembeui.Breadcrumb"]:
         for bc in breadcrumbs:
             if match(bc):
                 return bc
@@ -98,7 +100,7 @@ class Breadcrumb:
         component_full_name: Optional[str] = None,
         component_init_params: Optional[dict] = None,
         title: Union[str, Callable[["jembe.Component"], str]] = "",
-        children: Optional[Sequence["Breadcrumb"]] = None,
+        children: Optional[Sequence["jembeui.Breadcrumb"]] = None,
     ) -> None:
         """
         When component_full_name and title are None then this breadcrumb should not be displayed
@@ -146,11 +148,11 @@ class Breadcrumb:
         return str(uuid3(NAMESPACE_DNS, idstr))
 
     @property
-    def parent(self) -> Optional["Breadcrumb"]:
+    def parent(self) -> Optional["jembeui.Breadcrumb"]:
         return self._parent
 
     @parent.setter
-    def parent(self, parent: "Breadcrumb"):
+    def parent(self, parent: "jembeui.Breadcrumb"):
         if self._parent is not None:
             # remove itself from parent breadcrumb
             self._parent.children = [
@@ -167,11 +169,11 @@ class Breadcrumb:
             c._update_all_parents_ids()
 
     @property
-    def children(self) -> List["Breadcrumb"]:
+    def children(self) -> List["jembeui.Breadcrumb"]:
         return self._children
 
     @children.setter
-    def children(self, children: List["Breadcrumb"]):
+    def children(self, children: List["jembeui.Breadcrumb"]):
         for c in children:
             c.parent = self
 
@@ -229,9 +231,11 @@ class Breadcrumb:
     @classmethod
     def from_menu(
         cls,
-        menu: Optional[Union["Menu", Sequence[Union["Link", "Menu"]]]],
+        menu: Optional[
+            Union["jembeui.Menu", Sequence[Union["jembeui.Link", "jembeui.Menu"]]]
+        ],
         first_home: bool = False,
-    ) -> "BreadcrumbList":
+    ) -> "jembeui.BreadcrumbList":
         """Generates Breadcrum configuration from Menu configuration"""
         if menu is None:
             return BreadcrumbList()
@@ -252,7 +256,9 @@ class Breadcrumb:
             return BreadcrumbList((home,))
 
     @classmethod
-    def _from_menu_item(cls, menu_item: Union[Menu, "Link"]) -> "BreadcrumbList":
+    def _from_menu_item(
+        cls, menu_item: Union["jembeui.Menu", "jembeui.Link"]
+    ) -> "jembeui.BreadcrumbList":
         if isinstance(menu_item, Menu):
             menu = menu_item
             parent_bc: Optional["Breadcrumb"] = (

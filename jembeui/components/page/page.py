@@ -19,7 +19,7 @@ from ..menu import CMenu
 
 if TYPE_CHECKING:
     import jembe
-    from ..menu import Menu, Link
+    import jembeui
 
 __all__ = ("CPage",)
 
@@ -32,11 +32,15 @@ class CPage(Component):
 
         def __init__(
             self,
-            main_menu: Optional[Union["Menu", Sequence[Union["Link", "Menu"]]]] = None,
-            system_menu: Optional[
-                Union["Menu", Sequence[Union["Link", "Menu"]]]
+            main_menu: Optional[
+                Union["jembeui.Menu", Sequence[Union["jembeui.Link", "jembeui.Menu"]]]
             ] = None,
-            breadcrumbs: Optional[Union["Breadcrumb", Sequence["Breadcrumb"]]] = None,
+            system_menu: Optional[
+                Union["jembeui.Menu", Sequence[Union["jembeui.Link", "jembeui.Menu"]]]
+            ] = None,
+            breadcrumbs: Optional[
+                Union["jembeui.Breadcrumb", Sequence["jembeui.Breadcrumb"]]
+            ] = None,
             breadcrumb_first_is_home: bool = True,
             title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
             template: Optional[Union[str, Iterable[str]]] = None,
@@ -82,9 +86,7 @@ class CPage(Component):
                 if breadcrumbs is None:
                     breadcrumbs = []
                     breadcrumbs.extend(
-                        Breadcrumb.from_menu(
-                            main_menu, breadcrumb_first_is_home
-                        )
+                        Breadcrumb.from_menu(main_menu, breadcrumb_first_is_home)
                     )
                     breadcrumbs.extend(Breadcrumb.from_menu(system_menu))
 

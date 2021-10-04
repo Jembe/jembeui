@@ -3,15 +3,15 @@ from datetime import date, datetime
 from abc import ABCMeta
 from markupsafe import Markup
 import wtforms as wtf
-from flask import render_template, current_app
+from flask import render_template
 from jembe import JembeInitParamSupport
 from ..helpers import get_widget_variants, camel_to_snake
 from ..settings import settings
 from ..exceptions import JembeUIError
 
 if TYPE_CHECKING:
-    from ..components import CForm
-    from wtforms import Field
+    import jembeui
+    import wtforms
     from flask_sqlalchemy import Model
 
 __all__ = ("Form",)
@@ -50,8 +50,8 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
         **kwargs
     ):
         self.is_readonly = readonly
-        self._readonly_fields: List["Field"] = []
-        self.cform: "CForm"
+        self._readonly_fields: List["wtforms.Field"] = []
+        self.cform: "jembeui.CForm"
 
         super().__init__(
             formdata=formdata, obj=obj, prefix=prefix, data=data, meta=meta, **kwargs
@@ -84,7 +84,7 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
 
         return cls(data={k: load_param(k, v) for k, v in value.items()})
 
-    def mount(self, cform: "CForm") -> "Form":
+    def mount(self, cform: "jembeui.CForm") -> "jembeui.Form":
         """
         Mount is called by CFrom before form is displayed or before
         form needs aditional processing
@@ -110,12 +110,14 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
         # TODO
         pass
 
-    def _field_setdefault(self, field: "Field", param_name: str, value: Any) -> Any:
+    def _field_setdefault(
+        self, field: "wtforms.Field", param_name: str, value: Any
+    ) -> Any:
         if field.render_kw is None:
             field.render_kw = dict()
         return field.render_kw.setdefault(param_name, value)
 
-    def set_readonly(self, *fields: "Field"):
+    def set_readonly(self, *fields: "wtforms.Field"):
         for field in fields:
             self._field_setdefault(field, "disabled", True)
             self._field_setdefault(field, "readonly", True)
@@ -131,7 +133,7 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
 
     def field_as_html(
         self,
-        field: Union[str, "wtf.Field"],
+        field: Union[str, "wtforms.Field"],
         variant_or_template_name: Optional[str] = None,
     ) -> str:
         template = self._jui_field_template(field, variant_or_template_name)
@@ -181,7 +183,7 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
 
     def _jui_field_template(
         self,
-        field: Union[str, "wtf.Field"],
+        field: Union[str, "wtforms.Field"],
         variant_or_template_name: Optional[str] = None,
     ) -> Union[str, List[str]]:
         if variant_or_template_name and (

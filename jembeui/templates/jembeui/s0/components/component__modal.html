@@ -2,7 +2,7 @@
     <div>
         <div class="head">
             <div>{{title}}</div>
-            {%- if  action_is_accessible("cancel") %}
+            {%- if  component("cancel()").is_accessible %}
             <button jmb-on:click="cancel()" type="button" title="Close">X</button>
             {% else %}
             <button jmb-on:click="$jmb.emit('cancel')" type="button" title="Close">X</button>

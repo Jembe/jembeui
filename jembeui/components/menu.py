@@ -10,10 +10,11 @@ from typing import (
 )
 
 from .component import Component
-from ..lib import Menu, Link
+from ..lib import Menu
 
 if TYPE_CHECKING:
     import jembe
+    import jembeui
 
 __all__ = ("CMenu",)
 
@@ -24,7 +25,9 @@ class CMenu(Component):
 
         def __init__(
             self,
-            menu: Optional[Union["Menu", Sequence[Union["Link", "Menu"]]]] = None,
+            menu: Optional[
+                Union["jembeui.Menu", Sequence[Union["jembeui.Link", "jembeui.Menu"]]]
+            ] = None,
             title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
             template: Optional[Union[str, Iterable[str]]] = None,
             components: Optional[Dict[str, "jembe.ComponentRef"]] = None,
@@ -52,6 +55,5 @@ class CMenu(Component):
 
     _config: Config
 
-    def display(self) -> "jembe.DisplayResponse":
+    def hydrate(self):
         self.menu = self._config.menu.bind_to(self)
-        return super().display()

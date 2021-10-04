@@ -5,7 +5,7 @@ from jembe import listener
 from flask import current_app
 
 if TYPE_CHECKING:
-    from jembe import Event
+    import jembe
 
 __all__ = ("CPageTitle",)
 
@@ -25,7 +25,7 @@ class CPageTitle(Component):
         return self.state.title
 
     @listener(event="setPageTitle")
-    def on_set_page_title(self, event: "Event"):
+    def on_set_page_title(self, event: "jembe.Event"):
         try:
             self.state.title = event.params["title"]
         except Exception as e:

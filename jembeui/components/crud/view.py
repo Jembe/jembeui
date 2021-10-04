@@ -11,11 +11,12 @@ from typing import (
 from jembe import action
 from flask_sqlalchemy import Model, SQLAlchemy
 from .form import CFormBase
-from ...lib import Form, Menu, Link
+from ...lib import Form, Menu
 
 
 if TYPE_CHECKING:
     import jembe
+    import jembeui
 
 __all__ = ("CViewRecord",)
 
@@ -28,9 +29,9 @@ class CViewRecord(CFormBase):
             self,
             form: "Form",
             get_record: Optional[
-                Callable[["CViewRecord"], Union["Model", dict]]
+                Callable[["jembeui.CViewRecord"], Union["Model", dict]]
             ] = None,
-            menu: Optional[Union["Menu", Sequence[Union["Link", "Menu"]]]] = None,
+            menu: Optional[Union["jembeui.Menu", Sequence[Union["jembeui.Link", "jembeui.Menu"]]]] = None,
             db: Optional["SQLAlchemy"] = None,
             title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
             template: Optional[Union[str, Iterable[str]]] = None,

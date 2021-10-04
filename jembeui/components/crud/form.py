@@ -7,7 +7,7 @@ from ...lib import Form
 
 if TYPE_CHECKING:
     import jembe
-    from jembe import DisplayResponse
+    import jembeui
     from flask_sqlalchemy import SQLAlchemy, Model
 
 __all__ = ("CFormBase", "CForm")
@@ -19,7 +19,7 @@ class CFormBase(Component):
 
         def __init__(
             self,
-            form: "Form",
+            form: "jembeui.Form",
             get_record: Optional[
                 Callable[["jembe.Component"], Union["Model", dict]]
             ] = None,

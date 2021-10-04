@@ -16,17 +16,18 @@ from ...helpers import get_jembeui
 from ...exceptions import JembeUIError
 
 if TYPE_CHECKING:
+    import jembeui
     import jembe
 
 __all__ = ("CDeleteRecord",)
 
 
 
-def default_on_submit(c: "CDeleteRecord", r: Union["Model", str]):
+def default_on_submit(c: "jembeui.CDeleteRecord", r: Union["Model", str]):
     c.jui_push_notification("Deleted successefully", "success")
 
 
-def default_on_submit_exception(c: "CDeleteRecord", error: "Exception"):
+def default_on_submit_exception(c: "jembeui.CDeleteRecord", error: "Exception"):
     if isinstance(error, sa.exc.SQLAlchemyError):
         c.jui_push_notification(
             str(getattr(error, "orig", error))
@@ -45,17 +46,17 @@ class CDeleteRecord(Component):
         def __init__(
             self,
             get_record: Optional[
-                Callable[["CDeleteRecord"], Union["Model", dict]]
+                Callable[["jembeui.CDeleteRecord"], Union["Model", dict]]
             ] = None,
             redisplay_on_submit: bool = False,
             on_submit: Optional[
-                Callable[["CDeleteRecord", Union["Model", dict]], None]
+                Callable[["jembeui.CDeleteRecord", Union["Model", dict]], None]
             ] = default_on_submit,
             on_submit_exception: Optional[
-                Callable[["CDeleteRecord", "Exception"], None]
+                Callable[["jembeui.CDeleteRecord", "Exception"], None]
             ] = default_on_submit_exception,
+            on_cancel: Optional[Callable[["jembeui.CDeleteRecord"], None]] = None,
             db: Optional["SQLAlchemy"] = None,
-            on_cancel: Optional[Callable[["CDeleteRecord"], None]] = None,
             title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
             template: Optional[Union[str, Iterable[str]]] = None,
             components: Optional[Dict[str, "jembe.ComponentRef"]] = None,

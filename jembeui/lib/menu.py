@@ -18,18 +18,19 @@ from flask import render_template
 from ..exceptions import JembeUIError
 from ..settings import settings
 from ..helpers import get_widget_variants
-from .link import Link
 
 if TYPE_CHECKING:
     import jembe
+    import jembeui
+
 
 @dataclass
 class Menu:
-    items: Sequence[Union["Link", "Menu"]] = field(default_factory=list)
-    title: Optional[Union[str, Callable[["Menu"], str]]] = None
-    description: Optional[Union[str, Callable[["Menu"], str]]] = None
-    icon: Optional[Union[str, Callable[["Menu"], str]]] = None
-    icon_html: Optional[Union[str, Callable[["Menu"], str]]] = None
+    items: Sequence[Union["jembeui.Link", "jembeui.Menu"]] = field(default_factory=list)
+    title: Optional[Union[str, Callable[["jembeui.Menu"], str]]] = None
+    description: Optional[Union[str, Callable[["jembeui.Menu"], str]]] = None
+    icon: Optional[Union[str, Callable[["jembeui.Menu"], str]]] = None
+    icon_html: Optional[Union[str, Callable[["jembeui.Menu"], str]]] = None
     params: Dict[str, Any] = field(default_factory=dict)
     styling: Dict[str, Any] = field(default_factory=dict)
 
@@ -97,4 +98,3 @@ class Menu:
             template = self.template_variants[variant]
         context = {"menu": self}
         return Markup(render_template(template, **context))
-

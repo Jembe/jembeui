@@ -15,6 +15,7 @@ from ...lib import Breadcrumb, BreadcrumbItem
 
 if TYPE_CHECKING:
     import jembe
+    import jembeui
 
 
 __all__ = (
@@ -37,7 +38,7 @@ class CBreadcrumb(Component):
 
         def __init__(
             self,
-            breadcrumbs: Sequence["Breadcrumb"],
+            breadcrumbs: Sequence["jembeui.Breadcrumb"],
             title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
             template: Optional[Union[str, Iterable[str]]] = None,
             components: Optional[Dict[str, "jembe.ComponentRef"]] = None,
@@ -69,8 +70,8 @@ class CBreadcrumb(Component):
 
         def _flatten_breadcrumbs(
             self,
-            breadcrumbs: Sequence[Breadcrumb],
-        ) -> Dict[str, Breadcrumb]:
+            breadcrumbs: Sequence["jembeui.Breadcrumb"],
+        ) -> Dict[str, "jembeui.Breadcrumb"]:
             flatten: Dict[str, Breadcrumb] = dict()
             for bc in breadcrumbs:
                 flatten[bc.id] = bc

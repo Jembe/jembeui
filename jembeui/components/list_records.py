@@ -24,7 +24,7 @@ import sqlalchemy as sa
 
 if TYPE_CHECKING:
     import jembe
-    from .menu import Link
+    import jembeui
     from flask_sqlalchemy import SQLAlchemy
 
 __all__ = ("CListRecords",)
@@ -108,7 +108,9 @@ class CListRecords(Component):
                     )
                 )
 
-        def mount(self, component: "jembe.Component") -> "CListRecords.ChoiceFilter":
+        def mount(
+            self, component: "jembe.Component"
+        ) -> "jembeui.CListRecords.ChoiceFilter":
             if self._dynamic_choices:
                 cfcopy = CListRecords.ChoiceFilter(
                     self.expr, *self.choices, grouped=self.is_grouped
@@ -133,7 +135,7 @@ class CListRecords(Component):
             query: "sa.orm.Query",
             fields: Optional[Dict[str, str]] = None,
             field_values: Optional[
-                Dict[str, Callable[["Component", Any, str], str]]
+                Dict[str, Callable[["jembeui.Component", Any, str], str]]
             ] = None,
             field_order_by: Optional[
                 Dict[str, Callable[["sa.orm.Query", str, bool], "sa.orm.Query"]]
@@ -142,11 +144,16 @@ class CListRecords(Component):
             search_filter: Optional[
                 Callable[["sa.orm.Query", str], "sa.orm.Query"]
             ] = None,
-            choice_filters: Iterable["CListRecords.ChoiceFilter"] = (),
-            menu: Optional[Union["Menu", Sequence[Union["Link", "Menu"]]]] = None,
+            choice_filters: Iterable["jembeui.CListRecords.ChoiceFilter"] = (),
+            menu: Optional[
+                Union["jembeui.Menu", Sequence[Union["jembeui.Link", "jembeui.Menu"]]]
+            ] = None,
             record_menu: Optional[
                 Callable[
-                    ["Component", Any], Union["Menu", Sequence[Union["Link", "Menu"]]]
+                    ["Component", Any],
+                    Union[
+                        "jembeui.Menu", Sequence[Union["jembeui.Link", "jembeui.Menu"]]
+                    ],
                 ]
             ] = None,
             page_size: int = 0,
@@ -381,7 +388,7 @@ class CListRecords(Component):
         # record menu
         self.get_record_menu = self._get_record_menu
 
-    def _get_record_menu(self, record) -> "Menu":
+    def _get_record_menu(self, record) -> "jembeui.Menu":
         if self._config.record_menu is None:
             raise JembeUIError()
         raw_menu = self._config.record_menu(self, record)

@@ -16,20 +16,21 @@ from ...lib import Form, Menu, Link, ActionLink
 
 if TYPE_CHECKING:
     import jembe
+    import jembeui
 
 __all__ = ("CUpdateRecord",)
 
 
-def default_on_submit(c: "CUpdateRecord", r: Union["Model", str]):
+def default_on_submit(c: "jembeui.CUpdateRecord", r: Union["Model", str]):
     c.jui_push_notification("Saved sucessefuly", "success")
 
 
-def default_on_invalid_form(c: "CUpdateRecord"):
+def default_on_invalid_form(c: "jembeui.CUpdateRecord"):
     # TODO chek are they errors not associated with field and display it
     c.jui_push_notification("Form is invalid", "warn")
 
 
-def default_on_submit_exception(c: "CUpdateRecord", error: "Exception"):
+def default_on_submit_exception(c: "jembeui.CUpdateRecord", error: "Exception"):
     if isinstance(error, sa.exc.SQLAlchemyError):
         c.jui_push_notification(
             str(getattr(error, "orig", error))
@@ -49,20 +50,22 @@ class CUpdateRecord(CForm):
             self,
             form: "Form",
             get_record: Optional[
-                Callable[["CUpdateRecord"], Union["Model", dict]]
+                Callable[["jembeui.CUpdateRecord"], Union["Model", dict]]
             ] = None,
             redisplay_on_submit: bool = False,
-            menu: Optional[Union["Menu", Sequence[Union["Link", "Menu"]]]] = None,
+            menu: Optional[
+                Union["jembeui.Menu", Sequence[Union["jembeui.Link", "jembeui.Menu"]]]
+            ] = None,
             on_submit: Optional[
-                Callable[["CUpdateRecord", Union["Model", dict]], None]
+                Callable[["jembeui.CUpdateRecord", Union["Model", dict]], None]
             ] = default_on_submit,
             on_invalid_form: Optional[
-                Callable[["CUpdateRecord"], None]
+                Callable[["jembeui.CUpdateRecord"], None]
             ] = default_on_invalid_form,
             on_submit_exception: Optional[
-                Callable[["CUpdateRecord", "Exception"], None]
+                Callable[["jembeui.CUpdateRecord", "Exception"], None]
             ] = default_on_submit_exception,
-            on_cancel: Optional[Callable[["CUpdateRecord"], None]] = None,
+            on_cancel: Optional[Callable[["jembeui.CUpdateRecord"], None]] = None,
             db: Optional["SQLAlchemy"] = None,
             title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
             template: Optional[Union[str, Iterable[str]]] = None,
