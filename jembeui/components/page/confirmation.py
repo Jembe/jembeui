@@ -5,7 +5,7 @@ from ..component import Component
 from jembe import config, listener, action, JembeInitParamSupport
 
 if TYPE_CHECKING:
-    from jembe import Event
+    import jembe
 
 
 __all__ = "CActionConfirmationDialog"
@@ -49,7 +49,7 @@ class CActionConfirmationDialog(Component):
         super().__init__()
 
     @listener(event="requestActionConfirmation")
-    def on_request_confirmation(self, event: "Event"):
+    def on_request_confirmation(self, event: "jembe.Event"):
         self.state.confirmation = event.confirmation
         self.state.source = event.source_exec_name
 
