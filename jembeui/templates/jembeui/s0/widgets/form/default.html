@@ -1,8 +1,6 @@
 <div class="form">
 {%set top = namespace(grab_focus = true) %}
 {% for field in form  %}
-    {# {% with columns_span=form.FIELDS_KW[field.name].get("columns", 1) %} #}
-    {# {% endwith %} #}
     {% with is_inline=form.FIELDS_KW[field.name].get("_inline", False) %}
         {% if not is_inline and not loop.first %}
         </div> 
