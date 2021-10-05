@@ -123,6 +123,8 @@ a:focus-visible {
 }
 /* Notification */
 .page-notification {
+    z-index: 90000;
+    position: relative;
     width: auto;
     border-radius: 4px;
     min-height: 32px;

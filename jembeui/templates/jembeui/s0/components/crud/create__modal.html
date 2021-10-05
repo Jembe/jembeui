@@ -1,5 +1,5 @@
 <div class="modal">
-    <div>
+    <div class="modal__dialog">
         <div class="modal__dialog__head">
             <div jmb-ref="title">{{title}}</div>
             <button jmb-on:click="{%- if component('cancel').is_accesible %}cancel(){% else %}$jmb.emit('cancel'){% endif -%}" type="button" title="Close">X</button>
