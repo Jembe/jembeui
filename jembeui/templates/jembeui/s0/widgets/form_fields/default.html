@@ -1,5 +1,22 @@
-{# check if field is readonly and dont add jmb-on:change #}
-{{form_field(**{"jmb-on:change.defer":"form." + form_field.name + " =  $self.value;is_modified=true", "id":false})}}
-{% for error in form_field.errors %}
-<div>{{error}}</div>
-{% endfor %}
+{%set field_id = "{}--{}".format(exec_name.replace("/","-"), form_field.name)%}
+{% do render_kw.update({
+    "id": field_id,
+    "class": " ".join(["input", "input--error" if form_field.errors else "", render_kw.get("+class", "")]) if "class" not in render_kw else render_kw["class"]
+}) %}
+{% if "disabled" not in render_kw %}
+    {% do render_kw.update({"jmb-on:change.defer": "form.{} = $self.value; is_modified = true".format(form_field.name)}) %}
+{% endif %}
+
+<div 
+    {%- if 'class' in field_kw  %}
+    class="{{field_kw['class']}}"
+    {% else %}
+    class="form-field form-field--{{form_field.type|replace('Field', '')|lower}} {{field_kw['+class']|default('',true)}}"
+    {% endif -%}
+    {% for k,w in field_kw.items() if k != "class" %}{{k}}="{{w}}"{% endfor %}>
+    <label for="{{field_id}}" class="input-label">{{form_field.label}}</label>
+    {{form_field(**render_kw)}}
+    {% for error in form_field.errors %}
+    <div class="form-field__error">{{error}}</div>
+    {% endfor %}
+</div>

@@ -38,6 +38,7 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
     DEFAULT_TEMPLATE: Union[str, List[str]]
     FIELD_TEMPLATES_CACHE: dict
     FIELD_TEMPLATES_VARIANTS_CACHE: dict
+    FIELDS_KW: Dict[str, Dict[str, Any]] = dict()
 
     def __init__(
         self,
@@ -46,11 +47,10 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
         prefix="",
         data=None,
         meta=None,
-        readonly: bool = False,
+        disabled: bool = False,
         **kwargs
     ):
-        self.is_readonly = readonly
-        self._readonly_fields: List["wtforms.Field"] = []
+        self.is_disabled = disabled
         self.cform: "jembeui.CForm"
 
         super().__init__(
@@ -67,7 +67,14 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
             return value
 
         return (
-            {k: dump_param(k, v) for k, v in value.data.items()}
+            {
+                k: dump_param(k, v)
+                for k, v in value.data.items()
+                if getattr(getattr(cls, k, None), "render_kw", dict()).get(
+                    "disabled", None
+                )
+                is None
+            }
             if value is not None
             else dict()
         )
@@ -82,7 +89,16 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
                 return datetime.fromisoformat(value) if value is not None else None
             return value
 
-        return cls(data={k: load_param(k, v) for k, v in value.items()})
+        return cls(
+            data={
+                k: load_param(k, v)
+                for k, v in value.items()
+                if getattr(getattr(cls, k, None), "render_kw", dict()).get(
+                    "disabled", None
+                )
+                is None
+            }
+        )
 
     def mount(self, cform: "jembeui.CForm") -> "jembeui.Form":
         """
@@ -90,8 +106,13 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
         form needs aditional processing
         """
         self.cform = cform
-        if self.is_readonly:
-            self.set_readonly_all()
+        for field in self:
+            if field.name not in self.FIELDS_KW:
+                if field.render_kw and "field" in field.render_kw:
+                    self.FIELDS_KW[field.name] = field.render_kw.get("field")
+                    del field.render_kw["field"]
+                else:
+                    self.FIELDS_KW[field.name] = {}
         return self
 
     def submit(self, record: Union["Model", dict]) -> Union["Model", dict]:
@@ -110,42 +131,40 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
         # TODO
         pass
 
-    def _field_setdefault(
-        self, field: "wtforms.Field", param_name: str, value: Any
-    ) -> Any:
-        if field.render_kw is None:
-            field.render_kw = dict()
-        return field.render_kw.setdefault(param_name, value)
-
-    def set_readonly(self, *fields: "wtforms.Field"):
+    def set_disabled(self, *fields: "wtforms.Field"):
         for field in fields:
             self._field_setdefault(field, "disabled", True)
-            self._field_setdefault(field, "readonly", True)
-            self._readonly_fields.append(field)
 
-    def set_readonly_all(self):
-        self.set_readonly(*[field for field in self])
-
-    def as_html(self, variant_or_template_name: Optional[str] = None) -> str:
-        template = self._jui_template(variant_or_template_name)
+    def as_html(self, _variant_or_template_name: Optional[str] = None) -> str:
+        template = self._jui_template(_variant_or_template_name)
         context = self.cform._get_default_template_context()
         return Markup(render_template(template, **context))
 
     def field_as_html(
         self,
         field: Union[str, "wtforms.Field"],
-        variant_or_template_name: Optional[str] = None,
+        _variant_or_template_name: Optional[str] = None,
+        **render_kw
     ) -> str:
-        template = self._jui_field_template(field, variant_or_template_name)
+        template = self._jui_field_template(field, _variant_or_template_name)
         context = self.cform._get_default_template_context()
         if "form_field" in context:
             raise JembeUIError(
                 "form_field var already exist in CForm context and "
                 "Form.field_as_html can't be used"
             )
-        context["form_field"] = (
-            getattr(self, field) if isinstance(field, str) else field
-        )
+        form_field = getattr(self, field) if isinstance(field, str) else field
+        context["form_field"] = form_field
+
+        render_kw.update(form_field.render_kw if form_field.render_kw else dict())
+        context["field_kw"] = self.FIELDS_KW.get(form_field.name, dict())
+        try:
+            del render_kw["field"]
+        except KeyError:
+            pass
+        if self.is_disabled:
+            render_kw["disabled"] = True
+        context["render_kw"] = render_kw
         return Markup(render_template(template, **context))
 
     def _jui_template(
@@ -300,3 +319,10 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
             )
             for d in settings.forms_template_dirs
         ]
+
+    def _field_setdefault(
+        self, field: "wtforms.Field", param_name: str, value: Any
+    ) -> Any:
+        if field.render_kw is None:
+            field.render_kw = dict()
+        return field.render_kw.setdefault(param_name, value)

@@ -1,1 +1,21 @@
-{% include "jembeui/s0/widgets/form/one_per_row.html" %}
+<div class="form">
+{%set top = namespace(grab_focus = true) %}
+{% for field in form  %}
+    {# {% with columns_span=form.FIELDS_KW[field.name].get("columns", 1) %} #}
+    {% with is_inline=form.FIELDS_KW[field.name].get("inline", False) %}
+        {% if not is_inline  and not loop.first %}
+        </div> 
+        {% endif %}
+        {% if not is_inline %}
+        <div class="form__row">
+        {% endif %} 
+        {% if not form.is_disabled and top.grab_focus and (field.render_kw|default({}, true)).get("disabled", none) is none %}
+            {% set top.grab_focus = false %}
+            {{form.field_as_html(field, **{"jmb-on:ready":"$self.focus()"})}}
+        {% else %}
+            {{form.field_as_html(field)}}
+        {% endif %}
+    {% endwith %}
+    {# {% endwith %} #}
+{% endfor %}
+</div>

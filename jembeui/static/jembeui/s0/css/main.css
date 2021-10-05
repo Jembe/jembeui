@@ -793,12 +793,20 @@ a.main-menu__sub-menu__title:hover {
     margin-bottom: 8px;
 } 
 /* Input */
+.input-label {
+    font: 400 0.8333rem 'Fira Sans';
+    line-height: 1.4rem;
+    display: block;
+}
 .input {
+    width: 100%;
     font: 400 1rem 'Fira Sans';
     line-height: 1.4rem;
     border-radius: 2px;
     padding: 4px 8px;
     border: 1px solid var(--grey-90-a20);
+    outline: none;
+    box-sizing: border-box;
 }
 .input::placeholder {
     color: var(--grey-50);
@@ -828,4 +836,23 @@ a.main-menu__sub-menu__title:hover {
     box-shadow: 0 0 0 1px var(--blue-50);
     outline: none;
     border: none;
+}
+/* form */
+
+.form__row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+}
+.form-field {
+    margin: 0 0 8px 0;
+    flex-grow: 1;
+}
+.form-field__error {
+    margin-top: 4px;
+    color: var(--red-50);
+    font: 400 0.8333rem 'Fira Sans';
+    line-height: 1.4rem;
+    display: block;
 }

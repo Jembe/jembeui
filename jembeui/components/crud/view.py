@@ -27,11 +27,13 @@ class CViewRecord(CFormBase):
 
         def __init__(
             self,
-            form: "Form",
+            form: "jembeui.Form",
             get_record: Optional[
                 Callable[["jembeui.CViewRecord"], Union["Model", dict]]
             ] = None,
-            menu: Optional[Union["jembeui.Menu", Sequence[Union["jembeui.Link", "jembeui.Menu"]]]] = None,
+            menu: Optional[
+                Union["jembeui.Menu", Sequence[Union["jembeui.Link", "jembeui.Menu"]]]
+            ] = None,
             db: Optional["SQLAlchemy"] = None,
             title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
             template: Optional[Union[str, Iterable[str]]] = None,
@@ -73,11 +75,10 @@ class CViewRecord(CFormBase):
         ):
             self._record = _record
         self.form: Form = (
-            self._config.form(data=self.record)
+            self._config.form(data=self.record, disabled=True)
             if isinstance(self.record, dict)
-            else self._config.form(obj=self.record)
+            else self._config.form(obj=self.record, disabled=True)
         )
-        self.form.set_readonly_all()
         self.form.mount(self)
         super().__init__()
 
