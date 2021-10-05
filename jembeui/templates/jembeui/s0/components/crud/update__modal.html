@@ -1,13 +1,13 @@
-<div class="dialog">
+<div class="modal">
     <div>
-        <div class="head">
+        <div class="modal__dialog__head">
             <div jmb-ref="title">{{title}}</div>
             <button jmb-on:click="{%- if component('cancel()').is_accessible %}cancel(){% else %}$jmb.emit('cancel'){% endif -%}" type="button" title="Close">X</button>
         </div>
-        <div class="content">
+        <div class="modal__dialog__content">
             {{form.as_html()}}
         </div>
-        <div class="footer">
+        <div class="modal__dialog__footer">
             <div>{{menu.as_html('buttons_modal')}}</div>
         </div>
     </div>

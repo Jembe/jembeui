@@ -166,13 +166,13 @@ a:focus-visible {
     flex-grow: 1;
 }
 /* Dialog */
-.dialog {
+.modal {
     z-index: 1000;
-    position: absolute;
+    position: fixed;
     inset: 0;
     background-color: var(--grey-90-a60);
 }
-.dialog > div {
+.modal__dialog {
     max-width: 80%;
     width: 650px;
     min-width: 280px;
@@ -180,7 +180,7 @@ a:focus-visible {
     margin: auto;
     margin-top: 10vh;
 }
-.dialog .head {
+.modal__dialog__head {
     background-color: var(--grey-20);
     display: flex;
     justify-content: space-between;
@@ -191,20 +191,20 @@ a:focus-visible {
     font-size: 17px;
     font-weight: 500;
 }
-.dialog .head button {
+.modal__dialog__head button {
     cursor: pointer;
     border: none;
     background-color: inherit;
     color: inherit;
     border-radius: 100%;
 }
-.dialog .head button:hover {
+.modal__dialog__head button:hover {
     background-color: var(--grey-90-a20);
 }
-.dialog .content {
+.modal__dialog__content {
     padding: 16px;
 }
-.dialog .footer {
+.modal__dialog__footer {
     padding: 16px;
     text-align: right;
 }

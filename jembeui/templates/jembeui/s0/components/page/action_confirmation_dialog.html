@@ -1,16 +1,16 @@
 {% if confirmation %}
-<div class="dialog">
-    <div>
+<div class="modal">
+    <div class="modal__dialog">
         {% if confirmation.title %}
-        <div class="head">
+        <div class="modal__dialog__head">
             <div jmb-ref="title">{{confirmation.title}}</div>
             <button jmb-on:click="cancel()" type="button" title="Close">X</button>
         </div>
         {% endif %}
         {% if confirmation.question %}
-        <div class="content">{{confirmation.question}}</div>
+        <div class="modal__dialog__content">{{confirmation.question}}</div>
         {% endif %}
-        <div class="footer">
+        <div class="modal__dialog__footer">
             <button jmb-on:click="cancel()" type="button" class="button">Cancel</button>
             <button jmb-on:click="confirm()" jmb-on:ready="$self.focus()" type="button" class="button button--primary">OK</button>
         </div>

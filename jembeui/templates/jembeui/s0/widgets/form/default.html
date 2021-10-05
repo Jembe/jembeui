@@ -2,8 +2,9 @@
 {%set top = namespace(grab_focus = true) %}
 {% for field in form  %}
     {# {% with columns_span=form.FIELDS_KW[field.name].get("columns", 1) %} #}
+    {# {% endwith %} #}
     {% with is_inline=form.FIELDS_KW[field.name].get("inline", False) %}
-        {% if not is_inline  and not loop.first %}
+        {% if not is_inline and not loop.first %}
         </div> 
         {% endif %}
         {% if not is_inline %}
@@ -16,6 +17,8 @@
             {{form.field_as_html(field)}}
         {% endif %}
     {% endwith %}
-    {# {% endwith %} #}
+    {% if  loop.last %}
+    </div> 
+    {% endif %}
 {% endfor %}
 </div>
