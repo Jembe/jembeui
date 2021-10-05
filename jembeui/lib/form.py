@@ -118,28 +118,26 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
                 self.PLUS_RENDERS_KW[field.name] = {}
                 if field.render_kw:
                     # get "fields" config from render_kw and save it in FIELDS_KW
-                    if "field" in field.render_kw:
+                    if "_field" in field.render_kw:
                         self.FIELDS_KW[field.name] = {
                             k: v
-                            for k, v in field.render_kw.get("field").items()
-                            if not k.startswith("+")
+                            for k, v in field.render_kw.get("_field").items()
+                            if not k.endswith("+")
                         }
                         self.PLUS_FIELDS_KW[field.name] = {
                             k.strip("+"): v
-                            for k, v in field.render_kw.get("field").items()
-                            if k.startswith("+")
+                            for k, v in field.render_kw.get("_field").items()
+                            if k.endswith("+")
                         }
-                        del field.render_kw["field"]
+                        del field.render_kw["_field"]
                     # gets + instructions from render_kw and save it in RENDERS_KW
                     self.PLUS_RENDERS_KW[field.name] = {
                         k.strip("+"): v
                         for k, v in field.render_kw.items()
-                        if k.startswith("+") and k != "+field"
+                        if k.endswith("+") and k != "_field+"
                     }
                     field.render_kw = {
-                        k: v
-                        for k, v in field.render_kw.items()
-                        if not k.startswith("+")
+                        k: v for k, v in field.render_kw.items() if not k.endswith("+")
                     }
         return self
 
@@ -189,13 +187,13 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
         _render_kw = form_field.render_kw.copy() if form_field.render_kw else dict()
         _plus_render_kw = self.PLUS_RENDERS_KW[form_field.name].copy()
         for k, v in render_kw.items():
-            if k.startswith("+"):
-                if k != "+field":
+            if k.endswith("+"):
+                if k != "_field+":
                     kn = k.strip("+")
                     _plus_render_kw[kn] = "{} {}".format(v, _plus_render_kw.get(kn, ""))
-            elif k == "field":
+            elif k == "_field":
                 for kf, vf in v.items():
-                    if kf.startswith("+"):
+                    if kf.endswith("+"):
                         kfn = kf.strip("+")
                         _plus_field_kw[kfn] = "{} {}".format(
                             vf, _plus_field_kw.get(kfn, "")
@@ -222,6 +220,9 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
             if k not in kw:
                 result[k] = v if k not in result else "{} {}".format(result[k], v)
         return result
+
+    def kw_attr_filter(self, kw: dict) -> dict:
+        return {k: v for k, v in kw.items() if not k.startswith("_")}
 
     def _jui_template(
         self, variant_or_template_name: Optional[str] = None

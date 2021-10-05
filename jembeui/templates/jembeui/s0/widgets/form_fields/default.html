@@ -9,9 +9,9 @@
     "jmb-on:keydown.enter.ctrl": "$self.blur();$self.focus();submit()" if "disabled" not in render_kw else none,
 })%}
 
-<div {{final_field_kw|xmlattr}}>
+<div {{form.kw_attr_filter(final_field_kw)|xmlattr}}>
     <label for="{{field_id}}" class="input-label">{{form_field.label}}</label>
-    {{form_field(**final_render_kw)}}
+    {{form_field(**form.kw_attr_filter(final_render_kw))}}
     {% for error in form_field.errors %}
     <div class="form-field__error">{{error}}</div>
     {% endfor %}
