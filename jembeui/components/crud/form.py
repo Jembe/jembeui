@@ -78,7 +78,9 @@ class CFormBase(Component):
                     self._config.full_name
                 )
             )
-        return self._config.get_record_callback(self)
+        record =  self._config.get_record_callback(self)
+        print(self, record)
+        return record
 
     @property
     def record(self) -> Union["Model", dict]:

@@ -38,7 +38,9 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
     DEFAULT_TEMPLATE: Union[str, List[str]]
     FIELD_TEMPLATES_CACHE: dict
     FIELD_TEMPLATES_VARIANTS_CACHE: dict
-    FIELDS_KW: Dict[str, Dict[str, Any]] = dict()
+    FIELDS_KW: Dict[str, Dict[str, Any]]
+    PLUS_FIELDS_KW: Dict[str, Dict[str, Any]]
+    PLUS_RENDERS_KW: Dict[str, Dict[str, Any]]
 
     def __init__(
         self,
@@ -106,13 +108,39 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
         form needs aditional processing
         """
         self.cform = cform
-        for field in self:
-            if field.name not in self.FIELDS_KW:
-                if field.render_kw and "field" in field.render_kw:
-                    self.FIELDS_KW[field.name] = field.render_kw.get("field")
-                    del field.render_kw["field"]
-                else:
-                    self.FIELDS_KW[field.name] = {}
+        if "FIELDS_KW" not in self.__class__.__dict__:
+            self.__class__.FIELDS_KW = dict()
+            self.__class__.PLUS_FIELDS_KW = dict()
+            self.__class__.PLUS_RENDERS_KW = dict()
+            for field in self:
+                self.FIELDS_KW[field.name] = {}
+                self.PLUS_FIELDS_KW[field.name] = {}
+                self.PLUS_RENDERS_KW[field.name] = {}
+                if field.render_kw:
+                    # get "fields" config from render_kw and save it in FIELDS_KW
+                    if "field" in field.render_kw:
+                        self.FIELDS_KW[field.name] = {
+                            k: v
+                            for k, v in field.render_kw.get("field").items()
+                            if not k.startswith("+")
+                        }
+                        self.PLUS_FIELDS_KW[field.name] = {
+                            k.strip("+"): v
+                            for k, v in field.render_kw.get("field").items()
+                            if k.startswith("+")
+                        }
+                        del field.render_kw["field"]
+                    # gets + instructions from render_kw and save it in RENDERS_KW
+                    self.PLUS_RENDERS_KW[field.name] = {
+                        k.strip("+"): v
+                        for k, v in field.render_kw.items()
+                        if k.startswith("+") and k != "+field"
+                    }
+                    field.render_kw = {
+                        k: v
+                        for k, v in field.render_kw.items()
+                        if not k.startswith("+")
+                    }
         return self
 
     def submit(self, record: Union["Model", dict]) -> Union["Model", dict]:
@@ -156,16 +184,44 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
         form_field = getattr(self, field) if isinstance(field, str) else field
         context["form_field"] = form_field
 
-        render_kw.update(form_field.render_kw if form_field.render_kw else dict())
-        context["field_kw"] = self.FIELDS_KW.get(form_field.name, dict())
-        try:
-            del render_kw["field"]
-        except KeyError:
-            pass
+        _field_kw = self.FIELDS_KW[form_field.name].copy()
+        _plus_field_kw = self.PLUS_FIELDS_KW[form_field.name].copy()
+        _render_kw = form_field.render_kw.copy() if form_field.render_kw else dict()
+        _plus_render_kw = self.PLUS_RENDERS_KW[form_field.name].copy()
+        for k, v in render_kw.items():
+            if k.startswith("+"):
+                if k != "+field":
+                    kn = k.strip("+")
+                    _plus_render_kw[kn] = "{} {}".format(v, _plus_render_kw.get(kn, ""))
+            elif k == "field":
+                for kf, vf in v.items():
+                    if kf.startswith("+"):
+                        kfn = kf.strip("+")
+                        _plus_field_kw[kfn] = "{} {}".format(
+                            vf, _plus_field_kw.get(kfn, "")
+                        )
+                    else:
+                        _field_kw[kf] = vf
+            else:
+                _render_kw[k] = v
         if self.is_disabled:
-            render_kw["disabled"] = True
-        context["render_kw"] = render_kw
+            _render_kw["disabled"] = True
+
+        context["render_kw"] = _render_kw
+        context["plus_render_kw"] = _plus_render_kw
+        context["field_kw"] = _field_kw
+        context["plus_field_kw"] = _plus_field_kw
         return Markup(render_template(template, **context))
+
+    def add_kw_defaults(self, kw: dict, plus_kw: dict, defaults_kw: dict) -> dict:
+        result = kw.copy()
+        for k, v in defaults_kw.items():
+            if v is not None and k not in kw:
+                result[k] = v
+        for k, v in plus_kw.items():
+            if k not in kw:
+                result[k] = v if k not in result else "{} {}".format(result[k], v)
+        return result
 
     def _jui_template(
         self, variant_or_template_name: Optional[str] = None

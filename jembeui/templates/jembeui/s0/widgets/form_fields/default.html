@@ -1,21 +1,17 @@
-{%set field_id = "{}--{}".format(exec_name.replace("/","-"), form_field.name)%}
-{% do render_kw.update({
-    "id": field_id,
-    "class": " ".join(["input", "input--error" if form_field.errors else "", render_kw.get("+class", "")]) if "class" not in render_kw else render_kw["class"]
-}) %}
-{% if "disabled" not in render_kw %}
-    {% do render_kw.update({"jmb-on:change.defer": "form.{} = $self.value; is_modified = true".format(form_field.name)}) %}
-{% endif %}
+{% set field_id = "{}--{}".format(exec_name.replace("/","-"), form_field.name)%}
+{% set final_field_kw = form.add_kw_defaults(field_kw, plus_field_kw, {
+    "class":"form-field form-field--{}".format(form_field.type.replace('Field', '').lower())
+})%}
+{% set final_render_kw = form.add_kw_defaults(render_kw, plus_render_kw, {
+    "id":field_id,
+    "class":" ".join(["input", "input--error" if form_field.errors else ""]),
+    "jmb-on:change.defer": "form.{} = $self.value; is_modified = true;".format(form_field.name) if "disabled" not in render_kw else none,
+    "jmb-on:keydown.enter.ctrl": "$self.blur();$self.focus();submit()" if "disabled" not in render_kw else none,
+})%}
 
-<div 
-    {%- if 'class' in field_kw  %}
-    class="{{field_kw['class']}}"
-    {% else %}
-    class="form-field form-field--{{form_field.type|replace('Field', '')|lower}} {{field_kw['+class']|default('',true)}}"
-    {% endif -%}
-    {% for k,w in field_kw.items() if k != "class" %}{{k}}="{{w}}"{% endfor %}>
+<div {{final_field_kw|xmlattr}}>
     <label for="{{field_id}}" class="input-label">{{form_field.label}}</label>
-    {{form_field(**render_kw)}}
+    {{form_field(**final_render_kw)}}
     {% for error in form_field.errors %}
     <div class="form-field__error">{{error}}</div>
     {% endfor %}

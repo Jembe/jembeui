@@ -842,7 +842,7 @@ a.main-menu__sub-menu__title:hover {
 .form__row {
     display: flex;
     flex-direction: row;
-    align-items: center;
+    align-items: stretch;
     gap: 8px;
 }
 .form-field {

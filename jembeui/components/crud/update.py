@@ -118,6 +118,9 @@ class CUpdateRecord(CForm):
             _record["id"] == id if isinstance(_record, dict) else _record.id == id
         ):
             self._record = _record
+            # insp = sa.inspect(_record)
+            # if insp.presistent or insp.pending:
+            #     self._record = _record
         super().__init__(form=form)
 
     @action
