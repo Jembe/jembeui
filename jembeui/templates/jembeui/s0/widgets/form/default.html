@@ -1,22 +1,55 @@
 <div class="form">
-{%set top = namespace(grab_focus = true) %}
+{%set top = namespace(grab_focus = true, open_blocks=0, do_close_block=0) %}
 {% for field in form  %}
-    {% with is_inline=form.FIELDS_KW[field.name].get("_inline", False) %}
-        {% if not is_inline and not loop.first %}
-        </div> 
-        {% endif %}
-        {% if not is_inline %}
-        <div class="form__row">
-        {% endif %} 
-        {% if not form.is_disabled and top.grab_focus and (field.render_kw|default({}, true)).get("disabled", none) is none %}
-            {% set top.grab_focus = false %}
-            {{form.field_as_html(field, **{"jmb-on:ready.once":"$self.focus()"})}}
-        {% else %}
-            {{form.field_as_html(field)}}
-        {% endif %}
-    {% endwith %}
-    {% if  loop.last %}
+    {% set is_inline=form.RENDER_KW[field.name].get("_field", {}).get("_inline", False) %}
+    {% set block=form.RENDER_KW[field.name].get("_block", {}) %}
+    {% set block_start=block.get("_start", False) %}
+    {% set block_is_inline=block.get("_inline", False) %}
+    {% set block_end=block.get("_end", 0) %}
+    {% set block_end = 1 if block_end == true else block_end %}
+
+    {# closing row #}
+    {% if ((not is_inline and not block_start) or (block_start and not block_is_inline)) and not loop.first %}
     </div> 
     {% endif %}
+
+    {# closing block #}
+    {% if top.do_close_block > 0 %}
+        {% set top.open_blocks = top.open_blocks - top.do_close_block %}
+        {% set top.do_close_block = 0 %}
+        {% for i in range(top.do_close_block) %}
+    </div>
+    close block
+        {% endfor %}
+    {% endif %}
+
+    {# start row#}
+    {% if (not is_inline and not block_start) or loop.first %}
+    <div class="form__row">
+    {% endif %}
+
+    {# start block #}
+    {% if block_start %}
+    {% set top.open_blocks = top.open_blocks + 1 %}
+    <div {{form.attr_kw(form.resolve_kw(block,{'class':'form__block'}))|xmlattr}}>
+        <div class="form__row">
+    {% endif %}
+
+    {% if not form.is_disabled and top.grab_focus and (field.render_kw|default({}, true)).get("disabled", none) is none %}
+        {% set top.grab_focus = false %}
+        {{form.field_as_html(field, **{"jmb-on:ready.once":"$self.focus()"})}}
+    {% else %}
+        {{form.field_as_html(field)}}
+    {% endif %}
+
+    {% set top.do_close_blocks = block_end %}
 {% endfor %}
+
+{% for i in range(top.open_blocks) %}
+{# Closing blocks #}
+</div> 
+{% endfor %}
+{# Closing row #}
+</div> 
+
 </div>

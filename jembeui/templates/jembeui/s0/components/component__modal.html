@@ -1,12 +1,8 @@
 <div class="modal">
-    <div>
+    <div class="modal__dialog">
         <div class="modal__dialog__head">
             <div>{{title}}</div>
-            {%- if  component("cancel()").is_accessible %}
-            <button jmb-on:click="cancel()" type="button" title="Close">X</button>
-            {% else %}
-            <button jmb-on:click="$jmb.emit('cancel')" type="button" title="Close">X</button>
-            {% endif -%}
+            <button jmb-on:click="{%- if component('cancel()').is_accessible %}cancel(){% else %}$jmb.emit('cancel'){% endif -%}" type="button" title="Close">X</button>
         </div>
         <div class="modal__dialog__content">
             {%- block content %}

@@ -884,8 +884,13 @@ a.main-menu__sub-menu__title:hover {
 .form__row {
     display: flex;
     flex-direction: row;
-    align-items: stretch;
+    align-items: flex-start;
     gap: 8px;
+}
+.form__container {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
 }
 .form-field {
     margin: 0 0 8px 0;
