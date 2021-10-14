@@ -222,15 +222,6 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
 
     def resolve_kw(self, render_kw: dict, defaults_kw: Optional[dict] = None) -> dict:
         if defaults_kw:
-            import pprint
-
-            pprint.pprint(render_kw)
-            pprint.pprint(defaults_kw)
-            pprint.pprint(self.__join_kw(render_kw, defaults_kw, True))
-            pprint.pprint(
-                self.__resolve_kw(self.__join_kw(render_kw, defaults_kw, True))
-            )
-            print("---------------------------------")
             return self.__resolve_kw(self.__join_kw(render_kw, defaults_kw, True))
         else:
             return self.__resolve_kw(render_kw)
@@ -239,7 +230,7 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
         return {
             k: v
             for k, v in kw.items()
-            if not k.startswith("_") and not k.endswith("+") and isinstance(v, str)
+            if not k.startswith("_") and not k.endswith("+") and isinstance(v, (str, int, bool))
         }
 
     def _jui_template(

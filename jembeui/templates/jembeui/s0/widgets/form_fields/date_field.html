@@ -5,11 +5,13 @@
     {
         "id":field_id,
         "class":" ".join(["input", "input--error" if form_field.errors else ""]),
-        "jmb-on:change.defer": "form.{} = $self.value; is_modified = true;".format(form_field.name) if is_not_disabled else none,
+        "jmb-on:change-date.camel.defer": "form.{} = $self.__datepicker.getDate('yyyy-mm-dd'); is_modified = true;".format(form_field.name) if is_not_disabled else none,
         "jmb-on:keydown.enter.ctrl": "$self.blur();$self.focus();submit()" if is_not_disabled else none,
+        "jmb-on:ready.once": "if($self.__datepicker === undefined){{$self.__datepicker = new Datepicker($self, {{format:'{}', language:'{}', container:'#{}--datepicker'}})}}".format(jembeui_date_format_js('datepicker'), get_locale_code('-'), field_id) if is_not_disabled else none,
+        "value": form_field.data|dateformat,
         "_field" : {
             "class":"form-field form-field--{}".format(form_field.type.replace('Field', '').lower())
-        }
+        },
     }
 )%}
 <div {{form.attr_kw(render_kw._field|default({}, true))|xmlattr}}>
@@ -18,4 +20,7 @@
     {% for error in form_field.errors %}
     <div class="form-field__error">{{error}}</div>
     {% endfor %}
+    {% if is_not_disabled %}
+    <div id="{{field_id}}--datepicker" jmb-ignore style="position:relative;"></div>
+    {% endif %}
 </div>

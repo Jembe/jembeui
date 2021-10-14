@@ -11,9 +11,10 @@ from typing import (
     Any,
 )
 from collections import namedtuple
-from datetime import date, datetime
+from datetime import date, datetime, time, timedelta
 from functools import partial, cached_property
 from math import ceil
+from flask_babel import format_date, format_datetime, format_time, format_timedelta
 from jembe import action
 from .component import Component
 from .menu import Menu
@@ -35,10 +36,14 @@ def default_field_value(component: "jembe.Component", record, field_name: str) -
     value = record[fnames.pop(0)]
     while len(fnames) > 0:
         value = getattr(value, fnames.pop(0))
-    if isinstance(value, date):
-        return str(value)  # TODO
-    elif isinstance(value, datetime):
-        return str(value)  # TODO
+    if isinstance(value, datetime):
+        return format_datetime(value)
+    elif isinstance(value, date):
+        return format_date(value)
+    elif isinstance(value, time):
+        return format_time(value)
+    elif isinstance(value, timedelta):
+        return format_timedelta(value)
     elif isinstance(value, bool):
         return str(value)  # TODO
     else:

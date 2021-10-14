@@ -33,7 +33,7 @@ class Settings:
     def forms_template_dirs(self):
         return current_app.config.get(
             "JEMBEUI_FORMS_TEMPLATE_DIRS",
-            ["forms/","{style}/forms/"],
+            ["forms/", "{style}/forms/"],
         )
 
     @property
@@ -50,6 +50,10 @@ class Settings:
     @property
     def list_records_page_size(self):
         return current_app.config.get("JEMBEUI_LIST_RECORDS_PAGE_SIZE", 20)
+
+    @property
+    def default_currency(self):
+        return current_app.config.get("JEMBEUI_DEFAULT_CURRENCY", "EUR")
 
 
 settings = Settings()

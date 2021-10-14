@@ -13,6 +13,7 @@
     {# seo tag + description #}
     <link rel="stylesheet" href="{{url_for('jembeui.static', filename='jembeui/s0/css/main.css')}}">
     <link rel="stylesheet" href="https://code.cdn.mozilla.net/fonts/fira.css">
+    <link rel="stylesheet" href="{{url_for('jembeui.static', filename='jembeui/s0/css/datepicker.css')}}">
 </head>
 <body>
     <div class="page-layout">
@@ -67,5 +68,11 @@
         })
     })
     </script> 
+    <script src="{{url_for('jembeui.static', filename='jembeui/s0/js/datepicker-full.min.js')}}"></script>
+    {% with locale_code = get_locale_code('-') %}
+    {% if locale_code != 'en' %}
+    <script src="{{url_for('jembeui.static', filename='jembeui/s0/js/datepicker-locales/{}.js'.format(locale_code))}}"></script>
+    {% endif %} 
+    {% endwith %}
 </body>
 </html>

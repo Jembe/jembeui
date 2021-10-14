@@ -13,6 +13,7 @@ __all__ = (
     "get_widget_variants",
     "get_component_template_variants",
     "camel_to_snake",
+    "convert_py_date_format_to_js",
 )
 
 
@@ -66,3 +67,32 @@ def camel_to_snake(name: str) -> str:
     global _re_cts_1, _re_cts_2
     name = _re_cts_1.sub(r"\1_\2", name)
     return _re_cts_2.sub(r"\1_\2", name).lower()
+
+
+BABEL_DATETIME_FORMAT_TO_DATEPICKER_JS = {
+    "dd":"dd",
+    "d":"d",
+    "EEEE": "DD",
+    "EEE": "D",
+    "MMMM": "MM",
+    "MMM": "M",
+    "MM": "mm",
+    "M": "m",
+    "y": "yyyy",
+}
+
+
+def convert_py_date_format_to_js(format_str, usefor:str="datepicker"):
+    """
+    * Description: Convert a python format string to javascript format string
+    * Example:     "%m/%d/%Y" to "MM/DD/YYYY"
+    * @param:  formatStr is the python format string
+    * @return: the javascript format string
+    */
+    """
+    wordbook =  {}
+    if usefor == "datepicker":
+        wordbook = BABEL_DATETIME_FORMAT_TO_DATEPICKER_JS
+    for key in wordbook.keys():
+        format_str = wordbook[key].join(format_str.split(key))
+    return format_str
