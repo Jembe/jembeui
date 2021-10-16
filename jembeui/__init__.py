@@ -1,6 +1,8 @@
 from typing import TYPE_CHECKING, Optional
 from babel.core import get_locale_identifier
 
+from flask import session, request
+import flask_babel
 from flask_babel import get_locale
 from .exceptions import JembeUIError
 from .lib import (
@@ -92,12 +94,31 @@ class JembeUI:
             "jembeui", JembeUIPage
         )  # if removed jembeui templates will not load
 
+        # jembetimezone support
+        @self.__jembe.flask.before_request
+        def update_user_timezone():
+            # from pdb import set_trace; set_trace()
+            if "jembeuiTimezone" in request.cookies and request.cookies.get(
+                "jembeuiTimezone"
+            ) != session.get("jembeui_timezone", None):
+                session["jembeui_timezone"] = request.cookies["jembeuiTimezone"]
+                flask_babel.refresh()
+
+        babel = self.__jembe.flask.extensions["babel"]
+
+        @babel.timezoneselector
+        def get_user_timezone():
+            if "jembeuiTimezone" in request.cookies:
+                tz = request.cookies["jembeTimezone"]
+                session["jembeui_timezone"] = tz
+            return session.get("jembeui_timezone", None)
+
         self.__jembe.flask.jinja_env.globals.update(
             {
-                "jembeui_date_format_js": lambda usefor: convert_py_date_format_to_js(
+                "jembeui_get_js_date_format": lambda usefor: convert_py_date_format_to_js(
                     get_locale().date_formats["medium"].pattern, usefor
                 ),
-                "jembeui_datetime_format_js": lambda usefor: convert_py_date_format_to_js(
+                "jembeui_get_js_datetime_format": lambda usefor: convert_py_date_format_to_js(
                     get_locale()
                     .datetime_formats["full"]
                     .format(
@@ -106,10 +127,10 @@ class JembeUI:
                     ),
                     usefor,
                 ),
-                "jembeui_time_format_js": lambda usefor: convert_py_date_format_to_js(
+                "jembeui_get_js_time_format": lambda usefor: convert_py_date_format_to_js(
                     get_locale().time_formats["medium"].pattern, usefor
                 ),
-                "get_locale_code": lambda separator="_": get_locale_identifier(
+                "jembeui_get_locale_code": lambda separator="_": get_locale_identifier(
                     (
                         get_locale().language,
                         get_locale().territory,
@@ -118,6 +139,7 @@ class JembeUI:
                     ),
                     separator,
                 ).lower(),
+                "jembeui_get_timezone": lambda : session.get("jembeui_timezone", None)
             }
         )
 

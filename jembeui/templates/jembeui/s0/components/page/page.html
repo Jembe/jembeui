@@ -60,6 +60,7 @@
 
     {{component("_syserror")}}
     {{component("_action_confirmation")}}
+
     <script src="{{ url_for('jembe.static', filename='js/jembe.js') }}" defer></script>
     <script defer>
     window.addEventListener('DOMContentLoaded', function(event){
@@ -69,7 +70,8 @@
     })
     </script> 
     <script src="{{url_for('jembeui.static', filename='jembeui/s0/js/datepicker-full.min.js')}}"></script>
-    {% with locale_code = get_locale_code('-') %}
+    <script src="{{url_for('jembeui.static', filename='jembeui/s0/js/i18n.js')}}"></script>
+    {% with locale_code = jembeui_get_locale_code('-') %}
     {% if locale_code != 'en' %}
     <script src="{{url_for('jembeui.static', filename='jembeui/s0/js/datepicker-locales/{}.js'.format(locale_code))}}"></script>
     {% endif %} 

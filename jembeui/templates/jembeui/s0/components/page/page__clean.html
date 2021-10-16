@@ -25,5 +25,12 @@
         })
     })
     </script> 
+    <script src="{{url_for('jembeui.static', filename='jembeui/s0/js/datepicker-full.min.js')}}"></script>
+    <script src="{{url_for('jembeui.static', filename='jembeui/s0/js/i18n.js')}}"></script>
+    {% with locale_code = jembeui_get_locale_code('-') %}
+    {% if locale_code != 'en' %}
+    <script src="{{url_for('jembeui.static', filename='jembeui/s0/js/datepicker-locales/{}.js'.format(locale_code))}}"></script>
+    {% endif %} 
+    {% endwith %}
 </body>
 </html>
