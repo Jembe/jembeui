@@ -55,5 +55,8 @@ class Settings:
     def default_currency(self):
         return current_app.config.get("JEMBEUI_DEFAULT_CURRENCY", "EUR")
 
+    @property
+    def supported_locales(self):
+        return current_app.config.get("JEMBEUI_SUPPORTED_LOCALES", [])
 
 settings = Settings()

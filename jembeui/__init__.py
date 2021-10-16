@@ -4,6 +4,8 @@ from babel.core import get_locale_identifier
 from flask import session, request
 import flask_babel
 from flask_babel import get_locale
+from werkzeug.wrappers import response
+
 from .exceptions import JembeUIError
 from .lib import (
     Link,
@@ -94,15 +96,41 @@ class JembeUI:
             "jembeui", JembeUIPage
         )  # if removed jembeui templates will not load
 
+        def get_locale_code(separator="-"):
+            locale = get_locale()
+            return get_locale_identifier(
+                (
+                    locale.language,
+                    locale.territory,
+                    locale.script,
+                    locale.variant,
+                ),
+                separator,
+            ).lower()
+
         # jembetimezone support
         @self.__jembe.flask.before_request
-        def update_user_timezone():
-            # from pdb import set_trace; set_trace()
+        def update_user_timezone_and_locale():
             if "jembeuiTimezone" in request.cookies and request.cookies.get(
                 "jembeuiTimezone"
             ) != session.get("jembeui_timezone", None):
                 session["jembeui_timezone"] = request.cookies["jembeuiTimezone"]
                 flask_babel.refresh()
+
+            if "jembeuiLocaleCode" in request.cookies and request.cookies.get(
+                "jembeuiLocaleCode"
+            ) != session.get("jembeui_locale_code", None):
+                from jembeui.settings import settings
+
+                lc = request.cookies["jembeuiLocaleCode"]
+                if lc in settings.supported_locales:
+                    session["jembeui_locale_code"] = lc
+                    flask_babel.refresh()
+
+        @self.__jembe.flask.after_request
+        def set_locale_cookie(response):
+            response.set_cookie("jembeuiLocaleCode", get_locale_code("_"))
+            return response
 
         babel = self.__jembe.flask.extensions["babel"]
 
@@ -112,6 +140,22 @@ class JembeUI:
                 tz = request.cookies["jembeTimezone"]
                 session["jembeui_timezone"] = tz
             return session.get("jembeui_timezone", None)
+
+        @babel.localeselector
+        def get_user_locale():
+            from jembeui.settings import settings
+
+            if "jembeuiLocaleCode" in request.cookies:
+                lc = request.cookies["jembeuiLocaleCode"]
+                if lc in settings.supported_locales:
+                    session["jembeui_locale_code"] = lc
+            if "jembeui_locale_code" not in session:
+                session["jembeui_locale_code"] = (
+                    settings.supported_locales[0]
+                    if settings.supported_locales
+                    else "en"
+                )
+            return session["jembeui_locale_code"]
 
         self.__jembe.flask.jinja_env.globals.update(
             {
@@ -130,16 +174,8 @@ class JembeUI:
                 "jembeui_get_js_time_format": lambda usefor: convert_py_date_format_to_js(
                     get_locale().time_formats["medium"].pattern, usefor
                 ),
-                "jembeui_get_locale_code": lambda separator="_": get_locale_identifier(
-                    (
-                        get_locale().language,
-                        get_locale().territory,
-                        get_locale().script,
-                        get_locale().variant,
-                    ),
-                    separator,
-                ).lower(),
-                "jembeui_get_timezone": lambda : session.get("jembeui_timezone", None)
+                "jembeui_get_locale_code": lambda separator="_": get_locale_code(separator),
+                "jembeui_get_timezone": lambda: session.get("jembeui_timezone", None),
             }
         )
 

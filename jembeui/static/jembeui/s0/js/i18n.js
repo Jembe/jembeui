@@ -12,5 +12,10 @@ function setJembeuiTimezoneCookie(timezone) {
         }
     }
 }
+function setJembeuiLocaleCookie(localeCode) {
+    if (localeCode !== undefined && localeCode !== null) {
+        document.cookie = `jembeuiLocaleCode=${localeCode};`
+    }
+}
 
 setJembeuiTimezoneCookie();
