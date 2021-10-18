@@ -36,6 +36,7 @@
             </label> 
             {% endfor %} 
             {% endfor %}
+            {% if choice_filters_config.values()|selectattr('is_grouped')|list|length > 0 %}
             <div class="list-records__toolbar__choice-filters-other" jmb-scope="{opened:false}" jmb-on:click.away="$scope().opened = false; ">
                 {% set ns = namespace(other_selected = false) %}
                 <div class="list-records__toolbar__choice-filters-other__dropdown" jmb-show="$scope().opened" jmb-cloak>
@@ -68,6 +69,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill="context-fill" d="M8 12a1 1 0 0 1-.707-.293l-5-5a1 1 0 0 1 1.414-1.414L8 9.586l4.293-4.293a1 1 0 0 1 1.414 1.414l-5 5A1 1 0 0 1 8 12z"></path></svg>
                 </button>
             </div>
+            {% endif %}
         </div>
         <nav class="list-records__toolbar__pagination">
             <button type="button" class="button button--ghost button--toolbar" jmb-on:click="page = page - 1" {% if page == 0 %} disabled {% endif %}>

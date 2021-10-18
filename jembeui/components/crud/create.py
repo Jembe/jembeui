@@ -54,7 +54,9 @@ class CCreateRecord(CForm):
                 Callable[["jembeui.CCreateRecord"], Union["Model", dict]]
             ] = None,
             redisplay_on_submit: bool = False,
-            menu: Optional[Union["jembeui.Menu", Sequence[Union["jembeui.Link", "jembeui.Menu"]]]] = None,
+            menu: Optional[
+                Union["jembeui.Menu", Sequence[Union["jembeui.Link", "jembeui.Menu"]]]
+            ] = None,
             on_submit: Optional[
                 Callable[["jembeui.CCreateRecord", Union["Model", dict]], None]
             ] = default_on_submit,
@@ -77,16 +79,13 @@ class CCreateRecord(CForm):
             url_query_params: Optional[Dict[str, str]] = None,
         ):
             self.redisplay_on_submit = redisplay_on_submit
-            self.menu: "Menu" = (
-                Menu(
+            if menu is None:
+                menu = Menu(
                     [
                         ActionLink("submit()", "Save", styling=dict(primary=True)),
                         ActionLink("cancel()", "Cancel"),
                     ]
                 )
-                if menu is None
-                else (Menu(menu) if not isinstance(menu, Menu) else menu)
-            )
             self.on_submit = on_submit
             self.on_invalid_form = on_invalid_form
             self.on_submit_exception = on_submit_exception
@@ -94,6 +93,7 @@ class CCreateRecord(CForm):
             super().__init__(
                 form,
                 get_record=get_record,
+                menu=menu,
                 db=db,
                 title=title,
                 template=template,
@@ -143,11 +143,7 @@ class CCreateRecord(CForm):
         if confirmed or not self.state.is_modified:
             if self._config.on_cancel:
                 self._config.on_cancel(self)
-            self.emit(
-                "cancel",
-                record=self.record,
-                record_id=None
-            )
+            self.emit("cancel", record=self.record, record_id=None)
         else:
             self.jui_confirm_action(
                 "cancel",
@@ -155,6 +151,3 @@ class CCreateRecord(CForm):
                 "You have unsaved changes in {} that will be lost.".format(self.title),
             )
 
-    def hydrate(self):
-        self.menu = self._config.menu.bind_to(self)
-        return super().hydrate()

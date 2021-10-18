@@ -78,16 +78,13 @@ class CUpdateRecord(CForm):
             url_query_params: Optional[Dict[str, str]] = None,
         ):
             self.redisplay_on_submit = redisplay_on_submit
-            self.menu: "Menu" = (
-                Menu(
+            if menu is None:
+                menu = Menu(
                     [
                         ActionLink("submit()", "Save", styling=dict(primary=True)),
                         ActionLink("cancel()", "Cancel"),
                     ]
                 )
-                if menu is None
-                else (Menu(menu) if not isinstance(menu, Menu) else menu)
-            )
             self.on_submit = on_submit
             self.on_invalid_form = on_invalid_form
             self.on_submit_exception = on_submit_exception
@@ -95,6 +92,7 @@ class CUpdateRecord(CForm):
             super().__init__(
                 form,
                 get_record=get_record,
+                menu=menu,
                 db=db,
                 title=title,
                 template=template,
@@ -166,7 +164,3 @@ class CUpdateRecord(CForm):
                 "Unsaved changes",
                 "You have unsaved changes in {} that will be lost.".format(self.title),
             )
-
-    def hydrate(self):
-        self.menu = self._config.menu.bind_to(self)
-        return super().hydrate()

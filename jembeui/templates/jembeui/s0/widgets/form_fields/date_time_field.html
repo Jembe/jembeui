@@ -1,0 +1,28 @@
+{% set field_id = "{}--{}".format(exec_name.replace("/","-"), form_field.name)%}
+{% set is_not_disabled = "disabled" not in raw_render_kw %}
+{% set render_kw = form.resolve_kw(
+    raw_render_kw,
+    {
+        "id":field_id,
+        "class":" ".join(["input", "input--error" if form_field.errors else ""]),
+        "jmb-on:change.defer": "form.{} = (new Date($self.value)).toISOString(); console.log(form);is_modified = true;".format(form_field.name) if is_not_disabled else none,
+        "jmb-on:keydown.enter.ctrl": "$self.blur();$self.focus();submit()" if is_not_disabled else none,
+        "value": form_field.data|datetimeformat,
+        "_field" : {
+            "class":"form-field form-field--{}".format(form_field.type.replace('Field', '').lower())
+        },
+    }
+)%}
+<div {{form.attr_kw(render_kw._field|default({}, true))|xmlattr}}>
+    {{form_field.data}}<br/>
+    {{form_field.data|datetimeformat }}<br/>
+    {{jembeui_get_timezone()}}<br/>
+    {{jembeui_get_js_datetime_format('datepicker')}}
+    {{jembeui_get_js_date_format('datepicker')}}
+    {{jembeui_get_js_time_format('datepicker')}}
+    <label for="{{field_id}}" class="input-label">{{form_field.label}}</label>
+    {{form_field(**form.attr_kw(render_kw))}}
+    {% for error in form_field.errors %}
+    <div class="form-field__error">{{error}}</div>
+    {% endfor %}
+</div>

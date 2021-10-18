@@ -137,7 +137,7 @@ class JembeUI:
         @babel.timezoneselector
         def get_user_timezone():
             if "jembeuiTimezone" in request.cookies:
-                tz = request.cookies["jembeTimezone"]
+                tz = request.cookies["jembeuiTimezone"]
                 session["jembeui_timezone"] = tz
             return session.get("jembeui_timezone", None)
 
@@ -164,10 +164,10 @@ class JembeUI:
                 ),
                 "jembeui_get_js_datetime_format": lambda usefor: convert_py_date_format_to_js(
                     get_locale()
-                    .datetime_formats["full"]
+                    .datetime_formats["medium"]
                     .format(
-                        get_locale().time_formats["full"].pattern,
-                        get_locale().date_formats["full"].pattern,
+                        get_locale().time_formats["medium"].pattern,
+                        get_locale().date_formats["medium"].pattern,
                     ),
                     usefor,
                 ),

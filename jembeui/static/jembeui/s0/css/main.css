@@ -218,14 +218,14 @@ a:focus-visible {
 .page-system-error > div {
     width: 80%;
 }
-.page-system-error .head {
+.page-system-error .modal__dialog__head {
     background-color: var(--red-50);
     color: var(--white-100);
 }
-.page-system-error .head button:hover {
+.page-system-error .modal__dialog__head button:hover {
     background-color: var(--red-70);
 }
-.page-system-error .content  iframe{
+.page-system-error .modal__dialog__content  iframe{
     height: 70vh;
     border: none;
     width: 100%;

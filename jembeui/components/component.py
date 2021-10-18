@@ -84,6 +84,10 @@ class Component(jembe.Component):
 
     _config: Config
 
+    def init(self):
+        self.update_ac()
+        return super().init()
+
     @property
     def title(self) -> str:
         if isinstance(self._config.title, str):
@@ -123,6 +127,18 @@ class Component(jembe.Component):
     def jui_on_action_confirmed(self, event: "jembe.Event"):
         if hasattr(self, event.action_name):
             return getattr(self, event.action_name)(**event.action_params)
+
+    @listener(event="redisplay")
+    def jui_on_redisplay(self, event: "jembe.Event"):
+        return True
+
+    @listener(event="ac_update")
+    def jui_on_ac_update(self, event: "jembe.Event"):
+        self.update_ac()
+        return False
+
+    def update_ac(self):
+        pass
 
     def hydrate(self):
         pass

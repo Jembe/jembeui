@@ -1,9 +1,19 @@
-from typing import TYPE_CHECKING, Optional, Callable, Union, Dict, Iterable, Tuple, Any
+from typing import (
+    TYPE_CHECKING,
+    Optional,
+    Callable,
+    Sequence,
+    Union,
+    Dict,
+    Iterable,
+    Tuple,
+    Any,
+)
 from sqlalchemy.orm.scoping import scoped_session
 from ..component import Component
 from ...helpers import get_jembeui
 from ...exceptions import JembeUIError
-from ...lib import Form
+from ...lib import Form, Menu
 
 if TYPE_CHECKING:
     import jembe
@@ -95,6 +105,44 @@ class CFormBase(Component):
 
 class CForm(CFormBase):
     class Config(CFormBase.Config):
+        def __init__(
+            self,
+            form: "jembeui.Form",
+            get_record: Optional[
+                Callable[["jembe.Component"], Union["Model", dict]]
+            ] = None,
+            menu: Optional[
+                Union["jembeui.Menu", Sequence[Union["jembeui.Link", "jembeui.Menu"]]]
+            ] = None,
+            db: Optional["SQLAlchemy"] = None,
+            title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
+            template: Optional[Union[str, Iterable[str]]] = None,
+            components: Optional[Dict[str, "jembe.ComponentRef"]] = None,
+            inject_into_components: Optional[
+                Callable[["jembe.Component", "jembe.ComponentConfig"], dict]
+            ] = None,
+            redisplay: Tuple["jembe.RedisplayFlag", ...] = (),
+            changes_url: bool = True,
+            url_query_params: Optional[Dict[str, str]] = None,
+        ):
+            self.menu: "jembeui.Menu" = (
+                Menu()
+                if menu is None
+                else (Menu(menu) if not isinstance(menu, Menu) else menu)
+            )
+            super().__init__(
+                form,
+                get_record=get_record,
+                db=db,
+                title=title,
+                template=template,
+                components=components,
+                inject_into_components=inject_into_components,
+                redisplay=redisplay,
+                changes_url=changes_url,
+                url_query_params=url_query_params,
+            )
+
         pass
 
     def __init__(self, form: Optional[Form] = None):
@@ -107,3 +155,7 @@ class CForm(CFormBase):
 
         self.state.form.mount(self)
         super().__init__()
+
+    def hydrate(self):
+        self.menu = self._config.menu.bind_to(self)
+        return super().hydrate()

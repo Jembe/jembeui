@@ -37,6 +37,19 @@ def _get_default_breadcrumb_title(component: "jembe.Component") -> str:
 
 
 class BreadcrumbList(List["Breadcrumb"]):
+    def ignore(self, *components_full_names: str) -> "jembeui.BreadcrumbList":
+        def _remove_bc(breadcrumbs: List["Breadcrumb"], component_full_name: str):
+            for index, bc in enumerate(breadcrumbs):
+                if bc.component_full_name == component_full_name:
+                    del breadcrumbs[index]
+                    return
+                if bc.children:
+                    _remove_bc(bc.children, component_full_name)
+
+        for cn in components_full_names:
+            _remove_bc(self, cn)
+        return self
+
     def insert_into(
         self, component_full_name: str, *breadcrumbs: "jembeui.Breadcrumb"
     ) -> "jembeui.BreadcrumbList":
@@ -243,7 +256,12 @@ class Breadcrumb:
         if not first_home:
             return cls._from_menu_item(menu_source)
         else:
-            home_menu = menu_source.items[0]
+            try:
+                home_menu = menu_source.items[0]
+            except IndexError:
+                raise ValueError(
+                    "First item in menu must be action link when using first_home=True"
+                )
             if not isinstance(home_menu, ActionLink):
                 raise ValueError(
                     "First item in menu must be action link when using first_home=True"
@@ -278,12 +296,14 @@ class Breadcrumb:
             try:
                 to_full_name = menu_item.to_full_name
             except ValueError:
-                raise ValueError(
-                    "ActionLink {}: only component full_name is supported for "
-                    "action_link 'to' parameter, when converting it to breadcrumb".format(
-                        menu_item
-                    )
-                )
+                return BreadcrumbList()
+                # TODO write warning when debuging
+                # raise ValueError(
+                #     "ActionLink {}: only component full_name is supported for "
+                #     "action_link 'to' parameter, when converting it to breadcrumb".format(
+                #         menu_item
+                #     )
+                # )
             try:
                 title: Union[str, Callable[["jembe.Component"], str]] = menu_item.title
             except ValueError:
