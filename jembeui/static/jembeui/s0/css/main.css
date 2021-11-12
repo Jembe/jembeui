@@ -170,6 +170,7 @@ a:focus-visible {
 }
 .page-notification div {
     flex-grow: 1;
+    flex-basis: 0;
 }
 /* Dialog */
 .modal {
@@ -245,7 +246,7 @@ a:focus-visible {
 .button--short {
     min-width: unset;
 }
-.button:hover {
+.button:hover:not([disabled]) {
     background-color: var(--grey-90-a20);
 }
 .button:focus-visible {
@@ -255,14 +256,15 @@ a:focus-visible {
 .button:active {
     background-color: var(--grey-90-a30);
 }
-.button:disabled {
+.button[disabled] {
     opacity: 40%;
+    cursor: default;
 }
 .button--primary {
     background-color: var(--blue-60);
     color: var(--white-100);
 }
-.button--primary:hover {
+.button--primary:hover:not([disabled]) {
     background-color: var(--blue-70);
 }
 .button--primary:active {
@@ -272,7 +274,7 @@ a:focus-visible {
     background-color: var(--red-60);
     color: var(--white-100);
 }
-.button--danger:hover {
+.button--danger:hover:not([disabled]) {
     background-color: var(--red-70);
 }
 .button--danger:active {
@@ -290,7 +292,7 @@ a:focus-visible {
     min-width: unset;
     padding: 8px;
 }
-.button--ghost:hover {
+.button--ghost:hover:not([disabled]) {
     background-color: var(--grey-90-a10);
 }
 .button--ghost:active {
@@ -300,7 +302,7 @@ a:focus-visible {
     box-shadow: 0 0 0 1px var(--blue-50) inset, 0 0 0 1px var(--blue-50), 0 0 0 4px var(--blue-50-a30);
     outline: none;
 }
-.button--ghost:disabled {
+.button--ghost[disabled] {
     opacity: 40%;
 }
 
@@ -467,12 +469,14 @@ a:focus-visible {
     min-width: 160px;
     padding: 0 0 0 16px;
     flex-grow:0;
+    flex-basis: 0;
     flex-shrink: 1;
     overflow: hidden;
 }
 .page-layout__main__content {
     padding: 0 16px 32px 16px;
     flex-grow:1;
+    flex-basis: 0;
 }
 .page-layout__main__content__top-bar {
     display:flex;
@@ -786,10 +790,12 @@ a.main-menu__sub-menu__title:hover {
 }
 .list-records__toolbar__search {
     flex-grow: 1;
+    flex-basis: 0;
     display: flex;
 }
 .list-records__toolbar__search .input--toolbar{
     flex-grow: 1;
+    flex-basis: 0;
 }
 .list-records__toolbar__choice-filters {
     flex-shrink: 0;
@@ -887,14 +893,20 @@ a.main-menu__sub-menu__title:hover {
     align-items: flex-start;
     gap: 8px;
 }
+.form__block {
+    flex-grow: 1;
+    flex-basis: 0;
+}
 .form__container {
     display: flex;
     flex-direction: column;
     flex-grow: 1;
+    flex-basis: 0;
 }
 .form-field {
     margin: 0 0 8px 0;
     flex-grow: 1;
+    flex-basis: 0;
 }
 .form-field__error {
     margin-top: 4px;

@@ -9,7 +9,9 @@ from typing import (
     Tuple,
     Any,
 )
+from jembe import NotFound
 from sqlalchemy.orm.scoping import scoped_session
+from flask_sqlalchemy import Model
 from ..component import Component
 from ...helpers import get_jembeui
 from ...exceptions import JembeUIError
@@ -18,7 +20,7 @@ from ...lib import Form, Menu
 if TYPE_CHECKING:
     import jembe
     import jembeui
-    from flask_sqlalchemy import SQLAlchemy, Model
+    from flask_sqlalchemy import SQLAlchemy
 
 __all__ = ("CFormBase", "CForm")
 
@@ -96,6 +98,9 @@ class CFormBase(Component):
             return self._record
         except AttributeError:
             self._record = self.get_record()
+
+        if self._record is None:
+            raise NotFound()
         return self._record
 
     @property

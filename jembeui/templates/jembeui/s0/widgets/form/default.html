@@ -1,40 +1,53 @@
 <div class="form">
-{%set top = namespace(grab_focus = true, open_blocks=0, do_close_block=0) %}
+{% set top = namespace(grab_focus = true, prev_field_ends_block=false, open_divs = 0) %}
 {% for field in form  %}
-    {% set is_inline=form.RENDER_KW[field.name].get("_field", {}).get("_inline", False) %}
+    {% set field_is_inline=form.RENDER_KW[field.name].get("_field", {}).get("_inline", False) %}
     {% set block=form.RENDER_KW[field.name].get("_block", {}) %}
-    {% set block_start=block.get("_start", False) %}
-    {% set block_is_inline=block.get("_inline", False) %}
-    {% set block_end=block.get("_end", 0) %}
-    {% set block_end = 1 if block_end == true else block_end %}
+    {% set field_starts_block=block.get("_start", false) %}
+    {% set field_starts_inline_block =block.get("_inline", false) %}
+    {% set field_ends_block = block.get("_end", false) %}
 
-    {# closing row #}
-    {% if ((not is_inline and not block_start) or (block_start and not block_is_inline)) and not loop.first %}
-    </div> 
-    {% endif %}
+    {% set start_new_field_row = not field_is_inline or loop.first or field_starts_block %}
+    {% set start_new_block_row =  field_starts_block  and not field_starts_inline_block %}
+    {% set start_new_block =  field_starts_block  %}
+    {% set start_by_ending_field_row =  (not field_is_inline and not (field_starts_block and field_starts_inline_block) and not loop.first)  or top.prev_field_ends_block%}
+    {% set start_by_ending_block_row =  not field_is_inline and not (field_starts_block and field_starts_inline_block) and top.prev_field_ends_block  %}
+    {% set start_by_ending_block =  top.prev_field_ends_block  %}
 
-    {# closing block #}
-    {% if top.do_close_block > 0 %}
-        {% set top.open_blocks = top.open_blocks - top.do_close_block %}
-        {% set top.do_close_block = 0 %}
-        {% for i in range(top.do_close_block) %}
+
+    {# end field row #}
+    {% if start_by_ending_field_row %}
+        {% set top.open_divs = top.open_divs - 1 %}
     </div>
-    close block
-        {% endfor %}
+    {% endif %}
+    {# end block #}
+    {% if start_by_ending_block %}
+        {% set top.open_divs = top.open_divs - 1 %}
+    </div>
+    {% endif %}
+    {# end block row #}
+    {% if start_by_ending_block_row %}
+        {% set top.open_divs = top.open_divs - 1 %}
+    </div>
     {% endif %}
 
-    {# start row#}
-    {% if (not is_inline and not block_start) or loop.first %}
+    {# start block row #}
+    {% if start_new_block_row %}
+        {% set top.open_divs = top.open_divs + 1 %}
+    <div class="form__row">
+    {% endif %}
+    {# start block #}
+    {% if start_new_block%}
+        {% set top.open_divs = top.open_divs + 1 %}
+    <div {{form.attr_kw(form.resolve_kw(block,{'class':'form__block'}))|xmlattr}}>
+    {% endif %}
+    {# start field row #}
+    {% if start_new_field_row%}
+        {% set top.open_divs = top.open_divs + 1 %}
     <div class="form__row">
     {% endif %}
 
-    {# start block #}
-    {% if block_start %}
-    {% set top.open_blocks = top.open_blocks + 1 %}
-    <div {{form.attr_kw(form.resolve_kw(block,{'class':'form__block'}))|xmlattr}}>
-        <div class="form__row">
-    {% endif %}
-
+    {# field #}
     {% if not form.is_disabled and top.grab_focus and (field.render_kw|default({}, true)).get("disabled", none) is none %}
         {% set top.grab_focus = false %}
         {{form.field_as_html(field, **{"jmb-on:ready.once":"$self.focus()"})}}
@@ -42,14 +55,32 @@
         {{form.field_as_html(field)}}
     {% endif %}
 
-    {% set top.do_close_blocks = block_end %}
+    {% set top.prev_field_ends_block = field_ends_block %}
+
 {% endfor %}
 
-{% for i in range(top.open_blocks) %}
-{# Closing blocks #}
-</div> 
+{% for i in range(top.open_divs) %}
+     </div> 
 {% endfor %}
-{# Closing row #}
-</div> 
-
 </div>
+
+
+{# 
+Development and explanation of form logic:
+
+- Every field starts new field row except inline field
+- Every block starts new block row except inline block
+- Every field ends field row except when next field or block is inline
+- Every block end ends block row except when next field or block is inline
+- First field in Form starts new field row
+- First field in Block starts new field row
+
+ <=>
+
+- start new field row when field is not inline and field is first in form or field starts new block
+- start new block row when field starts block and block is not inline
+- start new block when field starts new block
+- start by ending field row when field is not inline and field dont start inline block and field is not first in form
+- start by ending block row when field is not inline and field not start inline block and previous field ends block 
+- start by ending block when previous field ends block 
+#}

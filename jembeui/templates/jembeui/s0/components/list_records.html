@@ -64,7 +64,7 @@
                 {% endfor %}
                 </div>
                 <button type="button" class="list-records__toolbar__choice-filters-other__button button button--micro button--select--toolbar {%if ns.other_selected%}button--select--toolbar--on{% endif %}" jmb-on:click.prevent="$scope().opened = !$scope().opened; " title="Other filters">
-                    Other
+                    Filters
                     <!-- This SVG Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. that You can obtain one at http://mozilla.org/MPL/2.0/. -->
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill="context-fill" d="M8 12a1 1 0 0 1-.707-.293l-5-5a1 1 0 0 1 1.414-1.414L8 9.586l4.293-4.293a1 1 0 0 1 1.414 1.414l-5 5A1 1 0 0 1 8 12z"></path></svg>
                 </button>
@@ -115,7 +115,6 @@
             </tr>
         </thead>
         <tbody>
-        </tbody>
     {% for record in records  %}
         <tr class="table__body__row {{loop.cycle('table__body__row--even','table__body__row--odd')}}">
             {% for field_name in _config.fields.keys() %}
@@ -130,5 +129,6 @@
             {% endif %}
         </tr>
     {% endfor %}
+        </tbody>
     </table>
 </div>

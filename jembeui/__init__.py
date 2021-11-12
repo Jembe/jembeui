@@ -15,8 +15,8 @@ from .lib import (
     Breadcrumb,
     BreadcrumbList,
     Form,
-    JembeFileField,
-    JembeImageField,
+    FileField,
+    ImageField,
 )
 from .components import (
     Component,

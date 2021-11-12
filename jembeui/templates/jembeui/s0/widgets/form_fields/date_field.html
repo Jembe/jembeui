@@ -1,4 +1,4 @@
-{% set field_id = "{}--{}".format(exec_name.replace("/","-"), form_field.name)%}
+{% set field_id = "{}--{}".format(exec_name.replace("/","-").replace(".","_"), form_field.name)%}
 {% set is_not_disabled = "disabled" not in raw_render_kw %}
 {% set render_kw = form.resolve_kw(
     raw_render_kw,

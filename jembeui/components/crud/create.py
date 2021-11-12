@@ -13,7 +13,7 @@ import sqlalchemy as sa
 from flask_sqlalchemy import Model, SQLAlchemy
 from jembe import action
 from .form import CForm
-from ...lib import Form, Menu, Link, ActionLink
+from ...lib import Form, Menu, ActionLink
 
 if TYPE_CHECKING:
     import jembe

@@ -137,7 +137,9 @@ class CListRecords(Component):
 
         def __init__(
             self,
-            query: "sa.orm.Query",
+            query: Union[
+                "sa.orm.Query", Callable[["jembeui.CListRecords"], "sa.orm.Query"]
+            ],
             fields: Optional[Dict[str, str]] = None,
             field_values: Optional[
                 Dict[str, Callable[["jembeui.Component", Any, str], str]]
@@ -196,14 +198,17 @@ class CListRecords(Component):
                 page_size if page_size > 0 else settings.list_records_page_size
             )
             # field names
-            self.fields = (
-                fields
-                if fields is not None
-                else {
-                    ca["name"]: ca["name"].replace("_", " ")
-                    for ca in self.query.column_descriptions
-                }
-            )
+            if isinstance(self.query, sa.orm.Query):
+                self.fields = (
+                    fields
+                    if fields is not None
+                    else {
+                        ca["name"]: ca["name"].replace("_", " ")
+                        for ca in self.query.column_descriptions
+                    }
+                )
+            else:
+                self.fields = fields if fields is not None else {}
             # field values
             self.field_values = (
                 field_values
@@ -331,9 +336,14 @@ class CListRecords(Component):
         }
 
     def hydrate(self):
-        self.records = self._config.query.with_session(
-            self._config.db.session()
-        ).only_return_tuples(True)
+        query = (
+            self._config.query
+            if isinstance(self._config.query, sa.orm.Query)
+            else self._config.query(self)
+        )
+        self.records = query.with_session(self._config.db.session()).only_return_tuples(
+            True
+        )
 
         # apply search filter
         if self._config.search_filter is not None and self.state.search:
