@@ -5,23 +5,28 @@ from markupsafe import Markup
 import wtforms as wtf
 from flask import render_template
 from jembe import JembeInitParamSupport
-from ..helpers import get_widget_variants, camel_to_snake
-from ..settings import settings
-from ..exceptions import JembeUIError
+
+from ...helpers import get_widget_variants, camel_to_snake
+from ...settings import settings
+from ...exceptions import JembeUIError
+from ._file_handling import SupportFileHandlingMixin
 
 if TYPE_CHECKING:
     import jembeui
     import wtforms
     from flask_sqlalchemy import Model
 
-__all__ = ("Form",)
+__all__ = (
+    "Form",
+    "FormBase",
+)
 
 
 class FormMeta(wtf.form.FormMeta, ABCMeta):
     pass
 
 
-class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
+class FormBase(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
     """
     Form should be used together with CForm component and its variants
     CEdit, CCreate, CView to represent actual form.
@@ -101,7 +106,9 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
             }
         )
 
-    def mount(self, cform: "jembeui.CForm") -> "jembeui.Form":
+    def mount(
+        self, cform: "jembeui.CForm", form_state_name: Optional[str] = None
+    ) -> "jembeui.Form":
         """
         Mount is called by CFrom before form is displayed or before
         form needs aditional processing
@@ -132,7 +139,7 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
             self.cform.session.add(record)
             return record
 
-    def cancel(self, record: Union["Model", dict]):
+    def cancel(self, record: Union["Model", dict]) -> Optional[bool]:
         # TODO
         pass
 
@@ -230,7 +237,9 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
         return {
             k: v
             for k, v in kw.items()
-            if not k.startswith("_") and not k.endswith("+") and isinstance(v, (str, int, bool))
+            if not k.startswith("_")
+            and not k.endswith("+")
+            and isinstance(v, (str, int, bool))
         }
 
     def _jui_template(
@@ -392,3 +401,10 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
         if field.render_kw is None:
             field.render_kw = dict()
         return field.render_kw.setdefault(param_name, value)
+
+
+class Form(SupportFileHandlingMixin, FormBase):
+    # TODO
+    # INSTANT_VALIDATE:bool = False
+    # INSTANT_SUBMIT:bool = False
+    pass

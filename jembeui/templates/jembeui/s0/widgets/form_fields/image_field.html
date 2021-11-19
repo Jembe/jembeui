@@ -14,11 +14,12 @@
         "_field" : {
             "class":"form-field form-field--{}".format(form_field.type.replace('Field', '').lower())
         },
-        "jmb-on:change.defer": (
-            "form.{fname} = $self.value;"  
+        "jmb-on:change": (
+            "form.{fname} = $self.files[0];" 
             + (" modified_fields.indexOf('{fname}') === -1 && modified_fields.push('{fname}');" if "modified_fields" in state else "")
+            + (" validate(true);" if "validate" in _config.component_actions else "")
         ).format(fname=form_field.name) if is_not_disabled else none,
-        "jmb-on:keydown.enter.ctrl": "$self.blur();$self.focus();submit()" if is_not_disabled and "submit" in _config.component_actions else none,
+        "jmb-on:keydown.enter.ctrl": "$self.blur();$self.focus();submit();" if is_not_disabled and "submit" in _config.component_actions else none,
     }
 )%}
 <div {{form.attr_kw(render_kw._field|default({}, true))|xmlattr}}>
@@ -29,7 +30,12 @@
         {% if form_field.description %}{{description}}{% endif %}
         </div>
     </div>
-    {{form_field(**form.attr_kw(render_kw))}}
+    <div class="image-input">
+        <a href="{{form_field.data.url}}" target="_blank">view</a> 
+        <img src="{{form_field.thumbnail().url}}" alt="{{form_field.data.basename}} thumbnail">
+        {{form_field.data.basename}}
+        {{form_field(**form.attr_kw(render_kw))}}
+    </div>
     {% for error in form_field.errors %}
     <div class="form-field__error">{{error}}</div>
     {% endfor %}

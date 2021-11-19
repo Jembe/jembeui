@@ -158,7 +158,7 @@ class CForm(CFormBase):
                 else self._config.form(obj=self.record)
             )
 
-        self.state.form.mount(self)
+        self.state.form.mount(self, "form")
         super().__init__()
 
     def hydrate(self):

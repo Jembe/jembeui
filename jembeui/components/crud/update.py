@@ -12,7 +12,7 @@ import sqlalchemy as sa
 from flask_sqlalchemy import Model, SQLAlchemy
 from jembe import action
 from .form import CForm
-from ...lib import Form, Menu, Link, ActionLink
+from ...lib import Form, Menu, ActionLink
 
 if TYPE_CHECKING:
     import jembe
@@ -23,6 +23,12 @@ __all__ = ("CUpdateRecord",)
 
 def default_on_submit(c: "jembeui.CUpdateRecord", r: Union["Model", str]):
     c.jui_push_notification("Saved sucessefuly", "success")
+
+
+def default_on_cancel(
+    c: "jembeui.CUpdateRecord", r: Union["Model", str]
+) -> Optional[bool]:
+    return c.state.form.cancel(r)
 
 
 def default_on_invalid_form(c: "jembeui.CUpdateRecord"):
@@ -65,7 +71,11 @@ class CUpdateRecord(CForm):
             on_submit_exception: Optional[
                 Callable[["jembeui.CUpdateRecord", "Exception"], None]
             ] = default_on_submit_exception,
-            on_cancel: Optional[Callable[["jembeui.CUpdateRecord"], None]] = None,
+            on_cancel: Optional[
+                Callable[
+                    ["jembeui.CUpdateRecord", Union["Model", dict]], Optional[bool]
+                ]
+            ] = default_on_cancel,
             db: Optional["SQLAlchemy"] = None,
             title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
             template: Optional[Union[str, Iterable[str]]] = None,
@@ -109,7 +119,7 @@ class CUpdateRecord(CForm):
         self,
         id: int,
         form: Optional[Form] = None,
-        is_modified: bool = False,
+        modified_fields: Tuple[str, ...] = (),
         _record: Optional[Union[Model, dict]] = None,
     ):
         if _record is not None and (
@@ -148,9 +158,10 @@ class CUpdateRecord(CForm):
 
     @action
     def cancel(self, confirmed: bool = False):
-        if confirmed or not self.state.is_modified:
+        if confirmed or not self.state.modified_fields:
+            redisplay: Optional[bool] = None
             if self._config.on_cancel:
-                self._config.on_cancel(self)
+                redisplay = self._config.on_cancel(self, self.record)
             self.emit(
                 "cancel",
                 record=self.record,
@@ -158,9 +169,30 @@ class CUpdateRecord(CForm):
                 if isinstance(self.record, dict)
                 else self.record.id,
             )
+            return redisplay
         else:
             self.jui_confirm_action(
                 "cancel",
                 "Unsaved changes",
                 "You have unsaved changes in {} that will be lost.".format(self.title),
             )
+
+    @action
+    def validate(self, only_modified_fields: bool = False):
+        """
+            Validates form without submiting it
+
+            if only_modified_fields is True then validate only modified fields not the whole
+            form
+        """
+        is_valid = True
+        if only_modified_fields:
+            for field_name in self.state.modified_fields:
+                is_valid = is_valid and getattr(self.state.form, field_name).validate(
+                    self.state.form
+                )
+        else:
+            is_valid = self.state.form.validate()
+        if not is_valid and self._config.on_invalid_form:
+            self._config.on_invalid_form(self)
+        return True

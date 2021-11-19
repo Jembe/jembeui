@@ -4,7 +4,6 @@ from babel.core import get_locale_identifier
 from flask import session, request
 import flask_babel
 from flask_babel import get_locale
-from werkzeug.wrappers import response
 
 from .exceptions import JembeUIError
 from .lib import (
@@ -15,6 +14,7 @@ from .lib import (
     Breadcrumb,
     BreadcrumbList,
     Form,
+    FormBase,
     FileField,
     ImageField,
 )
@@ -30,7 +30,7 @@ from .components import (
     CViewRecord,
     CDeleteRecord,
 )
-from .helpers import convert_py_date_format_to_js
+from .helpers import convert_py_date_format_to_js, camel_to_snake
 
 if TYPE_CHECKING:
     from flask_sqlalchemy import SQLAlchemy
@@ -44,7 +44,10 @@ __all__ = (
     "Menu",
     "Breadcrumb",
     "BreadcrumbList",
+    "FormBase",
     "Form",
+    "FileField",
+    "ImageField",
     "JembeFileField",
     "JembeImageField",
     "Component",
@@ -174,9 +177,14 @@ class JembeUI:
                 "jembeui_get_js_time_format": lambda usefor: convert_py_date_format_to_js(
                     get_locale().time_formats["medium"].pattern, usefor
                 ),
-                "jembeui_get_locale_code": lambda separator="_": get_locale_code(separator),
+                "jembeui_get_locale_code": lambda separator="_": get_locale_code(
+                    separator
+                ),
                 "jembeui_get_timezone": lambda: session.get("jembeui_timezone", None),
             }
+        )
+        self.__jembe.flask.jinja_env.filters.update(
+            {"jembeui_camel_to_snake": camel_to_snake}
         )
 
     def set_default_db(self, default_db: "SQLAlchemy"):
