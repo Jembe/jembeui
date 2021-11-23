@@ -404,7 +404,13 @@ class FormBase(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
 
 
 class Form(SupportFileHandlingMixin, FormBase):
-    # TODO
-    # INSTANT_VALIDATE:bool = False
-    # INSTANT_SUBMIT:bool = False
+
+    # If INASTANT_VALIDATE is True, validate action will be called
+    # after field value is changed by user
+    INSTANT_VALIDATE: bool = False
+    # If INASTANT_SUBMIT is True, submit action will be called
+    # after field value is changed by user
+    INSTANT_SUBMIT: bool = False
+    # INSTANT_VALIDATE and INSTANT_SUBMIT functionality is implemnted by
+    # field templates
     pass

@@ -232,6 +232,17 @@ a:focus-visible {
     width: 100%;
 }
 /* Button */
+.button--like {
+    display: inline-block;
+}
+.button--like {
+    text-decoration: none;
+    box-sizing: border-box;
+}
+.button--like:hover {
+    text-decoration: none;
+    color: inherit;
+}
 .button {
     background-color: var(--grey-90-a10);
     color: var(--grey-90);
@@ -930,4 +941,45 @@ a.main-menu__sub-menu__title:hover {
 .input.select[multiple],
 .input.text-area {
     flex-grow: 1;
+}
+.image-input {
+}
+.image-input__controls {
+    display: flex;
+    justify-content: space-between;
+}
+.image-input__thumbnail {
+    margin-top: 4px;
+}
+.image-input__thumbnail img {
+    width: 100%;
+    object-fit: contain;
+}
+.image-input__enlarged {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    display: flex;
+    z-index: 2000;
+    background-color: var(--grey-90-a90);
+}
+.image-input__enlarged img{
+    margin: auto;
+    object-fit: scale-down;
+    width: 100vw;
+    height: 100vh;
+}
+.image-input__enlarged .button--close{
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: 2001;
+    color: var(--grey-20);
+    background-color: var(--grey-90-a20);
+    margin: 8px;
+}
+.image-input__enlarged .button--close:hover{
+    color: var(--white-100);
 }

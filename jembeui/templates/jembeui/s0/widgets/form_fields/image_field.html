@@ -1,16 +1,17 @@
 {% set field_id = "{}--{}".format(exec_name.replace("/","-"), form_field.name)%}
 {% set is_not_disabled = "disabled" not in raw_render_kw %}
-{% set render_kw = form.resolve_kw(
-    raw_render_kw,
-    {
-        "id":field_id,
-        "class":" ".join(
+        {# "class":" ".join(
             [
                 "input", 
                 form_field.widget.__class__.__name__|jembeui_camel_to_snake|replace("_","-"),  
                 "input--error" if form_field.errors else ""
             ]
-        ),
+        ), #}
+{% set render_kw = form.resolve_kw(
+    raw_render_kw,
+    {
+        "id":field_id,
+        "style": "display:none;",
         "_field" : {
             "class":"form-field form-field--{}".format(form_field.type.replace('Field', '').lower())
         },
@@ -22,18 +23,51 @@
         "jmb-on:keydown.enter.ctrl": "$self.blur();$self.focus();submit();" if is_not_disabled and "submit" in _config.component_actions else none,
     }
 )%}
-<div {{form.attr_kw(render_kw._field|default({}, true))|xmlattr}}>
+<div {{form.attr_kw(render_kw._field|default({}, true))|xmlattr}} jmb-scope="{showEnlarged: false, imgUrl: ''}">
     <div class="form-field__label">
-        <label for="{{field_id}}" class="input-label">{{form_field.label.text}}</label>
-        <div class="input-info">
-        {% if is_not_disabled and not form_field.flags.required %}optional{% endif %}
-        {% if form_field.description %}{{description}}{% endif %}
+        <div class="input-label">{{form_field.label.text}}</div>
+        <div style="display:flex; align-items:center; gap:8px;">
+            <div class="input-info">
+                {%- if is_not_disabled and not form_field.flags.required %}optional{% endif %}
+                {%- if form_field.description %}{{description}}{% endif %}
+            </div>
+            <div class="buttons-menu">
+                {% if is_not_disabled %}
+                {% if form_field.data %}
+                <button jmb-on:click="form.{{form_field.name}} = null; validate(true);" type="button" class="button button--ghost" title="Remove image">
+                    <!-- The Source Code of followint svg is subject to the terms of the Mozilla Public License, v. 2.0. You can obtain MPL at http://mozilla.org/MPL/2.0/. -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill="context-fill" d="M6.5 12a.5.5 0 0 0 .5-.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 0 .5.5zm2 0a.5.5 0 0 0 .5-.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 0 .5.5zm2 0a.5.5 0 0 0 .5-.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 0 .5.5z"></path><path fill="context-fill" d="M14 2h-3.05a2.5 2.5 0 0 0-4.9 0H3a1 1 0 0 0 0 2v9a3 3 0 0 0 3 3h5a3 3 0 0 0 3-3V4a1 1 0 0 0 0-2zM8.5 1a1.489 1.489 0 0 1 1.391 1H7.109A1.489 1.489 0 0 1 8.5 1zM12 13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4h7z"></path></svg>
+                </button>
+                {% endif %}
+                <label for="{{field_id}}" class="button button--like button--ghost" title="{% if form_field.data %}Upload new image{% else %}Upload image{% endif %}">
+                    <!-- The Source Code of followint svg is subject to the terms of the Mozilla Public License, v. 2.0. You can obtain MPL at http://mozilla.org/MPL/2.0/. -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill="context-fill" d="M14 3h-2v2h2v8H2V5h7V3h-.849L6.584 1.538A2 2 0 0 0 5.219 1H2a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zM2 3h3.219l1.072 1H2z"></path><path fill="context-fill" d="M8.146 6.146a.5.5 0 0 0 0 .707l2 2a.5.5 0 0 0 .707 0l2-2a.5.5 0 1 0-.707-.707L11 7.293V.5a.5.5 0 0 0-1 0v6.793L8.854 6.146a.5.5 0 0 0-.708 0z"></path></svg>
+                </label>
+                {% endif %}
+                {% if form_field.data %}
+                <button jmb-on:click="$scope().imgUrl = '{{form_field.data.url if form_field.data else ''}}';$scope().showEnlarged=true;" class="button button--ghost" title="Enlarge image">
+                    <!-- The Source Code of followint svg is subject to the terms of the Mozilla Public License, v. 2.0. You can obtain MPL at http://mozilla.org/MPL/2.0/. -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill="context-fill" d="M7.707 8.293a1 1 0 0 0-1.414 0L3 11.586V9a1 1 0 0 0-2 0v5a1 1 0 0 0 1 1h5a1 1 0 1 0 0-2H4.414l3.293-3.293a1 1 0 0 0 0-1.414zM14 1H9a1 1 0 0 0 0 2h2.586L8.293 6.293a1 1 0 1 0 1.414 1.414L13 4.414V7a1 1 0 0 0 2 0V2a1 1 0 0 0-1-1z"></path></svg>
+                </button> 
+                {% endif %}
+            </div>
         </div>
     </div>
-    <div class="image-input">
-        <a href="{{form_field.data.url}}" target="_blank">view</a> 
-        <img src="{{form_field.thumbnail().url}}" alt="{{form_field.data.basename}} thumbnail">
-        {{form_field.data.basename}}
+    <div class="image-input" >
+        <div class="image-input__thumbnail" style="height: {{form_field.thumbnail_size[1]}}px;">
+            {% if form_field.data %}
+            <img src="{{form_field.thumbnail().url}}" alt="{{form_field.data.basename}} thumbnail" style="max-height: {{form_field.thumbnail_size[1]}}px;">
+            {% endif %}
+        </div>
+        {% if form_field.data %}
+        <div jmb-show="$scope().showEnlarged" jmb-cloak class="image-input__enlarged">
+            <button jmb-on:click="$scope().showEnlarged=false" class="button button--ghost button--close">
+                <!-- The Source Code of followint svg is subject to the terms of the Mozilla Public License, v. 2.0. You can obtain MPL at http://mozilla.org/MPL/2.0/. -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill="context-fill" d="M9.061 8l3.47-3.47a.75.75 0 0 0-1.061-1.06L8 6.939 4.53 3.47a.75.75 0 1 0-1.06 1.06L6.939 8 3.47 11.47a.75.75 0 1 0 1.06 1.06L8 9.061l3.47 3.47a.75.75 0 0 0 1.06-1.061z"></path></svg>
+            </button>
+            <img jmb-bind:src="$scope().imgUrl" alt="{{form_field.data.basename}}">
+        </div>
+        {% endif %}
         {{form_field(**form.attr_kw(render_kw))}}
     </div>
     {% for error in form_field.errors %}

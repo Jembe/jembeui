@@ -1,7 +1,7 @@
 from typing import Optional, Tuple
 from jembe import File
 from .file import FileField
-from PIL import Image
+from PIL import Image, ImageOps
 
 
 __all__ = ("ImageField",)
@@ -12,7 +12,7 @@ class ImageField(FileField):
         self,
         label=None,
         validators=None,
-        thumbnail_size=(400, 400),
+        thumbnail_size=(300, 300),
         filters=tuple(),
         description="",
         id=None,
@@ -40,10 +40,10 @@ class ImageField(FileField):
             _translations=_translations,
             _meta=_meta,
         )
-        self._thumbnail_size = thumbnail_size
+        self.thumbnail_size = thumbnail_size
 
     def thumbnail(self, size: Optional[Tuple[int, int]] = None) -> Optional["File"]:
-        thumbnail_size = size if size else self._thumbnail_size
+        thumbnail_size = size if size else self.thumbnail_size
         if self.data:
             thumb = self.data.get_cache_version(
                 "thumbnail_{}_{}.jpg".format(*thumbnail_size)
@@ -57,6 +57,7 @@ class ImageField(FileField):
                 with Image.open(self.data.open(mode="rb")) as img:
                     if img.mode != "RGB":
                         img = img.convert("RGB")
+                    img = ImageOps.exif_transpose(img)
                     img.thumbnail(thumbnail_size)
                     with thumb.open("wb") as tfo:
                         img.save(tfo, "JPEG")
