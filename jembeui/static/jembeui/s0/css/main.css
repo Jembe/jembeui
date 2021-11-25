@@ -899,7 +899,76 @@ a.main-menu__sub-menu__title:hover {
     outline: none;
     border: none;
 }
+/* checkbox */
+
+  
+.checkbox {
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  background-color: var(--grey-90-a10);
+  border-radius: 2px;
+  border: 1px solid var(--grey-90-a30);
+  height: 16px;
+  margin: -2px 4px;
+  width: 16px;
+  outline: none;
+}
+
+.checkbox:hover {
+  background-color: var(--grey-90-a20);
+}
+
+.checkbox:active {
+  background-color: var(--grey-90-a30);
+}
+
+.checkbox:focus {
+  border: none;
+  box-shadow: 0 0 0 1px #0a84ff inset, 0 0 0 1px #0a84ff, 0 0 0 4px rgba(10, 132, 255, .3);
+}
+
+.checkbox:checked {
+  background-color: var(--blue-60);
+  background-image: url(/jembeui/static/jembeui/s0/icons/checkbox-check-16-grey-10-a90.svg);
+  background-position: center center;
+}
+
+.checkbox:checked:hover {
+  background-color: var(--blue-70);
+}
+
+.checkbox:checked:active {
+  background-color: var(--blue-80);
+}
+
+.checkbox:disabled {
+  opacity: .4;
+}
+
+.checkbox:disabled:hover {
+  background-color: var(--grey-90-a10);
+}
+
+.checkbox:disabled:checked:hover {
+  background-color: var(--blue-60);
+}
+
+.checkbox--disabled__label__text {
+  opacity: .6;
+}
 /* form */
+
+.buttons-menu--label-actions {
+}
+.buttons-menu--label-actions .button {
+    width: 22px;
+    height: 22px;
+    padding: 2px;
+}
+.buttons-menu--label-actions .button svg {
+    width: 15px;
+    height: 15px;
+}
 
 .form__row {
     display: flex;
@@ -949,7 +1018,9 @@ a.main-menu__sub-menu__title:hover {
     justify-content: space-between;
 }
 .image-input__thumbnail {
-    margin-top: 4px;
+    border-radius: 2px;
+    overflow: hidden;
+    border: solid 1px var(--grey-90-a20);
 }
 .image-input__thumbnail img {
     width: 100%;
@@ -982,4 +1053,27 @@ a.main-menu__sub-menu__title:hover {
 }
 .image-input__enlarged .button--close:hover{
     color: var(--white-100);
+}
+.form-field--boolean {
+    margin-top: 8px;
+}
+.form-field--boolean + .form-field--boolean {
+    margin-top: 0;
+}
+.form-field__checkbox-holder {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.form-field--boolean .form-field__label {
+    flex-grow: 1;
+    flex-basis: 0;
+}
+.form-field--boolean .checkbox-label {
+    font-size: 15px;
+    width: 100%;
+    line-height: 1.4;
+}
+.form-field__error--checkbox {
+    margin-left: 24px;
 }

@@ -31,7 +31,7 @@
                 {%- if is_not_disabled and not form_field.flags.required %}optional{% endif %}
                 {%- if form_field.description %}{{description}}{% endif %}
             </div>
-            <div class="buttons-menu">
+            <div class="buttons-menu buttons-menu--label-actions">
                 {% if is_not_disabled %}
                 {% if form_field.data %}
                 <button jmb-on:click="form.{{form_field.name}} = null; validate(true);" type="button" class="button button--ghost" title="Remove image">
