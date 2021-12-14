@@ -7,6 +7,7 @@ from typing import (
     Tuple,
     Dict,
     Sequence,
+    Any
 )
 from jembe import action
 from flask_sqlalchemy import Model, SQLAlchemy
@@ -81,6 +82,11 @@ class CViewRecord(CFormBase):
         )
         self.form.mount(self)
         super().__init__()
+
+    def inject_into(self, cconfig: "jembe.ComponentConfig") -> Dict[str, Any]:
+        return {
+            "_form": self.form,
+        }
 
     @action
     def cancel(self):

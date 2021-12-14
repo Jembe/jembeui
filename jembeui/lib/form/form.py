@@ -10,6 +10,7 @@ from ...helpers import get_widget_variants, camel_to_snake
 from ...settings import settings
 from ...exceptions import JembeUIError
 from ._file_handling import SupportFileHandlingMixin
+from ..form_fields import JUIFieldMixin
 
 if TYPE_CHECKING:
     import jembeui
@@ -58,6 +59,7 @@ class FormBase(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
     ):
         self.is_disabled = disabled
         self.cform: "jembeui.CForm"
+        self.is_mounted = False
 
         super().__init__(
             formdata=formdata, obj=obj, prefix=prefix, data=data, meta=meta, **kwargs
@@ -113,6 +115,12 @@ class FormBase(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
         Mount is called by CFrom before form is displayed or before
         form needs aditional processing
         """
+        if self.is_mounted:
+            raise JembeUIError(
+                "Form {} can't be mounted multiple times!".format(
+                    self.__class__.__name__
+                )
+            )
         self.cform = cform
         if "RENDER_KW" not in self.__class__.__dict__:
             self.__class__.RENDER_KW = dict()
@@ -125,6 +133,11 @@ class FormBase(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
                         for k, v in field.render_kw.items()
                         if not k.endswith("+") and not k.startswith("_")
                     }
+
+        for field in self:
+            if isinstance(field, JUIFieldMixin):
+                field.jui_mount(self)
+        self.is_mounted = True
         return self
 
     def submit(self, record: Union["Model", dict]) -> Union["Model", dict]:

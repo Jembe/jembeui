@@ -957,6 +957,11 @@ a.main-menu__sub-menu__title:hover {
   opacity: .6;
 }
 /* form */
+.form {
+    max-width: 1024px;
+    /* margin: auto; */
+    margin-top: 16px;
+}
 
 .buttons-menu--label-actions {
 }
@@ -1055,7 +1060,7 @@ a.main-menu__sub-menu__title:hover {
     color: var(--white-100);
 }
 .form-field--boolean {
-    margin-top: 8px;
+    margin-top: 22px;
 }
 .form-field--boolean + .form-field--boolean {
     margin-top: 0;

@@ -17,6 +17,8 @@ from .lib import (
     FormBase,
     FileField,
     ImageField,
+    SelectMultipleField,
+    JUIFieldMixin,
 )
 from .components import (
     Component,
@@ -48,8 +50,8 @@ __all__ = (
     "Form",
     "FileField",
     "ImageField",
-    "JembeFileField",
-    "JembeImageField",
+    "SelectMultipleField",
+    "JUIFieldMixin",
     "Component",
     "CPage",
     "CMenu",

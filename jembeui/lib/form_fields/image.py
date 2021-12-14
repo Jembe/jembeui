@@ -58,7 +58,7 @@ class ImageField(FileField):
                     if img.mode != "RGB":
                         img = img.convert("RGB")
                     img = ImageOps.exif_transpose(img)
-                    img.thumbnail(thumbnail_size)
+                    img.thumbnail(thumbnail_size, Image.BICUBIC)
                     with thumb.open("wb") as tfo:
                         img.save(tfo, "JPEG")
                         return thumb

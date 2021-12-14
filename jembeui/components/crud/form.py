@@ -12,10 +12,11 @@ from typing import (
 from jembe import NotFound
 from sqlalchemy.orm.scoping import scoped_session
 from flask_sqlalchemy import Model
+
 from ..component import Component
 from ...helpers import get_jembeui
 from ...exceptions import JembeUIError
-from ...lib import Form, Menu
+from ...lib import Form, Menu, JUIFieldMixin
 
 if TYPE_CHECKING:
     import jembe
@@ -58,6 +59,12 @@ class CFormBase(Component):
                         "Either 'db' for CListRecords.Config or default_db"
                         " on JembeUI instance must be set"
                     )
+            if components is None:
+                components = {}
+            for field in self.form():
+                if isinstance(field, JUIFieldMixin):
+                    components.update(field.jui_get_components())
+
             super().__init__(
                 title=title,
                 template=template,
@@ -149,6 +156,11 @@ class CForm(CFormBase):
             )
 
         pass
+
+    def inject_into(self, cconfig: "jembe.ComponentConfig") -> Dict[str, Any]:
+        return {
+            "_form": self.state.form,
+        }
 
     def __init__(self, form: Optional[Form] = None):
         if self.state.form is None:
