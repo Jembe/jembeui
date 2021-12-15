@@ -83,3 +83,7 @@ class CSelectMultipleSearch(Component):
     @property
     def all_choices(self) -> list:
         return self.field._all_choices()
+
+    @property
+    def choices(self) -> List[tuple]:
+        return self.field._get_choices(self.state.search, self.state.selected)

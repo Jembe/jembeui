@@ -14,29 +14,29 @@
             ]
         ),
         "_field" : {
-            "class":"form-field form-field--{}".format(form_field.type.replace('Field', '').lower())
-        },
-        "jmb-on:select-option-change.defer": (
-            "form.{fname} = $self.value;"  
-            + (" modified_fields.indexOf('{fname}') === -1 && modified_fields.push('{fname}');" if "modified_fields" in state else "")
-        ).format(fname=form_field.name) if is_not_disabled and not instant_validate and not instant_submit else none,
-        "jmb-on:select-option-change": (
-            "form.{fname} = $self.value;"  
-            + (" modified_fields.indexOf('{fname}') === -1 && modified_fields.push('{fname}');" if "modified_fields" in state else "")
-            + (" validate();" if instant_validate  else "")
-            + (" submit();" if instant_submit else "")
-        ).format(fname=form_field.name) if is_not_disabled and (instant_validate or instant_submit) else none,
+            "class": "form-field form-field--{}".format(form_field.type.replace('Field', '').lower()),
+            "jmb-on:select-option-changed.prevent.stop.defer": (
+                "form.{fname} = $event.detail.selected;console.log(form.{fname});"  
+                + (" modified_fields.indexOf('{fname}') === -1 && modified_fields.push('{fname}');" if "modified_fields" in state else "")
+            ).format(fname=form_field.name) if is_not_disabled and not instant_validate and not instant_submit else none,
+            "jmb-on:select-option-changed.prevent.stop": (
+                "form.{fname} = $event.detail.selected;"  
+                + (" modified_fields.indexOf('{fname}') === -1 && modified_fields.push('{fname}');" if "modified_fields" in state else "")
+                + (" validate();" if instant_validate  else "")
+                + (" submit();" if instant_submit else "")
+            ).format(fname=form_field.name) if is_not_disabled and (instant_validate or instant_submit) else none,
+        }
     }
 )%}
 <div {{form.attr_kw(render_kw._field|default({}, true))|xmlattr}}>
-    {# <div class="form-field__label">
+     <div class="form-field__label">
         <label for="{{field_id}}" class="input-label">{{form_field.label.text}}</label>
         <div class="input-info">
         {% if is_not_disabled and not form_field.flags.required %}optional{% endif %}
         {% if form_field.description %}{{description}}{% endif %}
         </div>
     </div>
-    {{form_field(**form.attr_kw(render_kw))}} #}
+    {# <input type="hidden" id="{{field_id}}" value="{{form_field.data}}"> #}
     {{form_field.jui_component("search", selected=form_field.data if form_field.data else [], is_disabled=not is_not_disabled)}}
     {% for error in form_field.errors %}
     <div class="form-field__error">{{error}}</div>

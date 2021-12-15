@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING, Union, Callable, List, Tuple, Dict, Optional
 
+
 from jembeui.exceptions import JembeUIError
 from .jui_field import JUIFieldMixin
 import wtforms
@@ -28,6 +29,7 @@ class SelectMultipleField(JUIFieldMixin, wtforms.Field):
     Viewing, Updating and Creating values are supported by association
     of respectiv CViewRecord, CUpdateRecord and CCreateRecord jembe UI components
     """
+    widget = wtforms.widgets.HiddenInput
 
     def __init__(
         self,
@@ -127,7 +129,7 @@ class SelectMultipleField(JUIFieldMixin, wtforms.Field):
         return choices
 
     def _get_selected_choices(
-        self, selected_ids: Optional[list] = None
+        self, selected_ids: Optional[tuple] = None
     ) -> List[Tuple[str, str]]:
         """
         Returns list of (id, title) of choices that are selected.
@@ -135,7 +137,11 @@ class SelectMultipleField(JUIFieldMixin, wtforms.Field):
         if selected_choices function is provided it will use it otherwise
         it will get all choices and filter it by its id
         """
-        data = selected_ids if selected_ids is not None else self.data
+        data = (
+            [self.coerce(id) for id in selected_ids]
+            if selected_ids is not None
+            else self.data
+        )
         if not data:
             return []
         if self.selected_choices:
@@ -155,6 +161,20 @@ class SelectMultipleField(JUIFieldMixin, wtforms.Field):
         ]
         self.data = temp_data
         return select_choices
+
+    def _get_choices(self, search: str, selected_ids: tuple) -> List[tuple]:
+        temp_data = self.data
+        self.data = [self.coerce(id) for id in selected_ids]
+        choices = []
+        for choice in self.choices(self, self.cform, search):
+            choices.append(
+                (
+                    self.coerce(getattr(choice, "id", choice[0])),
+                    getattr(choice, "title", choice[1]),
+                )
+            )
+        self.data = temp_data
+        return choices  # type:ignore
 
     def pre_validate(self, form):
         if self.data:

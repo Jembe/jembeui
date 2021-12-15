@@ -1,6 +1,23 @@
-<div>
-    OLE {{selected}} 
-    {{selected_choices}}
-    {{all_choices_ids}}
-    {{all_choices}}
+<div jmb-local="{displayList:false}">
+    {% if not is_disabled %}
+    
+    <div jmb-on:click.away="$local.displayList=false">
+        <input jmb-on:input.debounce="search=$self.value"  jmb-on:focus="$local.displayList=true" >
+        <div jmb-show="$local.displayList" style="border:2px solid black" >
+            {% for choice in  choices %}
+            <button jmb-on:click="selected.indexOf('{{choice[0]}}') === -1 && selected.push('{{choice[0]}}');$dispatch('select-option-changed',{selected:selected});">{{choice[1]}}</button>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    <div>
+    selected options:
+    {% for choice in selected_choices  %}
+        {% if not is_disabled %}
+        <button jmb-on:click="selected = selected.filter(function(item){ return item !='{{choice[0]}}'});$dispatch('select-option-changed',{selected:selected});">{{choice[1]}} X</button>
+        {% else %}
+        <button>{{choice[1]}}</button>
+        {% endif %}
+    {% endfor %}
+    </div>
 </div>
