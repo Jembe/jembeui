@@ -899,6 +899,13 @@ a.main-menu__sub-menu__title:hover {
     outline: none;
     border: none;
 }
+.input--icon {
+    padding-right: 32px ;
+    background-size: 16px 16px ;
+    background-image: var(--icon);
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+}
 /* checkbox */
 
   
@@ -1081,4 +1088,71 @@ a.main-menu__sub-menu__title:hover {
 }
 .form-field__error--checkbox {
     margin-left: 24px;
+}
+.form-field__select-multiple-search {
+    position: relative;
+}
+.form-field__select-multiple-search__selected--container {
+    border-radius: 2px;
+    overflow: hidden;
+    border: solid 1px var(--grey-90-a20);
+    min-height: 36px;
+}
+.form-field__select-multiple-search__selected {
+    padding: 2px 8px;
+    display: flex;
+    align-items: center;
+    min-height: 36px;
+}
+/* .form-field__select-multiple-search__selected:last-of-type {
+    margin-bottom: 4px;
+} */
+.form-field__select-multiple-search__selected div {
+    flex-grow: 1;
+}
+/* .form-field__select-multiple-search__selected--even {
+    background-color: rgba(0,0,0,0.04);
+} */
+.form-field__select-multiple-search__selected--odd {
+    background-color: rgba(0,0,0,0.04);
+}
+/* .form-field__select-multiple-search__selected:hover {
+    background-color: var(--blue-40);
+    background-color: #d1e8ff;
+} */
+.form-field__select-multiple-search__dropdown {
+    z-index: 900;
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    background-color: var(--white-100);
+    border-radius: 0 0 4px 4px;
+    border: solid 1px var(--grey-90-a20);
+    box-shadow: 0 4px 16px var(--grey-90-a10);
+    white-space:  nowrap;
+    display: flex;
+    flex-direction: column;
+    max-height: 40vh;
+}
+.form-field__select-multiple-search__dropdown__item {
+    display: block;
+    border: none;
+    text-align: left;
+    margin: 0;
+    padding: 0;
+    font:inherit;
+    line-height: inherit;
+    color: inherit;
+    padding: 4px 8px;
+}
+.form-field__select-multiple-search__dropdown__item.odd {
+    background-color: var(--white-100);
+}
+.form-field__select-multiple-search__dropdown__item.even {
+    background-color: rgba(0,0,0,0.04);
+}
+.form-field__select-multiple-search__dropdown__item:hover:not(.no-more) {
+    background-color: var(--blue-40);
+    background-color: #d1e8ff;
+    cursor: pointer;
 }

@@ -2,7 +2,6 @@ from typing import TYPE_CHECKING, Union, Callable, Tuple, Optional, Dict, Iterab
 
 from ...components import Component
 from ...exceptions import JembeUIError
-from jembe import action
 
 if TYPE_CHECKING:
     import jembe
@@ -45,8 +44,8 @@ class CSelectMultipleSearch(Component):
 
     def __init__(
         self,
-        search: str = "",
         selected: Tuple[str, ...] = (),
+        search: Optional[str] = None,
         is_disabled: bool = False,
         _form: Optional["jembeui.Form"] = None,
     ):
@@ -86,4 +85,11 @@ class CSelectMultipleSearch(Component):
 
     @property
     def choices(self) -> List[tuple]:
-        return self.field._get_choices(self.state.search, self.state.selected)
+        if self.state.search is not None:
+            return self.field._get_choices(self.state.search, self.state.selected)
+        else:
+            return []
+
+    def display(self) -> "jembe.DisplayResponse":
+        print(self.state)
+        return super().display()

@@ -1,23 +1,47 @@
-<div jmb-local="{displayList:false}">
-    {% if not is_disabled %}
-    
-    <div jmb-on:click.away="$local.displayList=false">
-        <input jmb-on:input.debounce="search=$self.value"  jmb-on:focus="$local.displayList=true" >
-        <div jmb-show="$local.displayList" style="border:2px solid black" >
-            {% for choice in  choices %}
-            <button jmb-on:click="selected.indexOf('{{choice[0]}}') === -1 && selected.push('{{choice[0]}}');$dispatch('select-option-changed',{selected:selected});">{{choice[1]}}</button>
-            {% endfor %}
-        </div>
-    </div>
-    {% endif %}
-    <div>
-    selected options:
+<div class="form-field__select-multiple-search">
+    {% if selected_choices %}
+    <div class="form-field__select-multiple-search__selected--container">
     {% for choice in selected_choices  %}
-        {% if not is_disabled %}
-        <button jmb-on:click="selected = selected.filter(function(item){ return item !='{{choice[0]}}'});$dispatch('select-option-changed',{selected:selected});">{{choice[1]}} X</button>
-        {% else %}
-        <button>{{choice[1]}}</button>
-        {% endif %}
+        <div class="form-field__select-multiple-search__selected {{loop.cycle('form-field__select-multiple-search__selected--even','form-field__select-multiple-search__selected--odd')}}">
+            <div>{{choice[1]}}</div>
+            {% if not is_disabled %}
+            <button jmb-on:click="selected = selected.filter(function(item){ return item !='{{choice[0]}}'});$dispatch('select-option-changed',{selected:selected});" type="button" class="button button--ghost">
+                <!-- The Source Code of followint svg is subject to the terms of the Mozilla Public License, v. 2.0. You can obtain MPL at http://mozilla.org/MPL/2.0/. -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill="context-fill" d="M6.5 12a.5.5 0 0 0 .5-.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 0 .5.5zm2 0a.5.5 0 0 0 .5-.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 0 .5.5zm2 0a.5.5 0 0 0 .5-.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 0 .5.5z"></path><path fill="context-fill" d="M14 2h-3.05a2.5 2.5 0 0 0-4.9 0H3a1 1 0 0 0 0 2v9a3 3 0 0 0 3 3h5a3 3 0 0 0 3-3V4a1 1 0 0 0 0-2zM8.5 1a1.489 1.489 0 0 1 1.391 1H7.109A1.489 1.489 0 0 1 8.5 1zM12 13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4h7z"></path></svg>
+            </button>
+            {% endif %}
+        </div>
     {% endfor %}
     </div>
+    {% elif is_disabled %}
+    <div class="form-field__select-multiple-search__selected--container"></div>
+    {% endif %}
+
+    {% if not is_disabled %}
+    <div 
+        {% if search is none or choices%}
+        jmb-on:focusin.document="if (search !== null && !$self.contains(document.activeElement)){search=null}" jmb-on:click.away="search=null;" jmb-on:mouseleave="search=null" {%endif%}>
+        <input 
+        {% if search is not none and not choices %} 
+            disabled 
+        {% else %}
+            jmb-on:input.debounce="search=$self.value"  jmb-on:focus="if (search === null) {search=''}" jmb-on:mouseenter="if (search===null) {search=''}" {% if search is not none%}jmb-on:ready.once="$self.focus()"{%endif%} 
+        {%endif%} 
+        style="--icon:url(&quot;data:image/svg+xml,%3C!-- This Source Code Form is subject to the terms of the Mozilla Public - License, v. 2.0. If a copy of the MPL was not distributed with this - file, You can obtain one at http://mozilla.org/MPL/2.0/. --%3E %3Csvg xmlns=&#x27;http://www.w3.org/2000/svg&#x27; width=&#x27;16&#x27; height=&#x27;16&#x27; viewBox=&#x27;0 0 16 16&#x27;%3E%3Cpath fill=&#x27;%230c0c0d&#x27; d=&#x27;M8 12a1 1 0 0 1-.707-.293l-5-5a1 1 0 0 1 1.414-1.414L8 9.586l4.293-4.293a1 1 0 0 1 1.414 1.414l-5 5A1 1 0 0 1 8 12z&#x27;/%3E%3C/svg%3E&quot;)"
+        type="text" class="input text-input input--icon">
+
+        {% if search is not none and choices %}
+        <div class="form-field__select-multiple-search__dropdown">
+            {% for choice in  choices %}
+            <button jmb-on:click="selected.indexOf('{{choice[0]}}') === -1 && selected.push('{{choice[0]}}');$dispatch('select-option-changed',{selected:selected});" type="button" class="form-field__select-multiple-search__dropdown__item {{loop.cycle('even','odd')}}">{{choice[1]}}</button>
+            {# {%else%}
+            <div class="form-field__select-multiple-search__dropdown__item even no-more">
+                No more choices
+            </div> #}
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
 </div>
