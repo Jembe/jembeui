@@ -1120,6 +1120,9 @@ a.main-menu__sub-menu__title:hover {
     background-color: var(--blue-40);
     background-color: #d1e8ff;
 } */
+.form-field__select-multiple__search-input {
+    margin-top: 4px;
+}
 .form-field__select-multiple-search__dropdown {
     z-index: 900;
     position: absolute;
@@ -1133,6 +1136,7 @@ a.main-menu__sub-menu__title:hover {
     display: flex;
     flex-direction: column;
     max-height: 40vh;
+    overflow: auto;
 }
 .form-field__select-multiple-search__dropdown__item {
     display: block;
@@ -1151,8 +1155,12 @@ a.main-menu__sub-menu__title:hover {
 .form-field__select-multiple-search__dropdown__item.even {
     background-color: rgba(0,0,0,0.04);
 }
-.form-field__select-multiple-search__dropdown__item:hover:not(.no-more) {
+/* .form-field__select-multiple-search__dropdown__item:hover:not(.no-more),  */
+.form-field__select-multiple-search__dropdown__item.focused {
     background-color: var(--blue-40);
     background-color: #d1e8ff;
     cursor: pointer;
+}
+.focused {
+    background-color: red;
 }

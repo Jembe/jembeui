@@ -1,4 +1,41 @@
-<div class="form-field__select-multiple-search">
+<div 
+    jmb-local="{
+        focusedOptionId: null,
+        selectOption: function($data, $dispatch, optionId) {
+            $data.selected.indexOf(optionId) === -1 && $data.selected.push(optionId);
+            $dispatch('select-option-changed',{selected:$data.selected});
+        },
+        focusNext: function ($data) {
+            if ($data.$local.focusedOptionId === null) {
+                return
+            }
+            selOption = $data.$el.querySelector('[option-id=\'' + $data.$local.focusedOptionId + '\']')
+            nextOption = selOption.nextElementSibling
+            if (nextOption === null) {
+                nextOption = $data.$el.querySelector('[option-id]');
+                if (nextOption === null ) {return}
+            }
+            $data.$local.focusedOptionId = nextOption.getAttribute('option-id');
+            nextOption.scrollIntoViewIfNeeded()
+        },
+        focusPrev: function ($data) {
+            if ($data.$local.focusedOptionId === null) {
+                return
+            }
+            selOption = $data.$el.querySelector('[option-id=\'' + $data.$local.focusedOptionId + '\']')
+            prevOption = selOption.previousElementSibling
+            if (prevOption === null) {
+                prevOption = $data.$el.querySelector('[option-id]:last-of-type');
+                if (prevOption === null ) {return}
+            }
+            $data.$local.focusedOptionId = prevOption.getAttribute('option-id');
+            prevOption.scrollIntoViewIfNeeded()
+        }
+    }" 
+    jmb-update="function () {
+        this.$local.focusedOptionId = {{ "'{}'".format(choices[0][0]) if choices else 'null'}};
+    }"
+    class="form-field__select-multiple-search">
     {% if selected_choices %}
     <div class="form-field__select-multiple-search__selected--container">
     {% for choice in selected_choices  %}
@@ -20,20 +57,33 @@
     {% if not is_disabled %}
     <div 
         {% if search is none or choices%}
-        jmb-on:focusin.document="if (search !== null && !$self.contains(document.activeElement)){search=null}" jmb-on:click.away="search=null;" jmb-on:mouseleave="search=null" {%endif%}>
+        jmb-on:focusin.document="if (search !== null && !$self.contains(document.activeElement)){search=null}" 
+        jmb-on:click.away="search=null;" 
+        {# jmb-on:mouseleave="search=null"  #}
+        {%endif%}>
         <input 
-        {% if search is not none and not choices %} 
+        {% if search == "" and not choices %} 
             disabled 
         {% else %}
-            jmb-on:input.debounce="search=$self.value"  jmb-on:focus="if (search === null) {search=''}" jmb-on:mouseenter="if (search===null) {search=''}" {% if search is not none%}jmb-on:ready.once="$self.focus()"{%endif%} 
+            value="{{search|default('', true)}}"
+            jmb-on:input.debounce="search=$self.value"  
+            jmb-on:focus="if (search === null) {search=''}" 
+            {# jmb-on:mouseenter="if (search===null) {search=''}"  #}
+            {% if search is not none%}jmb-on:ready="$self.focus()"{%endif%}
+            jmb-on:keydown.arrow-down.prevent="$local.focusNext($data)" 
+            jmb-on:keydown.arrow-up.prevent="$local.focusPrev($data)" 
+            jmb-on:keydown.enter.prevent="$local.focusedOptionId !== null && $local.selectOption($data, $dispatch, $local.focusedOptionId)" 
         {%endif%} 
         style="--icon:url(&quot;data:image/svg+xml,%3C!-- This Source Code Form is subject to the terms of the Mozilla Public - License, v. 2.0. If a copy of the MPL was not distributed with this - file, You can obtain one at http://mozilla.org/MPL/2.0/. --%3E %3Csvg xmlns=&#x27;http://www.w3.org/2000/svg&#x27; width=&#x27;16&#x27; height=&#x27;16&#x27; viewBox=&#x27;0 0 16 16&#x27;%3E%3Cpath fill=&#x27;%230c0c0d&#x27; d=&#x27;M8 12a1 1 0 0 1-.707-.293l-5-5a1 1 0 0 1 1.414-1.414L8 9.586l4.293-4.293a1 1 0 0 1 1.414 1.414l-5 5A1 1 0 0 1 8 12z&#x27;/%3E%3C/svg%3E&quot;)"
-        type="text" class="input text-input input--icon">
+        type="text" class="input text-input input--icon form-field__select-multiple__search-input">
 
         {% if search is not none and choices %}
         <div class="form-field__select-multiple-search__dropdown">
             {% for choice in  choices %}
-            <button jmb-on:click="selected.indexOf('{{choice[0]}}') === -1 && selected.push('{{choice[0]}}');$dispatch('select-option-changed',{selected:selected});" type="button" class="form-field__select-multiple-search__dropdown__item {{loop.cycle('even','odd')}}">{{choice[1]}}</button>
+            <button jmb-on:click="console.log($local);$local.selectOption($data, $dispatch, '{{choice[0]}}')" type="button" class="form-field__select-multiple-search__dropdown__item {{loop.cycle('even','odd')}}"
+            tabindex="-1"
+            jmb-bind:class="{focused: $local.focusedOptionId === '{{choice[0]}}'}"
+            option-id='{{choice[0]}}'>{{choice[1]}}</button>
             {# {%else%}
             <div class="form-field__select-multiple-search__dropdown__item even no-more">
                 No more choices
@@ -43,5 +93,4 @@
         {% endif %}
     </div>
     {% endif %}
-
 </div>
