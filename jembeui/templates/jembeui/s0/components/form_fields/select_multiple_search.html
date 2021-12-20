@@ -80,8 +80,9 @@
         {% if search is not none and choices %}
         <div class="form-field__select-multiple-search__dropdown">
             {% for choice in  choices %}
-            <button jmb-on:click="console.log($local);$local.selectOption($data, $dispatch, '{{choice[0]}}')" type="button" class="form-field__select-multiple-search__dropdown__item {{loop.cycle('even','odd')}}"
+            <button jmb-on:click="$local.selectOption($data, $dispatch, '{{choice[0]}}')" type="button" class="form-field__select-multiple-search__dropdown__item {{loop.cycle('even','odd')}}"
             tabindex="-1"
+            jmb-on:mouseover="$local.focusedOptionId='{{choice[0]}}'"
             jmb-bind:class="{focused: $local.focusedOptionId === '{{choice[0]}}'}"
             option-id='{{choice[0]}}'>{{choice[1]}}</button>
             {# {%else%}

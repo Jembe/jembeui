@@ -1137,6 +1137,7 @@ a.main-menu__sub-menu__title:hover {
     flex-direction: column;
     max-height: 40vh;
     overflow: auto;
+    margin-bottom: 24px;
 }
 .form-field__select-multiple-search__dropdown__item {
     display: block;

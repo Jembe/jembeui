@@ -106,6 +106,7 @@ class SelectMultipleField(JUIFieldMixin, wtforms.Field):
             )
 
     def _all_choices_ids(self) -> list:
+        print('ALL CHOICES IDS')
         temp_data = self.data
         self.data = None
         ids = []
@@ -115,6 +116,7 @@ class SelectMultipleField(JUIFieldMixin, wtforms.Field):
         return ids
 
     def _all_choices(self) -> list:
+        print('ALL CHOICES')
         temp_data = self.data
         self.data = None
         choices = []
@@ -137,6 +139,7 @@ class SelectMultipleField(JUIFieldMixin, wtforms.Field):
         if selected_choices function is provided it will use it otherwise
         it will get all choices and filter it by its id
         """
+        print('GET SELECTED CHOICES')
         data = (
             [self.coerce(id) for id in selected_ids]
             if selected_ids is not None
@@ -163,6 +166,7 @@ class SelectMultipleField(JUIFieldMixin, wtforms.Field):
         return select_choices
 
     def _get_choices(self, search: str, selected_ids: tuple) -> List[tuple]:
+        print('GET CHOICES')
         temp_data = self.data
         self.data = [self.coerce(id) for id in selected_ids]
         choices = []

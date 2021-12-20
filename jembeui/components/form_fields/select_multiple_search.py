@@ -91,5 +91,4 @@ class CSelectMultipleSearch(Component):
             return []
 
     def display(self) -> "jembe.DisplayResponse":
-        print(self.state)
         return super().display()
