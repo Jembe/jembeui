@@ -81,6 +81,10 @@ class CSelectMultipleSearch(Component):
             return self.field._get_choices(self.state.search, self.state.selected)
         else:
             return []
-
-    def display(self) -> "jembe.DisplayResponse":
-        return super().display()
+    @property
+    def choices_count(self) -> int:
+        all_choices_result = self.field._get_all_choices_result()
+        if isinstance(all_choices_result, list):
+            return len(all_choices_result)
+        else:
+            return all_choices_result.count()

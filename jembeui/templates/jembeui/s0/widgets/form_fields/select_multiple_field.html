@@ -25,6 +25,7 @@
                 + (" validate();" if instant_validate  else "")
                 + (" submit();" if instant_submit else "")
             ).format(fname=form_field.name) if is_not_disabled and (instant_validate or instant_submit) else none,
+            "jmb-on:select-option-submit.prevent.stop": "submit()" 
         }
     }
 )%}

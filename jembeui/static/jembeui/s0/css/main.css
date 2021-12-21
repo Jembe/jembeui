@@ -1135,9 +1135,13 @@ a.main-menu__sub-menu__title:hover {
     white-space:  nowrap;
     display: flex;
     flex-direction: column;
-    max-height: 260px;
+    max-height: 240px;
     overflow: auto;
     margin-bottom: 24px;
+}
+.form-field__select-multiple-search__dropdown__items {
+    display: flex;
+    flex-direction: column;
 }
 .form-field__select-multiple-search__dropdown__item {
     display: block;
@@ -1162,6 +1166,8 @@ a.main-menu__sub-menu__title:hover {
     background-color: #d1e8ff;
     cursor: pointer;
 }
-.focused {
-    background-color: red;
+.more-choices-avaiable{
+    text-align: center;
+    color: var(--grey-90-a50);
+    font-style: italic;
 }
