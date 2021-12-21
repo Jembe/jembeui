@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Union, Callable, List, Tuple, Dict, Optional
 from jembeui.exceptions import JembeUIError
 from .jui_field import JUIFieldMixin
 import wtforms
+from sqlalchemy.orm import Query
 
 
 if TYPE_CHECKING:
@@ -29,6 +30,7 @@ class SelectMultipleField(JUIFieldMixin, wtforms.Field):
     Viewing, Updating and Creating values are supported by association
     of respectiv CViewRecord, CUpdateRecord and CCreateRecord jembe UI components
     """
+
     widget = wtforms.widgets.HiddenInput
 
     def __init__(
@@ -39,13 +41,6 @@ class SelectMultipleField(JUIFieldMixin, wtforms.Field):
             None,
             Callable[
                 ["jembeui.SelectMultipleField", "jembeui.CForm", str],
-                Union["sa.orm.Query", list],
-            ],
-        ] = None,
-        selected_choices: Union[
-            None,
-            Callable[
-                ["jembeui.SelectMultipleField", "jembeui.CForm", list],
                 Union["sa.orm.Query", list],
             ],
         ] = None,
@@ -87,7 +82,6 @@ class SelectMultipleField(JUIFieldMixin, wtforms.Field):
             ["SelectMultipleField", "jembeui.CForm", str],
             Union["sa.orm.Query", list],
         ] = choices
-        self.selected_choices = selected_choices
 
     def process_data(self, value):
         try:
@@ -105,30 +99,29 @@ class SelectMultipleField(JUIFieldMixin, wtforms.Field):
                 )
             )
 
-    def _all_choices_ids(self) -> list:
-        print('ALL CHOICES IDS')
+    def _get_all_choices_result(self) -> Union["sa.orm.Query", list]:
         temp_data = self.data
         self.data = None
-        ids = []
-        for choice in self.choices(self, self.cform, ""):
-            ids.append(self.coerce(getattr(choice, "id", choice[0])))
+        result = self.choices(self, self.cform, "")
         self.data = temp_data
-        return ids
 
-    def _all_choices(self) -> list:
-        print('ALL CHOICES')
-        temp_data = self.data
-        self.data = None
-        choices = []
-        for choice in self.choices(self, self.cform, ""):
-            choices.append(
-                (
-                    self.coerce(getattr(choice, "id", choice[0])),
-                    getattr(choice, "title", choice[1]),
-                )
-            )
-        self.data = temp_data
-        return choices
+        if isinstance(result, Query):
+            result = result.limit(None)
+        return result
+
+    def _get_ids(self, choices_result: Union["sa.orm.Query", list]) -> list:
+        return [
+            self.coerce(getattr(choice, "id", choice[0])) for choice in choices_result
+        ]
+
+    def _get_id_column(self, query: "sa.orm.Query"):
+        id_column = next(
+            (cd["expr"] for cd in query.column_descriptions if cd["name"] == "id"),
+            None,
+        )
+        if id_column is None:
+            id_column = query.column_descriptions[0]["expr"]
+        return id_column
 
     def _get_selected_choices(
         self, selected_ids: Optional[tuple] = None
@@ -136,10 +129,8 @@ class SelectMultipleField(JUIFieldMixin, wtforms.Field):
         """
         Returns list of (id, title) of choices that are selected.
 
-        if selected_choices function is provided it will use it otherwise
         it will get all choices and filter it by its id
         """
-        print('GET SELECTED CHOICES')
         data = (
             [self.coerce(id) for id in selected_ids]
             if selected_ids is not None
@@ -147,26 +138,28 @@ class SelectMultipleField(JUIFieldMixin, wtforms.Field):
         )
         if not data:
             return []
-        if self.selected_choices:
+
+        all_choices_result = self._get_all_choices_result()
+        if isinstance(all_choices_result, Query):
             return [
-                (getattr(choice, "id", choice[0]), getattr(choice, "title", choice[1]))
-                for choice in self.selected_choices(self, self.cform, data)
+                (
+                    self.coerce(getattr(choice, "id", choice[0])),
+                    getattr(choice, "title", choice[1]),
+                )
+                for choice in all_choices_result.filter(
+                    self._get_id_column(all_choices_result).in_(data)
+                )
             ]
-        temp_data = self.data
-        self.data = None
-        select_choices = [
-            (
-                self.coerce(getattr(choice, "id", choice[0])),
-                getattr(choice, "title", choice[1]),
-            )
-            for choice in self.choices(self, self.cform, "")
-            if getattr(choice, "id", choice[0]) in data
-        ]
-        self.data = temp_data
-        return select_choices
+        else:
+            return [
+                (
+                    self.coerce(getattr(choice, "id", choice[0])),
+                    getattr(choice, "title", choice[1]),
+                )
+                for choice in all_choices_result
+            ]
 
     def _get_choices(self, search: str, selected_ids: tuple) -> List[tuple]:
-        print('GET CHOICES')
         temp_data = self.data
         self.data = [self.coerce(id) for id in selected_ids]
         choices = []
@@ -182,13 +175,17 @@ class SelectMultipleField(JUIFieldMixin, wtforms.Field):
 
     def pre_validate(self, form):
         if self.data:
-            values = self._all_choices_ids()
-            for d in self.data:
-                if d not in values:
-                    raise ValueError(
-                        self.gettext("'%(value)s' is not a valid choice for this field")
-                        % dict(value=d)
-                    )
+            choices_result = self._get_all_choices_result()
+            if isinstance(choices_result, list):
+                ids = self._get_ids(choices_result)
+                for d in self.data:
+                    if d not in ids:
+                        raise ValueError(self.gettext("Invalid values selected"))
+            else:
+                if choices_result.filter(
+                    self._get_id_column(choices_result).in_(self.data)
+                ).count() != len(self.data):
+                    raise ValueError(self.gettext("Invalid values selected"))
 
     def jui_get_components(self) -> Dict[str, "jembe.ComponentRef"]:
         from ...components.form_fields import CSelectMultipleSearch

@@ -1135,7 +1135,7 @@ a.main-menu__sub-menu__title:hover {
     white-space:  nowrap;
     display: flex;
     flex-direction: column;
-    max-height: 40vh;
+    max-height: 260px;
     overflow: auto;
     margin-bottom: 24px;
 }
