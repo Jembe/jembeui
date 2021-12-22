@@ -31,6 +31,34 @@
             $data.$local.focusedOptionId = prevOption.getAttribute('option-id');
             prevOption.scrollIntoViewIfNeeded()
         }
+        {#
+        ,
+        focusNextPage: function ($data) {
+            if ($data.$local.focusedOptionId === null) {
+                return
+            }
+            selOption = $data.$el.querySelector('[option-id=\'' + $data.$local.focusedOptionId + '\']');
+            movePlaces = 8;
+            while (movePlaces > 0 && selOption.nextElementSibling !== null) {
+                selOption = selOption.nextElementSibling;
+                movePlaces = movePlaces - 1;
+            }
+            $data.$local.focusedOptionId = selOption.getAttribute('option-id');
+            selOption.scrollIntoViewIfNeeded()
+        },
+        focusPrevPage: function ($data) {
+            if ($data.$local.focusedOptionId === null) {
+                return
+            }
+            selOption = $data.$el.querySelector('[option-id=\'' + $data.$local.focusedOptionId + '\']')
+            movePlaces = 8;
+            while (movePlaces > 0 && selOption.previousElementSibling !== null) {
+                selOption = selOption.previousElementSibling;
+                movePlaces = movePlaces - 1;
+            }
+            $data.$local.focusedOptionId = selOption.getAttribute('option-id');
+            selOption.scrollIntoViewIfNeeded()
+        } #}
     }" 
     jmb-update="function () {
         this.$local.focusedOptionId = {{ "'{}'".format(choices[0][0]) if choices else 'null'}};
@@ -40,7 +68,15 @@
     <div class="form-field__select-multiple-search__selected--container">
     {% for choice in selected_choices  %}
         <div class="form-field__select-multiple-search__selected {{loop.cycle('form-field__select-multiple-search__selected--even','form-field__select-multiple-search__selected--odd')}}">
-            <div>{{choice[1]}}</div>
+            <div>
+                {% if has_view_component %}
+                <a jmb-on:click.prevent.stop="{{component('view', id=choice[0]).jrl}}" href="{{component().url}}">
+                    {{choice[1]}}
+                </a>
+                {% else %}
+                    {{choice[1]}}
+                {% endif %}
+            </div>
             {% if not is_disabled %}
             <button jmb-on:click="selected = selected.filter(function(item){ return item !='{{choice[0]}}'});$dispatch('select-option-changed',{selected:selected});" type="button" class="button button--ghost">
                 <img src="{{url_for('jembeui.static', filename='/jembeui/s0/icons/delete-16.svg')}}" alt="delete">
@@ -71,6 +107,8 @@
             {% if search is not none%}jmb-on:ready="$self.focus()"{%endif%}
             jmb-on:keydown.arrow-down.prevent="$local.focusNext($data)" 
             jmb-on:keydown.arrow-up.prevent="$local.focusPrev($data)" 
+            {# jmb-on:keydown.page-down.prevent="$local.focusNextPage($data)" 
+            jmb-on:keydown.page-up.prevent="$local.focusPrevPage($data)"  #}
             jmb-on:keydown.enter.prevent="$local.focusedOptionId !== null && $local.selectOption($data, $dispatch, $local.focusedOptionId)" 
             jmb-on:keydown.enter.ctrl.prevent="$dispatch('select-option-submit')" 
         {%endif%} 
@@ -103,4 +141,6 @@
         {% endif %}
     </div>
     {% endif %}
+
+    {{placeholder("view")}}
 </div>

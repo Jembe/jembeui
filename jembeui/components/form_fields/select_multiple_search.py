@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING, Union, Callable, Tuple, Optional, Dict, Iterable, List
 
+from jembe import listener
 from ...components import Component
 from ...exceptions import JembeUIError
 
@@ -21,6 +22,7 @@ class CSelectMultipleSearch(Component):
         def __init__(
             self,
             field_name: str,
+            view_component: Optional["jembe.ComponentReference"] = None,
             template: Optional[Union[str, Iterable[str]]] = None,
             components: Optional[Dict[str, "jembe.ComponentRef"]] = None,
             inject_into_components: Optional[
@@ -30,6 +32,10 @@ class CSelectMultipleSearch(Component):
             changes_url: bool = True,
             url_query_params: Optional[Dict[str, str]] = None,
         ):
+            if components is None:
+                components = dict()
+            if view_component:
+                components["view"] = view_component
             super().__init__(
                 template=template,
                 components=components,
@@ -81,6 +87,7 @@ class CSelectMultipleSearch(Component):
             return self.field._get_choices(self.state.search, self.state.selected)
         else:
             return []
+
     @property
     def choices_count(self) -> int:
         all_choices_result = self.field._get_all_choices_result()
@@ -88,3 +95,11 @@ class CSelectMultipleSearch(Component):
             return len(all_choices_result)
         else:
             return all_choices_result.count()
+
+    @property
+    def has_view_component(self) -> bool:
+        return "view" in self._config.components
+
+    @listener(event="cancel",source=("view",))
+    def on_cancel(self, event:"jembe.Event"):
+        self.remove_component(event.source_name)

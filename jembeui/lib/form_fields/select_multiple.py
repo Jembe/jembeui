@@ -1,6 +1,5 @@
 from typing import TYPE_CHECKING, Union, Callable, List, Tuple, Dict, Optional
 
-
 from jembeui.exceptions import JembeUIError
 from .jui_field import JUIFieldMixin
 import wtforms
@@ -44,6 +43,7 @@ class SelectMultipleField(JUIFieldMixin, wtforms.Field):
                 Union["sa.orm.Query", list],
             ],
         ] = None,
+        view_component: Optional["jembe.ComponentReference"] = None,
         coerce=int,
         filters=tuple(),
         description="",
@@ -82,6 +82,7 @@ class SelectMultipleField(JUIFieldMixin, wtforms.Field):
             ["SelectMultipleField", "jembeui.CForm", str],
             Union["sa.orm.Query", list],
         ] = choices
+        self.view_component = view_component
 
     def process_data(self, value):
         try:
@@ -194,7 +195,9 @@ class SelectMultipleField(JUIFieldMixin, wtforms.Field):
             self.jui_component_name("search"): (
                 CSelectMultipleSearch,
                 CSelectMultipleSearch.Config(
-                    field_name=self.short_name, changes_url=False
+                    field_name=self.short_name,
+                    view_component=self.view_component,
+                    changes_url=False,
                 ),
             )
         }
