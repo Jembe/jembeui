@@ -41,7 +41,6 @@ class CPage(Component):
             breadcrumbs: Optional[
                 Union["jembeui.Breadcrumb", Sequence["jembeui.Breadcrumb"]]
             ] = None,
-            breadcrumb_first_is_home: bool = True,
             title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
             template: Optional[Union[str, Iterable[str]]] = None,
             components: Optional[Dict[str, "jembe.ComponentRef"]] = None,
@@ -66,7 +65,7 @@ class CPage(Component):
                 components["_action_confirmation"] = CActionConfirmationDialog
             if "_update_indicator" not in components:
                 components["_update_indicator"] = CPageUpdateIndicator
-            if "_main_menu" not in components:
+            if "_main_menu" not in components and main_menu is not None:
                 components["_main_menu"] = (
                     CMenu,
                     CMenu.Config(
@@ -74,7 +73,7 @@ class CPage(Component):
                         template=CMenu.Config.template_variant("page_main"),
                     ),
                 )
-            if "_system_menu" not in components:
+            if "_system_menu" not in components and system_menu is not None:
                 components["_system_menu"] = (
                     CMenu,
                     CMenu.Config(
@@ -82,14 +81,7 @@ class CPage(Component):
                         template=CMenu.Config.template_variant("page_system"),
                     ),
                 )
-            if "_breadcrumb" not in components:
-                if breadcrumbs is None:
-                    breadcrumbs = []
-                    breadcrumbs.extend(
-                        Breadcrumb.from_menu(main_menu, breadcrumb_first_is_home)
-                    )
-                    breadcrumbs.extend(Breadcrumb.from_menu(system_menu))
-
+            if "_breadcrumb" not in components and breadcrumbs is not None:
                 if isinstance(breadcrumbs, Breadcrumb):
                     breadcrumbs = [breadcrumbs]
 

@@ -23,6 +23,7 @@
         </div>
         <div class="page-layout__header">
             <div class="page-layout__header__title">
+                {% if "_main_menu" in _config.components %}
                 <button class="button button--ghost page-layout__header__title__toggle-menu page-layout__header__title__toggle-menu--closed" type="button" 
                         jmb-ref="menuButton"
                         jmb-on:click="$dispatch('juiToggleMainMenu')"
@@ -38,20 +39,29 @@
                         - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
                         <svg class="hide" jmb-on:jui-toggle-main-menu.camel.window="$self.classList.toggle('hide')"  xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill="context-fill" d="M9.061 8l3.47-3.47a.75.75 0 0 0-1.061-1.06L8 6.939 4.53 3.47a.75.75 0 1 0-1.06 1.06L6.939 8 3.47 11.47a.75.75 0 1 0 1.06 1.06L8 9.061l3.47 3.47a.75.75 0 0 0 1.06-1.061z"></path></svg>
                 </button>
+                {% endif %}
                 <a href="{{url_for('index')}}">{{title}}</a></div>
             <div class="page-layout__header__menu">
+                {% if "_system_menu" in _config.components %}
                 {{component("_system_menu")}}
+                {% endif %}
             </div>
         </div>
         <div class="page-layout__main">
+            {% if "_main_menu" in _config.components %}
             <div class="page-layout__main__menu page-layout__main__menu--hide" 
                 jmb-cloak jmb-on:jui-toggle-main-menu.camel.window="$self.classList.toggle('page-layout__main__menu--hide')"
                 jmb-on:click.away="if (!$self.classList.contains('page-layout__main__menu--hide') && $event.target.closest('button') !== $refs.menuButton){$dispatch('juiToggleMainMenu')}">
                 {{component("_main_menu")}}
             </div>
+            {% endif %}
             <div class="page-layout__main__content">
                 <div class="page-layout__main__content__top-bar">
+                    {% if "_breadcrumb" in _config.components %}
                     {{component("_breadcrumb")}}
+                    {% else %}
+                    <div></div>
+                    {% endif %}
                     {{component("_notifications")}}
                 </div>
                 {% block page_content %}{% endblock page_content %}
