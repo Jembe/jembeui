@@ -126,6 +126,9 @@ a:focus-visible {
 
 }
 /* Notification */
+.page-notifications {
+    margin-top: 8px;
+}
 .page-notification {
     z-index: 90000;
     position: relative;

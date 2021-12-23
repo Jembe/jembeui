@@ -114,6 +114,7 @@ class Breadcrumb:
         component_init_params: Optional[dict] = None,
         title: Union[str, Callable[["jembe.Component"], str]] = "",
         children: Optional[Sequence["jembeui.Breadcrumb"]] = None,
+        is_home: bool = False,
     ) -> None:
         """
         When component_full_name and title are None then this breadcrumb should not be displayed
@@ -131,6 +132,8 @@ class Breadcrumb:
         self._all_childrens_ids: Set[str] = set()
 
         self.id: str = self._calc_id()
+
+        self.is_home = is_home
 
         if children is not None:
             self.children = list(children)
@@ -232,6 +235,7 @@ class Breadcrumb:
                 self.title if isinstance(self.title, str) else self.title(to_component),
                 component_reference.url,
                 component_reference.jrl,
+                self.is_home
             )
         else:
             return BreadcrumbItem(
@@ -239,6 +243,7 @@ class Breadcrumb:
                 self.title if isinstance(self.title, str) else self.title(to_component),
                 None,
                 None,
+                self.is_home
             )
 
     @classmethod
@@ -266,7 +271,7 @@ class Breadcrumb:
                 raise ValueError(
                     "First item in menu must be action link when using first_home=True"
                 )
-            home = cls._from_menu_item(home_menu)[0]
+            home = cls._from_menu_item(home_menu, True)[0]
             children: List["Breadcrumb"] = list()
             for menu_item in menu_source.items[1:]:
                 children.extend(cls._from_menu_item(menu_item))
@@ -275,7 +280,7 @@ class Breadcrumb:
 
     @classmethod
     def _from_menu_item(
-        cls, menu_item: Union["jembeui.Menu", "jembeui.Link"]
+        cls, menu_item: Union["jembeui.Menu", "jembeui.Link"], is_home: bool = False
     ) -> "jembeui.BreadcrumbList":
         if isinstance(menu_item, Menu):
             menu = menu_item
@@ -314,6 +319,7 @@ class Breadcrumb:
                         component_full_name=to_full_name,
                         component_init_params=menu_item.params,
                         title=title,
+                        is_home=is_home
                     ),
                 )
             )
@@ -329,6 +335,8 @@ class BreadcrumbItem(JembeInitParamSupport):
     url: Optional[str]
     jrl: Optional[str]
 
+    is_home:bool = False
+
     fresh: bool = field(init=False, default=False)
 
     @classmethod
@@ -338,6 +346,7 @@ class BreadcrumbItem(JembeInitParamSupport):
             title=value.title,
             url=value.url,
             jrl=value.jrl,
+            is_home=value.is_home
         )
 
     @classmethod
@@ -347,6 +356,7 @@ class BreadcrumbItem(JembeInitParamSupport):
             title=value.get("title"),
             url=value.get("url"),
             jrl=value.get("jrl"),
+            is_home=value.get("is_home"),
         )
 
     def __eq__(self, o: object) -> bool:
@@ -357,4 +367,5 @@ class BreadcrumbItem(JembeInitParamSupport):
             and self.title == o.title
             and self.url == o.url
             and self.jrl == o.jrl
+            and self.is_home == o.is_home
         )
