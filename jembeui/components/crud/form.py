@@ -9,7 +9,7 @@ from typing import (
     Tuple,
     Any,
 )
-from jembe import NotFound
+from jembe import NotFound, listener
 from sqlalchemy.orm.scoping import scoped_session
 from flask_sqlalchemy import Model
 
@@ -176,3 +176,8 @@ class CForm(CFormBase):
     def hydrate(self):
         self.menu = self._config.menu.bind_to(self)
         return super().hydrate()
+
+    @listener(event="update_form_field")
+    def on_update_form_field(self, event: "jembe.Event"):
+        field = getattr(self.state.form, event.params["name"])
+        field.data = event.params["value"]

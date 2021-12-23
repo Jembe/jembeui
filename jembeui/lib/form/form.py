@@ -115,29 +115,30 @@ class FormBase(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
         Mount is called by CFrom before form is displayed or before
         form needs aditional processing
         """
-        if self.is_mounted:
+        if self.is_mounted and cform != self.cform:
             raise JembeUIError(
                 "Form {} can't be mounted multiple times!".format(
                     self.__class__.__name__
                 )
             )
-        self.cform = cform
-        if "RENDER_KW" not in self.__class__.__dict__:
-            self.__class__.RENDER_KW = dict()
-            for field in self:
-                self.RENDER_KW[field.name] = {}
-                if field.render_kw:
-                    self.RENDER_KW[field.name] = field.render_kw.copy()
-                    field.render_kw = {
-                        k: v
-                        for k, v in field.render_kw.items()
-                        if not k.endswith("+") and not k.startswith("_")
-                    }
+        if not self.is_mounted:
+            self.cform = cform
+            if "RENDER_KW" not in self.__class__.__dict__:
+                self.__class__.RENDER_KW = dict()
+                for field in self:
+                    self.RENDER_KW[field.name] = {}
+                    if field.render_kw:
+                        self.RENDER_KW[field.name] = field.render_kw.copy()
+                        field.render_kw = {
+                            k: v
+                            for k, v in field.render_kw.items()
+                            if not k.endswith("+") and not k.startswith("_")
+                        }
 
-        for field in self:
-            if isinstance(field, JUIFieldMixin):
-                field.jui_mount(self)
-        self.is_mounted = True
+            for field in self:
+                if isinstance(field, JUIFieldMixin):
+                    field.jui_mount(self)
+            self.is_mounted = True
         return self
 
     def submit(self, record: Union["Model", dict]) -> Union["Model", dict]:

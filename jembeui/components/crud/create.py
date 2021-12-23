@@ -11,7 +11,7 @@ from typing import (
 )
 import sqlalchemy as sa
 from flask_sqlalchemy import Model, SQLAlchemy
-from jembe import action
+from jembe import action, listener
 from .form import CForm
 from ...lib import Form, Menu, ActionLink
 
@@ -164,19 +164,27 @@ class CCreateRecord(CForm):
     @action
     def validate(self, only_modified_fields: bool = False):
         """
-            Validates form without submiting it
+        Validates form without submiting it
 
-            if only_modified_fields is True then validate only modified fields not the whole
-            form
+        if only_modified_fields is True then validate only modified fields not the whole
+        form
         """
         is_valid = True
         if only_modified_fields:
             for field_name in self.state.modified_fields:
-                is_valid = getattr(self.state.form, field_name).validate(
-                    self.state.form
-                ) and is_valid
+                is_valid = (
+                    getattr(self.state.form, field_name).validate(self.state.form)
+                    and is_valid
+                )
         else:
             is_valid = self.state.form.validate()
         if not is_valid and self._config.on_invalid_form:
             self._config.on_invalid_form(self)
         return True
+
+    @listener(event="update_form_field")
+    def on_update_form_field(self, event: "jembe.Event"):
+        super().on_update_form_field(event)
+        self.state.modified_fields = tuple(
+            set(self.state.modified_fields + (event.params["name"],))
+        )

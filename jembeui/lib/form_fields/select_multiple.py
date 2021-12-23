@@ -44,6 +44,9 @@ class SelectMultipleField(JUIFieldMixin, wtforms.Field):
             ],
         ] = None,
         view_component: Optional["jembe.ComponentReference"] = None,
+        update_component: Optional["jembe.ComponentReference"] = None,
+        create_component: Optional["jembe.ComponentReference"] = None,
+        display_update_link: bool = True,
         coerce=int,
         filters=tuple(),
         description="",
@@ -83,6 +86,9 @@ class SelectMultipleField(JUIFieldMixin, wtforms.Field):
             Union["sa.orm.Query", list],
         ] = choices
         self.view_component = view_component
+        self.update_component = update_component
+        self.create_component = create_component
+        self.display_update_link = display_update_link
 
     def process_data(self, value):
         try:
@@ -197,6 +203,9 @@ class SelectMultipleField(JUIFieldMixin, wtforms.Field):
                 CSelectMultipleSearch.Config(
                     field_name=self.short_name,
                     view_component=self.view_component,
+                    update_component=self.update_component,
+                    create_component=self.create_component,
+                    display_update_link=self.display_update_link,
                     changes_url=False,
                 ),
             )

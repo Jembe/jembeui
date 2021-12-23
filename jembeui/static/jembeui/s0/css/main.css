@@ -906,6 +906,9 @@ a.main-menu__sub-menu__title:hover {
     background-repeat: no-repeat;
     background-position: right 8px center;
 }
+.input--icon--arrowhead-down {
+  background-image: url(/jembeui/static/jembeui/s0/icons/arrowhead-down-16-grey-90-a80.svg);
+}
 /* checkbox */
 
   

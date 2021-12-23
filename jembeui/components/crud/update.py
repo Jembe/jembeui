@@ -10,7 +10,7 @@ from typing import (
 )
 import sqlalchemy as sa
 from flask_sqlalchemy import Model, SQLAlchemy
-from jembe import action
+from jembe import action, listener
 from .form import CForm
 from ...lib import Form, Menu, ActionLink
 
@@ -196,3 +196,8 @@ class CUpdateRecord(CForm):
         if not is_valid and self._config.on_invalid_form:
             self._config.on_invalid_form(self)
         return True
+
+    @listener(event="update_form_field")
+    def on_update_form_field(self, event: "jembe.Event"):
+        super().on_update_form_field(event)
+        self.state.modified_fields = tuple(set(self.state.modified_fields + (event.params["name"],)))
