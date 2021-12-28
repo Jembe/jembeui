@@ -56,4 +56,10 @@ class CMenu(Component):
     _config: Config
 
     def hydrate(self):
-        self.menu = self._config.menu.bind_to(self)
+        if not hasattr(self, "menu"):
+            self.menu = self._config.menu.bind_to(self)
+
+    def is_empty(self) -> bool:
+        self.hydrate()
+        return self.menu.is_empty
+

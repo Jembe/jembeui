@@ -23,7 +23,7 @@
         </div>
         <div class="page-layout__header">
             <div class="page-layout__header__title">
-                {% if "_main_menu" in _config.components %}
+                {% if "_main_menu" in _config.components and not component("_main_menu").component_instance.is_empty() %}
                 <button class="button button--ghost" type="button" 
                         jmb-ref="menuButton"
                         jmb-on:click="$local.mainMenuOpen = ! $local.mainMenuOpen;">
@@ -47,7 +47,7 @@
             </div>
         </div>
         <div class="page-layout__main">
-            {% if "_main_menu" in _config.components %}
+            {% if "_main_menu" in _config.components and not component("_main_menu").component_instance.is_empty() %}
             <div jmb-cloak jmb-show="$local.mainMenuOpen" class="page-layout__main__menu">
                 {{component("_main_menu")}}
             </div>

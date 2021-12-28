@@ -67,6 +67,15 @@ class Menu:
         return False
 
     @property
+    def is_empty(self) -> bool:
+        if not self.binded:
+            raise ValueError("Menu must be binded to component!")
+        for item in self.items:
+            if item.is_accessible:
+                return False
+        return True
+
+    @property
     def is_menu(self) -> bool:
         return True
 
