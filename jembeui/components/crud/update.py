@@ -8,7 +8,6 @@ from typing import (
     Dict,
     Sequence,
 )
-import sqlalchemy as sa
 from flask_sqlalchemy import Model, SQLAlchemy
 from .form import CForm, cformbase_default_on_submit_exception
 from ...lib import Form, Menu, ActionLink
