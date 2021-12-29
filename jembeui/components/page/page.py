@@ -11,6 +11,7 @@ from typing import (
 from ..component import Component
 from .title import CPageTitle
 from .notifications import CPageNotifications
+from .notice import CPageNotice
 from .syserror import CPageSystemError
 from .confirmation import CActionConfirmationDialog
 from .update_indicatior import CPageUpdateIndicator
@@ -59,6 +60,8 @@ class CPage(Component):
                 )
             if "_notifications" not in components:
                 components["_notifications"] = CPageNotifications
+            if "_notice" not in components:
+                components["_notice"] = CPageNotice
             if "_syserror" not in components:
                 components["_syserror"] = CPageSystemError
             if "_action_confirmation" not in components:

@@ -90,8 +90,12 @@ class Component(jembe.Component):
 
     @property
     def title(self) -> str:
+        if "title" in self.state and self.state.title is not None:
+            return self.state.title
+
         if isinstance(self._config.title, str):
             return self._config.title
+
         return self._config.title(self)
 
     # JembeUI helper methods
@@ -100,6 +104,9 @@ class Component(jembe.Component):
 
     def jui_push_notification(self, message: str, level: str = "info"):
         self.emit("pushPageNotification", message=message, level=level)
+
+    def jui_push_notice(self, message: str, title:Optional[str]=None):
+        self.emit("pushPageNotice", message=message, title=title)
 
     def jui_confirm_action(
         self,

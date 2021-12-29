@@ -10,8 +10,7 @@ from typing import (
 )
 import sqlalchemy as sa
 from flask_sqlalchemy import Model, SQLAlchemy
-from jembe import action, listener
-from .form import CForm
+from .form import CForm, cformbase_default_on_submit_exception
 from ...lib import Form, Menu, ActionLink
 
 if TYPE_CHECKING:
@@ -21,31 +20,16 @@ if TYPE_CHECKING:
 __all__ = ("CUpdateRecord",)
 
 
-def default_on_submit(c: "jembeui.CUpdateRecord", r: Union["Model", str]):
-    c.jui_push_notification("Saved sucessefuly", "success")
-
-
-def default_on_cancel(
+def default_on_submit(
     c: "jembeui.CUpdateRecord", r: Union["Model", str]
 ) -> Optional[bool]:
-    return c.state.form.cancel(r)
+    c.jui_push_notification("Saved sucessefuly", "success")
+    return False
 
 
 def default_on_invalid_form(c: "jembeui.CUpdateRecord"):
     # TODO chek are they errors not associated with field and display it
     c.jui_push_notification("Form is invalid", "warn")
-
-
-def default_on_submit_exception(c: "jembeui.CUpdateRecord", error: "Exception"):
-    if isinstance(error, sa.exc.SQLAlchemyError):
-        c.jui_push_notification(
-            str(getattr(error, "orig", error))
-            if isinstance(error, sa.exc.SQLAlchemyError)
-            else str(error),
-            "error",
-        )
-    else:
-        c.jui_push_notification(str(error), "error")
 
 
 class CUpdateRecord(CForm):
@@ -54,28 +38,23 @@ class CUpdateRecord(CForm):
 
         def __init__(
             self,
-            form: "Form",
+            form: "jembeui.Form",
             get_record: Optional[
-                Callable[["jembeui.CUpdateRecord"], Union["Model", dict]]
+                Callable[["jembeui.CFormBase"], Union["Model", dict]]
             ] = None,
-            redisplay_on_submit: bool = False,
             menu: Optional[
                 Union["jembeui.Menu", Sequence[Union["jembeui.Link", "jembeui.Menu"]]]
             ] = None,
             on_submit: Optional[
-                Callable[["jembeui.CUpdateRecord", Union["Model", dict]], None]
+                Callable[["jembeui.CFormBase", Union["Model", dict]], Optional[bool]]
             ] = default_on_submit,
             on_invalid_form: Optional[
-                Callable[["jembeui.CUpdateRecord"], None]
+                Callable[["jembeui.CFormBase"], None]
             ] = default_on_invalid_form,
             on_submit_exception: Optional[
-                Callable[["jembeui.CUpdateRecord", "Exception"], None]
-            ] = default_on_submit_exception,
-            on_cancel: Optional[
-                Callable[
-                    ["jembeui.CUpdateRecord", Union["Model", dict]], Optional[bool]
-                ]
-            ] = default_on_cancel,
+                Callable[["jembeui.CFormBase", "Exception"], None]
+            ] = cformbase_default_on_submit_exception,
+            on_cancel: Optional[Callable[["jembeui.CFormBase"], Optional[bool]]] = None,
             db: Optional["SQLAlchemy"] = None,
             title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
             template: Optional[Union[str, Iterable[str]]] = None,
@@ -87,7 +66,6 @@ class CUpdateRecord(CForm):
             changes_url: bool = True,
             url_query_params: Optional[Dict[str, str]] = None,
         ):
-            self.redisplay_on_submit = redisplay_on_submit
             if menu is None:
                 menu = Menu(
                     [
@@ -95,14 +73,14 @@ class CUpdateRecord(CForm):
                         ActionLink("cancel()", "Cancel"),
                     ]
                 )
-            self.on_submit = on_submit
-            self.on_invalid_form = on_invalid_form
-            self.on_submit_exception = on_submit_exception
-            self.on_cancel = on_cancel
             super().__init__(
                 form,
                 get_record=get_record,
                 menu=menu,
+                on_submit=on_submit,
+                on_invalid_form=on_invalid_form,
+                on_submit_exception=on_submit_exception,
+                on_cancel=on_cancel,
                 db=db,
                 title=title,
                 template=template,
@@ -125,79 +103,16 @@ class CUpdateRecord(CForm):
         if _record is not None and (
             _record["id"] == id if isinstance(_record, dict) else _record.id == id
         ):
-            self._record = _record
+            self.record = _record
             # insp = sa.inspect(_record)
             # if insp.presistent or insp.pending:
             #     self._record = _record
         super().__init__(form=form)
 
-    @action
-    def submit(self) -> Optional[bool]:
-        if self.state.form.validate():
-            try:
-                submited_record = self.state.form.submit(self.record)
-                self.session.commit()
-                self.emit(
-                    "submit",
-                    record=submited_record,
-                    record_id=submited_record["id"]
-                    if isinstance(submited_record, dict)
-                    else submited_record.id,
-                )
-                if self._config.on_submit:
-                    self._config.on_submit(self, submited_record)
-                return self._config.redisplay_on_submit
-            except Exception as error:
-                if self._config.on_submit_exception:
-                    self._config.on_submit_exception(self, error)
-        else:
-            if self._config.on_invalid_form:
-                self._config.on_invalid_form(self)
-        self.session.rollback()
-        return True
+    @property
+    def is_form_modified(self) -> bool:
+        return len(self.state.modified_fields) > 0
 
-    @action
-    def cancel(self, confirmed: bool = False):
-        if confirmed or not self.state.modified_fields:
-            redisplay: Optional[bool] = None
-            if self._config.on_cancel:
-                redisplay = self._config.on_cancel(self, self.record)
-            self.emit(
-                "cancel",
-                record=self.record,
-                record_id=self.record["id"]
-                if isinstance(self.record, dict)
-                else self.record.id,
-            )
-            return redisplay
-        else:
-            self.jui_confirm_action(
-                "cancel",
-                "Unsaved changes",
-                "You have unsaved changes in {} that will be lost.".format(self.title),
-            )
-
-    @action
-    def validate(self, only_modified_fields: bool = False):
-        """
-            Validates form without submiting it
-
-            if only_modified_fields is True then validate only modified fields not the whole
-            form
-        """
-        is_valid = True
-        if only_modified_fields:
-            for field_name in self.state.modified_fields:
-                is_valid = is_valid and getattr(self.state.form, field_name).validate(
-                    self.state.form
-                )
-        else:
-            is_valid = self.state.form.validate()
-        if not is_valid and self._config.on_invalid_form:
-            self._config.on_invalid_form(self)
-        return True
-
-    @listener(event="update_form_field")
-    def on_update_form_field(self, event: "jembe.Event"):
-        super().on_update_form_field(event)
-        self.state.modified_fields = tuple(set(self.state.modified_fields + (event.params["name"],)))
+    @property
+    def modified_form_fields(self) -> Optional[Sequence[str]]:
+        return self.state.modified_fields

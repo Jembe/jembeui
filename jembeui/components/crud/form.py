@@ -9,9 +9,10 @@ from typing import (
     Tuple,
     Any,
 )
-from jembe import NotFound, listener
+from jembe import NotFound, listener, action
 from sqlalchemy.orm.scoping import scoped_session
 from flask_sqlalchemy import Model
+import sqlalchemy as sa
 
 from ..component import Component
 from ...helpers import get_jembeui
@@ -23,7 +24,19 @@ if TYPE_CHECKING:
     import jembeui
     from flask_sqlalchemy import SQLAlchemy
 
-__all__ = ("CFormBase", "CForm")
+__all__ = ("CFormBase", "CForm", "cformbase_default_on_submit_exception")
+
+
+def cformbase_default_on_submit_exception(c: "jembeui.CFormBase", error: "Exception"):
+    if isinstance(error, sa.exc.SQLAlchemyError):
+        c.jui_push_notification(
+            str(getattr(error, "orig", error))
+            if isinstance(error, sa.exc.SQLAlchemyError)
+            else str(error),
+            "error",
+        )
+    else:
+        c.jui_push_notification(str(error), "error")
 
 
 class CFormBase(Component):
@@ -34,8 +47,16 @@ class CFormBase(Component):
             self,
             form: "jembeui.Form",
             get_record: Optional[
-                Callable[["jembe.Component"], Union["Model", dict]]
+                Callable[["jembeui.CFormBase"], Union["Model", dict]]
             ] = None,
+            on_submit: Optional[
+                Callable[["jembeui.CFormBase", Union["Model", dict]], Optional[bool]]
+            ] = None,
+            on_invalid_form: Optional[Callable[["jembeui.CFormBase"], None]] = None,
+            on_submit_exception: Optional[
+                Callable[["jembeui.CFormBase", "Exception"], None]
+            ] = cformbase_default_on_submit_exception,
+            on_cancel: Optional[Callable[["jembeui.CFormBase"], Optional[bool]]] = None,
             db: Optional["SQLAlchemy"] = None,
             title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
             template: Optional[Union[str, Iterable[str]]] = None,
@@ -48,7 +69,11 @@ class CFormBase(Component):
             url_query_params: Optional[Dict[str, str]] = None,
         ):
             self.form = form
-            self.get_record_callback = get_record
+            self.get_record = get_record
+            self.on_submit = on_submit
+            self.on_invalid_form = on_invalid_form
+            self.on_submit_exception = on_submit_exception
+            self.on_cancel = on_cancel
             # defult db can be useds when db is None
             if db is not None:
                 self.db: "SQLAlchemy" = db
@@ -59,6 +84,8 @@ class CFormBase(Component):
                         "Either 'db' for CListRecords.Config or default_db"
                         " on JembeUI instance must be set"
                     )
+
+            # Add components defined by JUIFormFields
             if components is None:
                 components = {}
             for field in self.form():
@@ -77,6 +104,12 @@ class CFormBase(Component):
 
     _config: Config
 
+    def inject_into(self, cconfig: "jembe.ComponentConfig") -> Dict[str, Any]:
+        # inject _form into subcomponents injected by JUIField
+        if cconfig.name.startswith("form_field__"):
+            return {"_form": self.form}
+        return {}
+
     def __init__(self):
         self._record: Union["Model", dict]
         super().__init__()
@@ -91,13 +124,13 @@ class CFormBase(Component):
         return super().load_init_param(config, name, value)
 
     def get_record(self) -> Union["Model", dict]:
-        if self._config.get_record_callback is None:
+        if self._config.get_record is None:
             raise JembeUIError(
                 "You need to implement get_record method or to add config parameter get_record to component: {}".format(
                     self._config.full_name
                 )
             )
-        return self._config.get_record_callback(self)
+        return self._config.get_record(self)
 
     @property
     def record(self) -> Union["Model", dict]:
@@ -110,9 +143,136 @@ class CFormBase(Component):
             raise NotFound()
         return self._record
 
+    @record.setter
+    def record(self, value: Union["Model", dict]):
+        self._record = value
+
+    @property
+    def form(self) -> "Form":
+        """Returns form instance"""
+        try:
+            return self._form
+        except AttributeError:
+            raise NotImplementedError()
+
+    @form.setter
+    def form(self, form: "Form"):
+        self._form = form
+
+    @property
+    def is_form_modified(self) -> bool:
+        """Should return true when form is modified by user and not submited"""
+        return False if self.form.is_disabled else True
+
+    @property
+    def modified_form_fields(self) -> Optional[Sequence[str]]:
+        """Should return list of modified fields or None if component doesn' track modified fields"""
+        return None
+
     @property
     def session(self) -> "scoped_session":
         return self._config.db.session
+
+    @listener(event="update_form_field")
+    def on_update_form_field(self, event: "jembe.Event"):
+        if not self.form.is_disabled:
+            field = getattr(self.form, event.params["name"])
+            field.data = event.params["value"]
+
+    @action
+    def submit(self):
+        if self.form.is_disabled:
+            raise JembeUIError("Can't submit disabled form")
+
+        if self.form.validate():
+            try:
+                submited_record = self.form.submit(self.record)
+                self.session.commit()
+                self.emit(
+                    "submit",
+                    record=submited_record,
+                    record_id=submited_record["id"]
+                    if isinstance(submited_record, dict)
+                    else submited_record.id,
+                )
+                return self.on_submit(submited_record)
+            except Exception as error:
+                self.on_submit_exception(error)
+        else:
+            if self._config.on_invalid_form:
+                self._config.on_invalid_form(self)
+        self.session.rollback()
+        return True
+
+    def on_submit(self, submited_record: Union["Model", dict]) -> Optional[bool]:
+        if self._config.on_submit:
+            return self._config.on_submit(self, submited_record)
+        return None
+
+    def on_submit_exception(self, error: Exception):
+        if self._config.on_submit_exception:
+            self._config.on_submit_exception(self, error)
+
+    def on_invalid_form(self):
+        if self._config.on_invalid_form:
+            self._config.on_invalid_form(self)
+
+    @action
+    def cancel(self, confirmed: bool = False):
+        if self.form.is_disabled:
+            self.emit(
+                "cancel",
+                id=self.record["id"]
+                if isinstance(self.record, dict)
+                else self.record.id,
+                record=self.record,
+            )
+        # update and create
+        if confirmed or not self.is_form_modified:
+            self.form.cancel(self.record)
+            redisplay = self.on_cancel()
+            self.emit(
+                "cancel",
+                record=self.record,
+                record_id=self.record["id"]
+                if isinstance(self.record, dict)
+                else self.record.id,
+            )
+            return redisplay
+        else:
+            self.jui_confirm_action(
+                "cancel",
+                "Unsaved changes",
+                "You have unsaved changes in {} that will be lost.".format(self.title),
+            )
+
+    def on_cancel(self) -> Optional[bool]:
+        if self._config.on_cancel:
+            return self._config.on_cancel(self)
+        return None
+
+    @action
+    def validate(self, only_modified_fields: bool = False):
+        """
+        Validates form without submiting it.
+
+        if only_modified_fields is True then validate only modified fields not the whole
+        form
+        """
+        if self.form.is_disabled:
+            raise JembeUIError("Can't validate disabled form")
+
+        is_valid = True
+        if only_modified_fields and self.modified_form_fields is not None:
+            for field_name in self.modified_form_fields:
+                is_valid = is_valid and getattr(self.form, field_name).validate(
+                    self.form
+                )
+        else:
+            is_valid = self.form.validate()
+        if not is_valid:
+            self.on_invalid_form()
+        return True
 
 
 class CForm(CFormBase):
@@ -121,11 +281,19 @@ class CForm(CFormBase):
             self,
             form: "jembeui.Form",
             get_record: Optional[
-                Callable[["jembe.Component"], Union["Model", dict]]
+                Callable[["jembeui.CFormBase"], Union["Model", dict]]
             ] = None,
             menu: Optional[
                 Union["jembeui.Menu", Sequence[Union["jembeui.Link", "jembeui.Menu"]]]
             ] = None,
+            on_submit: Optional[
+                Callable[["jembeui.CFormBase", Union["Model", dict]], Optional[bool]]
+            ] = None,
+            on_invalid_form: Optional[Callable[["jembeui.CFormBase"], None]] = None,
+            on_submit_exception: Optional[
+                Callable[["jembeui.CFormBase", "Exception"], None]
+            ] = cformbase_default_on_submit_exception,
+            on_cancel: Optional[Callable[["jembeui.CFormBase"], Optional[bool]]] = None,
             db: Optional["SQLAlchemy"] = None,
             title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
             template: Optional[Union[str, Iterable[str]]] = None,
@@ -145,6 +313,10 @@ class CForm(CFormBase):
             super().__init__(
                 form,
                 get_record=get_record,
+                on_submit=on_submit,
+                on_invalid_form=on_invalid_form,
+                on_submit_exception=on_submit_exception,
+                on_cancel=on_cancel,
                 db=db,
                 title=title,
                 template=template,
@@ -155,12 +327,7 @@ class CForm(CFormBase):
                 url_query_params=url_query_params,
             )
 
-        pass
-
-    def inject_into(self, cconfig: "jembe.ComponentConfig") -> Dict[str, Any]:
-        return {
-            "_form": self.state.form,
-        }
+    _config: Config
 
     def __init__(self, form: Optional[Form] = None):
         if self.state.form is None:
@@ -171,13 +338,9 @@ class CForm(CFormBase):
             )
 
         self.state.form.mount(self, "form")
+        self.form = self.state.form
         super().__init__()
 
     def hydrate(self):
         self.menu = self._config.menu.bind_to(self)
         return super().hydrate()
-
-    @listener(event="update_form_field")
-    def on_update_form_field(self, event: "jembe.Event"):
-        field = getattr(self.state.form, event.params["name"])
-        field.data = event.params["value"]

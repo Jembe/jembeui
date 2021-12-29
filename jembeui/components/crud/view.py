@@ -7,12 +7,10 @@ from typing import (
     Tuple,
     Dict,
     Sequence,
-    Any
 )
-from jembe import action
 from flask_sqlalchemy import Model, SQLAlchemy
 from .form import CFormBase
-from ...lib import Form, Menu
+from ...lib import Menu
 
 
 if TYPE_CHECKING:
@@ -30,11 +28,19 @@ class CViewRecord(CFormBase):
             self,
             form: "jembeui.Form",
             get_record: Optional[
-                Callable[["jembeui.CViewRecord"], Union["Model", dict]]
+                Callable[["jembeui.CFormBase"], Union["Model", dict]]
             ] = None,
             menu: Optional[
                 Union["jembeui.Menu", Sequence[Union["jembeui.Link", "jembeui.Menu"]]]
             ] = None,
+            on_submit: Optional[
+                Callable[["jembeui.CFormBase", Union["Model", dict]], Optional[bool]]
+            ] = None,
+            on_invalid_form: Optional[Callable[["jembeui.CFormBase"], None]] = None,
+            on_submit_exception: Optional[
+                Callable[["jembeui.CFormBase", "Exception"], None]
+            ] = None,
+            on_cancel: Optional[Callable[["jembeui.CFormBase"], Optional[bool]]] = None,
             db: Optional["SQLAlchemy"] = None,
             title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
             template: Optional[Union[str, Iterable[str]]] = None,
@@ -46,7 +52,7 @@ class CViewRecord(CFormBase):
             changes_url: bool = True,
             url_query_params: Optional[Dict[str, str]] = None,
         ):
-            self.menu: "Menu" = (
+            self.menu: "jembeui.Menu" = (
                 Menu()
                 if menu is None
                 else (Menu(menu) if not isinstance(menu, Menu) else menu)
@@ -54,6 +60,10 @@ class CViewRecord(CFormBase):
             super().__init__(
                 form,
                 get_record=get_record,
+                on_submit=on_submit,
+                on_invalid_form=on_invalid_form,
+                on_submit_exception=on_submit_exception,
+                on_cancel=on_cancel,
                 db=db,
                 title=title,
                 template=template,
@@ -74,23 +84,14 @@ class CViewRecord(CFormBase):
         if _record is not None and (
             _record["id"] == id if isinstance(_record, dict) else _record.id == id
         ):
-            self._record = _record
-        self.form: Form = (
+            self.record = _record
+        self.form = (
             self._config.form(data=self.record, disabled=True)
             if isinstance(self.record, dict)
             else self._config.form(obj=self.record, disabled=True)
         )
         self.form.mount(self)
         super().__init__()
-
-    def inject_into(self, cconfig: "jembe.ComponentConfig") -> Dict[str, Any]:
-        return {
-            "_form": self.form,
-        }
-
-    @action
-    def cancel(self):
-        self.emit("cancel", id=self.record.id, record=self.record)
 
     def hydrate(self):
         self.menu = self._config.menu.bind_to(self)

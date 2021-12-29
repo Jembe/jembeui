@@ -1,4 +1,4 @@
-from typing import Dict, TYPE_CHECKING, Optional
+from typing import Dict, TYPE_CHECKING
 from ...exceptions import JembeUIError
 
 if TYPE_CHECKING:
@@ -14,7 +14,10 @@ class JUIFieldMixin:
     can be registred by field itself.
 
     Subcomponent will be registred with field name as prefix to avoid
-    colision of component names
+    colision of component names.
+
+    JUI Field allows Jembe UI to easaly ingerate sub components into field
+    (multiselect, selecte LOV etc.)
     """
 
     _cform: "jembeui.CForm"
@@ -43,7 +46,7 @@ class JUIFieldMixin:
 
     def jui_component_name(self, name: str) -> str:
         return "{}__{}__{}".format(
-            "form",
+            "form_field",
             self.short_name,  # type:ignore
             name,
         )

@@ -1,0 +1,16 @@
+{% if message %}
+<div class="modal">
+    <div class="modal__dialog">
+        {% if title %}
+        <div class="modal__dialog__head">
+            <div jmb-ref="title">{{title}}</div>
+            <button jmb-on:click="cancel()" type="button" title="Close">X</button>
+        </div>
+        {% endif %}
+        <div class="modal__dialog__content">{{message}}</div>
+        <div class="modal__dialog__footer">
+            <button jmb-on:click="cancel()" jmb-on:ready="$self.focus()" type="button" class="button button--primary">Ok</button>
+        </div>
+    </div>
+</div>
+{% endif %}

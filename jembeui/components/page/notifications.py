@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from jembe import Event
 
 
-__all__ = "CPageNotifications"
+__all__ = "CPageNotifications",
 
 
 @dataclass
