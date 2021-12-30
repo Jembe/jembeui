@@ -144,9 +144,9 @@ class FormBase(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
             self.is_mounted = True
         return self
 
-    def submit(self, record: Union["Model", dict]) -> Union["Model", dict]:
-        # TODO
+    def submit(self, record: Union["Model", dict]) -> Optional[Union["Model", dict]]:
         if isinstance(record, dict):
+            # TODO
             raise JembeUIError(
                 "You must provide submit logic for form when record is dict by overriding 'submit' method"
             )
@@ -154,6 +154,7 @@ class FormBase(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
         else:
             self.populate_obj(record)
             self.cform.session.add(record)
+            self.cform.session.commit()
             return record
 
     def cancel(self, record: Union["Model", dict]) -> Optional[bool]:
@@ -487,7 +488,7 @@ class Form(FormBase):
         super().cancel(record)  # type:ignore
         return False if state_changed else None
 
-    def submit(self, record: Union["Model", dict]) -> Union["Model", dict]:
+    def submit(self, record: Union["Model", dict]) -> Optional[Union["Model", dict]]:
         for field in self:  # type:ignore
             if isinstance(field, FileField):
                 if field.data and field.data.in_temp_storage():

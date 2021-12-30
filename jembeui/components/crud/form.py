@@ -50,7 +50,10 @@ class CFormBase(Component):
                 Callable[["jembeui.CFormBase"], Union["Model", dict]]
             ] = None,
             on_submit: Optional[
-                Callable[["jembeui.CFormBase", Union["Model", dict]], Optional[bool]]
+                Callable[
+                    ["jembeui.CFormBase", Optional[Union["Model", dict]]],
+                    Optional[bool],
+                ]
             ] = None,
             on_invalid_form: Optional[Callable[["jembeui.CFormBase"], None]] = None,
             on_submit_exception: Optional[
@@ -187,13 +190,18 @@ class CFormBase(Component):
         if self.form.validate():
             try:
                 submited_record = self.form.submit(self.record)
-                self.session.commit()
+
+                if submited_record is None:
+                    submited_record_id = None
+                elif isinstance(submited_record, dict):
+                    submited_record_id = submited_record["id"]
+                else:
+                    submited_record_id = submited_record.id
+
                 self.emit(
                     "submit",
                     record=submited_record,
-                    record_id=submited_record["id"]
-                    if isinstance(submited_record, dict)
-                    else submited_record.id,
+                    record_id=submited_record_id,
                 )
                 return self.on_submit(submited_record)
             except Exception as error:
@@ -204,7 +212,9 @@ class CFormBase(Component):
         self.session.rollback()
         return True
 
-    def on_submit(self, submited_record: Union["Model", dict]) -> Optional[bool]:
+    def on_submit(
+        self, submited_record: Optional[Union["Model", dict]]
+    ) -> Optional[bool]:
         if self._config.on_submit:
             return self._config.on_submit(self, submited_record)
         return None
