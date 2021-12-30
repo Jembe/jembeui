@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 __all__ = ("CUpdateRecord",)
 
 
-def default_on_submit(
+def default_on_submit_success(
     c: "jembeui.CUpdateRecord", r: Union["Model", str]
 ) -> Optional[bool]:
     c.jui_push_notification("Saved sucessefuly", "success")
@@ -44,9 +44,9 @@ class CUpdateRecord(CForm):
             menu: Optional[
                 Union["jembeui.Menu", Sequence[Union["jembeui.Link", "jembeui.Menu"]]]
             ] = None,
-            on_submit: Optional[
+            on_submit_success: Optional[
                 Callable[["jembeui.CFormBase", Union["Model", dict]], Optional[bool]]
-            ] = default_on_submit,
+            ] = default_on_submit_success,
             on_invalid_form: Optional[
                 Callable[["jembeui.CFormBase"], None]
             ] = default_on_invalid_form,
@@ -76,7 +76,7 @@ class CUpdateRecord(CForm):
                 form,
                 get_record=get_record,
                 menu=menu,
-                on_submit=on_submit,
+                on_submit_success=on_submit_success,
                 on_invalid_form=on_invalid_form,
                 on_submit_exception=on_submit_exception,
                 on_cancel=on_cancel,

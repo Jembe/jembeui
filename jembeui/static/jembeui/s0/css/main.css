@@ -546,7 +546,7 @@ a.main-menu__sub-menu__title:hover {
     position: relative;
 }
 .top-menu__dropdown {
-    z-index: 1000;
+    z-index: 100000;
     display: none;
     position: absolute;
     right: -16px;

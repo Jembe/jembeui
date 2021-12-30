@@ -33,7 +33,7 @@ class CViewRecord(CFormBase):
             menu: Optional[
                 Union["jembeui.Menu", Sequence[Union["jembeui.Link", "jembeui.Menu"]]]
             ] = None,
-            on_submit: Optional[
+            on_submit_success: Optional[
                 Callable[["jembeui.CFormBase", Union["Model", dict]], Optional[bool]]
             ] = None,
             on_invalid_form: Optional[Callable[["jembeui.CFormBase"], None]] = None,
@@ -60,7 +60,7 @@ class CViewRecord(CFormBase):
             super().__init__(
                 form,
                 get_record=get_record,
-                on_submit=on_submit,
+                on_submit_success=on_submit_success,
                 on_invalid_form=on_invalid_form,
                 on_submit_exception=on_submit_exception,
                 on_cancel=on_cancel,

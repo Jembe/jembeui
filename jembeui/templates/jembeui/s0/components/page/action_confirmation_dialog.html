@@ -12,7 +12,7 @@
         {% endif %}
         <div class="modal__dialog__footer">
             <button jmb-on:click="cancel()" type="button" class="button">Cancel</button>
-            <button jmb-on:click="confirm()" jmb-on:ready="$self.focus()" type="button" class="button button--primary">OK</button>
+            <button jmb-on:click="confirm()" jmb-on:ready="$self.focus()" type="button" class="button {% if confirmation.danger %}button--danger{% else %}button--primary{% endif %}">{{confirmation.confirm_title}}</button>
         </div>
     </div>
 </div>

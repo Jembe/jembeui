@@ -10,7 +10,6 @@ from typing import (
     Any,
 )
 from jembe import NotFound, listener, action
-from sqlalchemy.orm.scoping import scoped_session
 from flask_sqlalchemy import Model
 import sqlalchemy as sa
 
@@ -49,7 +48,7 @@ class CFormBase(Component):
             get_record: Optional[
                 Callable[["jembeui.CFormBase"], Union["Model", dict]]
             ] = None,
-            on_submit: Optional[
+            on_submit_success: Optional[
                 Callable[
                     ["jembeui.CFormBase", Optional[Union["Model", dict]]],
                     Optional[bool],
@@ -73,7 +72,7 @@ class CFormBase(Component):
         ):
             self.form = form
             self.get_record = get_record
-            self.on_submit = on_submit
+            self.on_submit_success = on_submit_success
             self.on_invalid_form = on_invalid_form
             self.on_submit_exception = on_submit_exception
             self.on_cancel = on_cancel
@@ -173,7 +172,7 @@ class CFormBase(Component):
         return None
 
     @property
-    def session(self) -> "scoped_session":
+    def session(self) -> "sa.orm.scoping.scoped_session":
         return self._config.db.session
 
     @listener(event="update_form_field")
@@ -203,20 +202,21 @@ class CFormBase(Component):
                     record=submited_record,
                     record_id=submited_record_id,
                 )
-                return self.on_submit(submited_record)
+                return self.on_submit_success(submited_record)
             except Exception as error:
                 self.on_submit_exception(error)
         else:
             if self._config.on_invalid_form:
                 self._config.on_invalid_form(self)
-        self.session.rollback()
+        if not isinstance(self.record, dict):
+            self.session.rollback()
         return True
 
-    def on_submit(
+    def on_submit_success(
         self, submited_record: Optional[Union["Model", dict]]
     ) -> Optional[bool]:
-        if self._config.on_submit:
-            return self._config.on_submit(self, submited_record)
+        if self._config.on_submit_success:
+            return self._config.on_submit_success(self, submited_record)
         return None
 
     def on_submit_exception(self, error: Exception):
@@ -296,7 +296,7 @@ class CForm(CFormBase):
             menu: Optional[
                 Union["jembeui.Menu", Sequence[Union["jembeui.Link", "jembeui.Menu"]]]
             ] = None,
-            on_submit: Optional[
+            on_submit_success: Optional[
                 Callable[["jembeui.CFormBase", Union["Model", dict]], Optional[bool]]
             ] = None,
             on_invalid_form: Optional[Callable[["jembeui.CFormBase"], None]] = None,
@@ -323,7 +323,7 @@ class CForm(CFormBase):
             super().__init__(
                 form,
                 get_record=get_record,
-                on_submit=on_submit,
+                on_submit_success=on_submit_success,
                 on_invalid_form=on_invalid_form,
                 on_submit_exception=on_submit_exception,
                 on_cancel=on_cancel,

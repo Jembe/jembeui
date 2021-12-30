@@ -105,7 +105,7 @@ class Component(jembe.Component):
     def jui_push_notification(self, message: str, level: str = "info"):
         self.emit("pushPageNotification", message=message, level=level)
 
-    def jui_push_notice(self, message: str, title:Optional[str]=None):
+    def jui_push_notice(self, message: str, title: Optional[str] = None):
         self.emit("pushPageNotice", message=message, title=title)
 
     def jui_confirm_action(
@@ -114,6 +114,8 @@ class Component(jembe.Component):
         title: str,
         question: str = "",
         action_params: Optional[dict] = None,
+        confirm_title: str = "OK",
+        danger: bool = False,
     ):
         from .page.confirmation import Confirmation
 
@@ -127,6 +129,8 @@ class Component(jembe.Component):
                 question=question,
                 action_name=action_name,
                 action_params=action_params,
+                confirm_title=confirm_title,
+                danger=danger,
             ),
         )
 

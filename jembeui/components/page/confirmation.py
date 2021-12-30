@@ -17,6 +17,8 @@ class Confirmation(JembeInitParamSupport):
     question: str
     action_name: str
     action_params: dict = field(default_factory=dict)
+    confirm_title: str = "OK"
+    danger: bool = False
 
     @classmethod
     def dump_init_param(cls, value: "Confirmation") -> Any:
@@ -30,6 +32,8 @@ class Confirmation(JembeInitParamSupport):
                 question=value.get("question"),
                 action_name=value.get("action_name"),
                 action_params=value.get("action_params"),
+                confirm_title=value.get("confirm_title"),
+                danger=value.get("danger"),
             )
             if value is not None
             else None

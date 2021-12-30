@@ -291,6 +291,10 @@ class CListRecords(Component):
             self.state.page_size = self._config.page_size
         super().__init__()
 
+    @property
+    def session(self) -> "sa.orm.scoping.scoped_session":
+        return self._config.db.session
+
     @action
     def jui_apply_choice_filter(self, filter_name, filter_value):
         if (
@@ -341,7 +345,7 @@ class CListRecords(Component):
             if isinstance(self._config.query, sa.orm.Query)
             else self._config.query(self)
         )
-        self.records = query.with_session(self._config.db.session()).only_return_tuples(
+        self.records = query.with_session(self.session()).only_return_tuples(
             True
         )
 

@@ -8,7 +8,6 @@ from typing import (
     Dict,
     Sequence,
 )
-import sqlalchemy as sa
 from flask_sqlalchemy import Model, SQLAlchemy
 from .form import CForm, cformbase_default_on_submit_exception
 from ...lib import Form, Menu, ActionLink
@@ -20,7 +19,7 @@ if TYPE_CHECKING:
 __all__ = ("CCreateRecord",)
 
 
-def default_on_submit(c: "jembeui.CCreateRecord", r: Union["Model", str]) -> Optional[bool]:
+def default_on_submit_success(c: "jembeui.CCreateRecord", r: Union["Model", str]) -> Optional[bool]:
     c.jui_push_notification("Created sucessefuly", "success")
     return False
 
@@ -43,9 +42,9 @@ class CCreateRecord(CForm):
             menu: Optional[
                 Union["jembeui.Menu", Sequence[Union["jembeui.Link", "jembeui.Menu"]]]
             ] = None,
-            on_submit: Optional[
+            on_submit_success: Optional[
                 Callable[["jembeui.CFormBase", Union["Model", dict]], Optional[bool]]
-            ] = default_on_submit,
+            ] = default_on_submit_success,
             on_invalid_form: Optional[
                 Callable[["jembeui.CFormBase"], None]
             ] = default_on_invalid_form,
@@ -75,7 +74,7 @@ class CCreateRecord(CForm):
                 form,
                 get_record=get_record,
                 menu=menu,
-                on_submit=on_submit,
+                on_submit_success=on_submit_success,
                 on_invalid_form=on_invalid_form,
                 on_submit_exception=on_submit_exception,
                 on_cancel=on_cancel,
