@@ -107,3 +107,23 @@ class Menu:
             template = self.template_variants[variant]
         context = {"menu": self}
         return Markup(render_template(template, **context))
+
+    def get_title(self):
+        if isinstance(self.title, str) or self.title is None:
+            return self.title
+        return self.title(self)
+
+    def get_description(self):
+        if isinstance(self.description, str) or self.description is None:
+            return self.description
+        return self.description(self)
+
+    def get_icon(self):
+        if isinstance(self.icon, str) or self.icon is None:
+            return self.icon
+        return self.icon(self)
+
+    def get_icon_html(self):
+        if isinstance(self.icon_html, str) or self.icon_html is None:
+            return self.icon_html
+        return self.icon_html(self)

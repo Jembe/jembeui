@@ -13,7 +13,7 @@
                     }" 
                 class="main-menu__sub-menu__title"
                 jmb-bind:class="{'main-menu__sub-menu__title--active': $scope().active.includes('{{menu.id}}')}">
-                {{menu.title}}
+                {{menu.get_title()}}
             </a>
         {% endif %}
         <div 

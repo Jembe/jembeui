@@ -25,7 +25,7 @@
                 <div class="top-menu__link"
                      jmb-bind:class="{'top-menu__link--active': $scope().active === '{{menu.id}}'}">
                     <a href="#" jmb-on:click.prevent="$scope().opened = '{{menu.id}}'">
-                        {{menu.title}}
+                        {{menu.get_title()}}
                     </a>
                 </div>
                 <div class="top-menu__dropdown" 
@@ -35,7 +35,7 @@
             </div>
         {% else %}
             <div class="top-menu__dropdown__submenu-title">
-                {{menu.title}}
+                {{menu.get_title()}}
             </div>
             <div class="top-menu__dropdown__submenu">
                 {{display_menu_items(menu, level, topMenuId)}}

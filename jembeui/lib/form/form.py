@@ -4,7 +4,7 @@ from abc import ABCMeta
 from markupsafe import Markup
 import wtforms as wtf
 from flask import render_template
-from jembe import JembeInitParamSupport
+from jembe import JembeInitParamSupport, ComponentPreviousStateUnavaiableError
 
 from ...helpers import get_widget_variants, camel_to_snake
 from ...settings import settings
@@ -455,17 +455,20 @@ class Form(FormBase):
                     # remove previous field value (file) if file is in temp storage
                     # when changing upload file without submit
                     # to remove changed file from disk
-                    if form_state_name and cform.previous_state:
-                        previous_form_field = getattr(
-                            cform.previous_state[form_state_name], field.name
-                        )
-                        if (
-                            previous_form_field
-                            and previous_form_field.data
-                            and previous_form_field.data.in_temp_storage()
-                            and previous_form_field.data != field.data
-                        ):
-                            previous_form_field.data.remove()
+                    try:
+                        if form_state_name and cform.previous_state:
+                            previous_form_field = getattr(
+                                cform.previous_state[form_state_name], field.name
+                            )
+                            if (
+                                previous_form_field
+                                and previous_form_field.data
+                                and previous_form_field.data.in_temp_storage()
+                                and previous_form_field.data != field.data
+                            ):
+                                previous_form_field.data.remove()
+                    except ComponentPreviousStateUnavaiableError:
+                        pass
         return super().mount(cform)  # type:ignore
 
     def cancel(self, record: Union["Model", dict]) -> Optional[bool]:

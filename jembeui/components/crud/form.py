@@ -34,6 +34,8 @@ def cformbase_default_on_submit_exception(c: "jembeui.CFormBase", error: "Except
             else str(error),
             "error",
         )
+    elif isinstance(error, ValueError):
+        c.jui_push_notification(str(error), "warn")
     else:
         c.jui_push_notification(str(error), "error")
 
@@ -340,17 +342,37 @@ class CForm(CFormBase):
     _config: Config
 
     def __init__(self, form: Optional[Form] = None):
-        if self.state.form is None:
-            self.state.form = (
+        if self.form is None:
+            self.form = (
                 self._config.form(data=self.record)
                 if isinstance(self.record, dict)
                 else self._config.form(obj=self.record)
             )
 
-        self.state.form.mount(self, "form")
-        self.form = self.state.form
+        self.form.mount(self, "form")
         super().__init__()
+
+    @property
+    def form(self) -> "Form":
+        return self.state.form
+
+    @form.setter
+    def form(self, form: "Form"):
+        self.state.form = form
 
     def hydrate(self):
         self.menu = self._config.menu.bind_to(self)
         return super().hydrate()
+
+    def on_cancel(self) -> Optional[bool]:
+        if self._config.on_cancel:
+            result = self._config.on_cancel(self)
+            if result is True:
+                self.form = (
+                    self._config.form(data=self.record)
+                    if isinstance(self.record, dict)
+                    else self._config.form(obj=self.record)
+                )
+                self.form.mount(self, "form")
+            return result
+        return None
