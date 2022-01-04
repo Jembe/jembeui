@@ -943,9 +943,25 @@ a.main-menu__sub-menu__title:hover {
 }
 /* form */
 .form {
-    max-width: 1024px;
+    /* max-width: 1024px; */
     /* margin: auto; */
     margin-top: 16px;
+}
+
+.form--stacked {
+    display: flex;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--grey-30);
+    margin-bottom: 16px;
+    gap: 16px;
+}
+.form--stacked > div:nth-child(1) {
+    flex-grow: 1;
+    flex-basis: 33%;
+}
+.form--stacked > div:nth-child(2) {
+    flex-grow: 1;
+    flex-basis: 67%;
 }
 
 .buttons-menu--label-actions {

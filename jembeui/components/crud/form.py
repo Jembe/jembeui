@@ -23,21 +23,10 @@ if TYPE_CHECKING:
     import jembeui
     from flask_sqlalchemy import SQLAlchemy
 
-__all__ = ("CFormBase", "CForm", "cformbase_default_on_submit_exception")
-
-
-def cformbase_default_on_submit_exception(c: "jembeui.CFormBase", error: "Exception"):
-    if isinstance(error, sa.exc.SQLAlchemyError):
-        c.jui_push_notification(
-            str(getattr(error, "orig", error))
-            if isinstance(error, sa.exc.SQLAlchemyError)
-            else str(error),
-            "error",
-        )
-    elif isinstance(error, ValueError):
-        c.jui_push_notification(str(error), "warn")
-    else:
-        c.jui_push_notification(str(error), "error")
+__all__ = (
+    "CFormBase",
+    "CForm",
+)
 
 
 class CFormBase(Component):
@@ -50,17 +39,6 @@ class CFormBase(Component):
             get_record: Optional[
                 Callable[["jembeui.CFormBase"], Union["Model", dict]]
             ] = None,
-            on_submit_success: Optional[
-                Callable[
-                    ["jembeui.CFormBase", Optional[Union["Model", dict]]],
-                    Optional[bool],
-                ]
-            ] = None,
-            on_invalid_form: Optional[Callable[["jembeui.CFormBase"], None]] = None,
-            on_submit_exception: Optional[
-                Callable[["jembeui.CFormBase", "Exception"], None]
-            ] = cformbase_default_on_submit_exception,
-            on_cancel: Optional[Callable[["jembeui.CFormBase"], Optional[bool]]] = None,
             db: Optional["SQLAlchemy"] = None,
             title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
             template: Optional[Union[str, Iterable[str]]] = None,
@@ -74,10 +52,6 @@ class CFormBase(Component):
         ):
             self.form = form
             self.get_record = get_record
-            self.on_submit_success = on_submit_success
-            self.on_invalid_form = on_invalid_form
-            self.on_submit_exception = on_submit_exception
-            self.on_cancel = on_cancel
             # defult db can be useds when db is None
             if db is not None:
                 self.db: "SQLAlchemy" = db
@@ -208,8 +182,7 @@ class CFormBase(Component):
             except Exception as error:
                 self.on_submit_exception(error)
         else:
-            if self._config.on_invalid_form:
-                self._config.on_invalid_form(self)
+            self.on_invalid_form()
         if not isinstance(self.record, dict):
             self.session.rollback()
         return True
@@ -217,17 +190,23 @@ class CFormBase(Component):
     def on_submit_success(
         self, submited_record: Optional[Union["Model", dict]]
     ) -> Optional[bool]:
-        if self._config.on_submit_success:
-            return self._config.on_submit_success(self, submited_record)
         return None
 
     def on_submit_exception(self, error: Exception):
-        if self._config.on_submit_exception:
-            self._config.on_submit_exception(self, error)
+        if isinstance(error, sa.exc.SQLAlchemyError):
+            self.jui_push_notification(
+                str(getattr(error, "orig", error))
+                if isinstance(error, sa.exc.SQLAlchemyError)
+                else str(error),
+                "error",
+            )
+        elif isinstance(error, ValueError):
+            self.jui_push_notification(str(error), "warn")
+        else:
+            self.jui_push_notification(str(error), "error")
 
     def on_invalid_form(self):
-        if self._config.on_invalid_form:
-            self._config.on_invalid_form(self)
+        pass
 
     @action
     def cancel(self, confirmed: bool = False):
@@ -259,8 +238,6 @@ class CFormBase(Component):
             )
 
     def on_cancel(self) -> Optional[bool]:
-        if self._config.on_cancel:
-            return self._config.on_cancel(self)
         return None
 
     @action
@@ -298,14 +275,8 @@ class CForm(CFormBase):
             menu: Optional[
                 Union["jembeui.Menu", Sequence[Union["jembeui.Link", "jembeui.Menu"]]]
             ] = None,
-            on_submit_success: Optional[
-                Callable[["jembeui.CFormBase", Union["Model", dict]], Optional[bool]]
-            ] = None,
-            on_invalid_form: Optional[Callable[["jembeui.CFormBase"], None]] = None,
-            on_submit_exception: Optional[
-                Callable[["jembeui.CFormBase", "Exception"], None]
-            ] = cformbase_default_on_submit_exception,
-            on_cancel: Optional[Callable[["jembeui.CFormBase"], Optional[bool]]] = None,
+            redisplay_on_submit: bool = False,
+            redisplay_on_cancel: bool = False,
             db: Optional["SQLAlchemy"] = None,
             title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
             template: Optional[Union[str, Iterable[str]]] = None,
@@ -317,6 +288,9 @@ class CForm(CFormBase):
             changes_url: bool = True,
             url_query_params: Optional[Dict[str, str]] = None,
         ):
+            self.redisplay_on_submit = redisplay_on_submit
+            self.redisplay_on_cancel = redisplay_on_cancel
+
             self.menu: "jembeui.Menu" = (
                 Menu()
                 if menu is None
@@ -325,10 +299,6 @@ class CForm(CFormBase):
             super().__init__(
                 form,
                 get_record=get_record,
-                on_submit_success=on_submit_success,
-                on_invalid_form=on_invalid_form,
-                on_submit_exception=on_submit_exception,
-                on_cancel=on_cancel,
                 db=db,
                 title=title,
                 template=template,
@@ -342,37 +312,42 @@ class CForm(CFormBase):
     _config: Config
 
     def __init__(self, form: Optional[Form] = None):
-        if self.form is None:
-            self.form = (
-                self._config.form(data=self.record)
-                if isinstance(self.record, dict)
-                else self._config.form(obj=self.record)
-            )
-
-        self.form.mount(self, "form")
+        # form must be mounted in init to clean up files in temp
+        self.form
         super().__init__()
 
     @property
     def form(self) -> "Form":
+        if self.state.form is None:
+            self.state.form = (
+                self._config.form(data=self.record)
+                if isinstance(self.record, dict)
+                else self._config.form(obj=self.record)
+            )
+        if not self.state.form.is_mounted:
+            self.state.form.mount(self, "form")
         return self.state.form
 
     @form.setter
-    def form(self, form: "Form"):
+    def form(self, form: Optional["Form"]):
         self.state.form = form
 
     def hydrate(self):
         self.menu = self._config.menu.bind_to(self)
         return super().hydrate()
 
+    def on_submit_success(
+        self, submited_record: Optional[Union["Model", dict]]
+    ) -> Optional[bool]:
+        # super().on_submit_success(submited_record)
+        if self._config.redisplay_on_submit:
+            # repopulate form from database
+            self.state.form = None 
+        return self._config.redisplay_on_submit
+
     def on_cancel(self) -> Optional[bool]:
-        if self._config.on_cancel:
-            result = self._config.on_cancel(self)
-            if result is True:
-                self.form = (
-                    self._config.form(data=self.record)
-                    if isinstance(self.record, dict)
-                    else self._config.form(obj=self.record)
-                )
-                self.form.mount(self, "form")
-            return result
-        return None
+        # super().on_cancel()
+        if self._config.redisplay_on_cancel:
+            # repopulate form from database
+            self.state.form = None 
+        return self._config.redisplay_on_cancel

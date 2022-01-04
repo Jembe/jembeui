@@ -157,8 +157,7 @@ class FormBase(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
             self.cform.session.commit()
             return record
 
-    def cancel(self, record: Union["Model", dict]) -> Optional[bool]:
-        # TODO
+    def cancel(self, record: Union["Model", dict]):
         pass
 
     def set_disabled(self, *fields: "wtforms.Field"):
@@ -471,8 +470,7 @@ class Form(FormBase):
                         pass
         return super().mount(cform)  # type:ignore
 
-    def cancel(self, record: Union["Model", dict]) -> Optional[bool]:
-        state_changed = False
+    def cancel(self, record: Union["Model", dict]):
         for field in self:  # type:ignore
             if isinstance(field, FileField):
                 # if file field is changed before canceling form
@@ -487,9 +485,7 @@ class Form(FormBase):
                 ):
                     field.data.remove()
                     field.data = None
-                    state_changed = True
         super().cancel(record)  # type:ignore
-        return False if state_changed else None
 
     def submit(self, record: Union["Model", dict]) -> Optional[Union["Model", dict]]:
         for field in self:  # type:ignore
