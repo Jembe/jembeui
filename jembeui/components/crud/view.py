@@ -53,6 +53,7 @@ class CViewRecord(CFormBase):
                 form,
                 get_record=get_record,
                 db=db,
+                grab_focus_on_display=False,
                 title=title,
                 template=template,
                 components=components,

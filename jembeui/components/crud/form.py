@@ -39,6 +39,7 @@ class CFormBase(Component):
             get_record: Optional[
                 Callable[["jembeui.CFormBase"], Union["Model", dict]]
             ] = None,
+            grab_focus_on_display: bool = True,
             db: Optional["SQLAlchemy"] = None,
             title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
             template: Optional[Union[str, Iterable[str]]] = None,
@@ -52,6 +53,7 @@ class CFormBase(Component):
         ):
             self.form = form
             self.get_record = get_record
+            self.grab_focus_on_display = grab_focus_on_display
             # defult db can be useds when db is None
             if db is not None:
                 self.db: "SQLAlchemy" = db
@@ -277,6 +279,7 @@ class CForm(CFormBase):
             ] = None,
             redisplay_on_submit: bool = False,
             redisplay_on_cancel: bool = False,
+            grab_focus_on_display: bool=False,
             db: Optional["SQLAlchemy"] = None,
             title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
             template: Optional[Union[str, Iterable[str]]] = None,
@@ -299,6 +302,7 @@ class CForm(CFormBase):
             super().__init__(
                 form,
                 get_record=get_record,
+                grab_focus_on_display=grab_focus_on_display,
                 db=db,
                 title=title,
                 template=template,
@@ -342,12 +346,12 @@ class CForm(CFormBase):
         # super().on_submit_success(submited_record)
         if self._config.redisplay_on_submit:
             # repopulate form from database
-            self.state.form = None 
+            self.state.form = None
         return self._config.redisplay_on_submit
 
     def on_cancel(self) -> Optional[bool]:
         # super().on_cancel()
         if self._config.redisplay_on_cancel:
             # repopulate form from database
-            self.state.form = None 
+            self.state.form = None
         return self._config.redisplay_on_cancel

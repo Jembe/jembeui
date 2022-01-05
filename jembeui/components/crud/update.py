@@ -34,6 +34,7 @@ class CUpdateRecord(CForm):
             ] = None,
             redisplay_on_submit: bool = False,
             redisplay_on_cancel: bool = False,
+            grab_focus_on_display: bool = True,
             db: Optional["SQLAlchemy"] = None,
             title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
             template: Optional[Union[str, Iterable[str]]] = None,
@@ -58,6 +59,7 @@ class CUpdateRecord(CForm):
                 menu=menu,
                 redisplay_on_submit=redisplay_on_submit,
                 redisplay_on_cancel=redisplay_on_cancel,
+                grab_focus_on_display=grab_focus_on_display,
                 db=db,
                 title=title,
                 template=template,
@@ -98,7 +100,12 @@ class CUpdateRecord(CForm):
         self, submited_record: Optional[Union["Model", dict]]
     ) -> Optional[bool]:
         self.jui_push_notification("Saved sucessefuly", "success")
+        self.state.modified_fields = ()
         return super().on_submit_success(submited_record)
+
+    def on_cancel(self) -> Optional[bool]:
+        self.state.modified_fields = ()
+        return super().on_cancel()
 
     def on_invalid_form(self):
         self.jui_push_notification("Form is invalid", "warn")

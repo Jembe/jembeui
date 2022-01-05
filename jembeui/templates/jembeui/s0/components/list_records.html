@@ -5,15 +5,19 @@
     </div>
     {% endif %}
     <div class="list-records__toolbar">
+        {% if _config.search_filter is not none or _config.choice_filters %}
         <div class="list-records__toolbar__clear-filters">
             <button type="button" class="button button--ghost button--toolbar" jmb-on:click.prevent="search=''; choice_filters=null" title="Clear all filters">
                 <!-- This SVG Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. that You can obtain one at http://mozilla.org/MPL/2.0/. -->
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill="context-fill" d="M6.5 12a.5.5 0 0 0 .5-.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 0 .5.5zm2 0a.5.5 0 0 0 .5-.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 0 .5.5zm2 0a.5.5 0 0 0 .5-.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 0 .5.5z"></path><path fill="context-fill" d="M14 2h-3.05a2.5 2.5 0 0 0-4.9 0H3a1 1 0 0 0 0 2v9a3 3 0 0 0 3 3h5a3 3 0 0 0 3-3V4a1 1 0 0 0 0-2zM8.5 1a1.489 1.489 0 0 1 1.391 1H7.109A1.489 1.489 0 0 1 8.5 1zM12 13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4h7z"></path></svg>            
             </button>
         </div>
+        {% endif %}
+        {% if _config.search_filter is not none  %}
         <div class="list-records__toolbar__search">
             <input jmb-on:input="page=0;search=$self.value;" value="{{search}}" type="text" placeholder="Search..." class="input input--toolbar">
         </div>
+        {% endif %}
         <div class="list-records__toolbar__choice-filters">
             {% for filter_name, choice_filter in choice_filters_config.items() if not choice_filter.is_grouped  %}
             {% for choice in choice_filter.choices  %}
@@ -71,7 +75,7 @@
             </div>
             {% endif %}
         </div>
-        <nav class="list-records__toolbar__pagination">
+        <nav class="list-records__toolbar__pagination" {%if total_records == 0 %}style="visibility:hidden;"{%endif%}>
             <button type="button" class="button button--ghost button--toolbar" jmb-on:click="page = page - 1" {% if page == 0 %} disabled {% endif %}>
                 <!-- This SVG Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. that You can obtain one at http://mozilla.org/MPL/2.0/. -->
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill="context-fill" d="M6.414 8l4.293-4.293a1 1 0 0 0-1.414-1.414l-5 5a1 1 0 0 0 0 1.414l5 5a1 1 0 0 0 1.414-1.414z"></path></svg>
@@ -85,6 +89,9 @@
             </button>
         </nav>
     </div>
+    {% if not _config.fields and not records %}
+    <div class="list-records__nodata">No data found</div>  
+    {% else %}
     <table class="table">
         <thead class="table__head">
             <tr>
@@ -131,4 +138,5 @@
     {% endfor %}
         </tbody>
     </table>
+    {% endif %}
 </div>

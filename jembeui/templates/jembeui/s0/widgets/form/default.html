@@ -1,5 +1,5 @@
 <div class="form">
-{% set top = namespace(grab_focus = true, prev_field_ends_block=false, open_divs = 0) %}
+{% set top = namespace(grab_focus = _config.grab_focus_on_display, prev_field_ends_block=false, open_divs = 0) %}
 {% for field in form  %}
     {% set field_is_inline=form.RENDER_KW[field.name].get("_field", {}).get("_inline", False) %}
     {% set block=form.RENDER_KW[field.name].get("_block", {}) %}

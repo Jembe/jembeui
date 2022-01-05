@@ -66,6 +66,12 @@ class Link(ABC):
     def binded(self) -> bool:
         return self._binded_to is not None
 
+    @property
+    def binded_to(self) -> "jembe.Component":
+        if self._binded_to is None:
+            raise JembeUIError("Action link is not binded to component")
+        return self._binded_to
+
     def _chek_binded(self):
         if not self.binded:
             raise ValueError("Link must be binded to component!")

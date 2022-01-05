@@ -815,8 +815,8 @@ a.main-menu__sub-menu__title:hover {
     flex-shrink: 0;
     display: flex;
     align-items: center;
-    box-shadow: 0 0 0 1px var(--grey-30);
-    border-radius: 4px;
+    /* box-shadow: 0 0 0 1px var(--grey-30);
+    border-radius: 4px; */
 }
 .list-records__toolbar__pagination__text {
    font-size: 11px; 
@@ -826,6 +826,11 @@ a.main-menu__sub-menu__title:hover {
 .list-records__menu {
     margin-bottom: 8px;
 } 
+.list-records__nodata {
+    text-align: center;
+    color: var(--grey-40);
+    font-size: 13px;
+}
 /* Input */
 .input-label, .input-info {
     font: 400 0.8333rem 'Fira Sans';
@@ -1024,9 +1029,11 @@ a.main-menu__sub-menu__title:hover {
     justify-content: space-between;
 }
 .image-input__thumbnail {
-    border-radius: 2px;
+    border-radius: 8px;
     overflow: hidden;
-    border: solid 1px var(--grey-90-a20);
+    /* border: solid 1px var(--grey-90-a20); */
+    /* background-color: var(--grey-90-a05); */
+    background-color: var(--white-100);
 }
 .image-input__thumbnail img {
     width: 100%;
