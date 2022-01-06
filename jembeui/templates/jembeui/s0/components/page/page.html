@@ -17,6 +17,13 @@
     {% block page_head %}{% endblock page_head %}
 </head>
 <body>
+    <div class="page-layout__notifications">
+        <div class="page-layout__notifications--width">
+            <div class="page-layout__notifications--right">
+                {{component("_notifications")}}
+            </div>
+        </div>
+    </div>
     <div class="page-layout">
         <div class="page-layout__top">
             {{component("_update_indicator")}}
@@ -59,7 +66,6 @@
                     {% else %}
                     <div></div>
                     {% endif %}
-                    {{component("_notifications")}}
                 </div>
                 {% block page_content %}{% endblock page_content %}
             </div>

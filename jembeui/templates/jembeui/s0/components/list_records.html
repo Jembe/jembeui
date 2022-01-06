@@ -4,6 +4,7 @@
     {{menu.as_html('buttons')}} 
     </div>
     {% endif %}
+    {% if not ( total_records == 0 and _config.search_filter is none and not _config.choice_filters and _config.search_filter is none and choice_filters_config|length == 0) %}
     <div class="list-records__toolbar">
         {% if _config.search_filter is not none or _config.choice_filters %}
         <div class="list-records__toolbar__clear-filters">
@@ -75,7 +76,8 @@
             </div>
             {% endif %}
         </div>
-        <nav class="list-records__toolbar__pagination" {%if total_records == 0 %}style="visibility:hidden;"{%endif%}>
+        {# <nav class="list-records__toolbar__pagination" {%if total_records == 0 %}style="visibility:hidden;"{%endif%}> #}
+        <nav class="list-records__toolbar__pagination">
             <button type="button" class="button button--ghost button--toolbar" jmb-on:click="page = page - 1" {% if page == 0 %} disabled {% endif %}>
                 <!-- This SVG Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. that You can obtain one at http://mozilla.org/MPL/2.0/. -->
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill="context-fill" d="M6.414 8l4.293-4.293a1 1 0 0 0-1.414-1.414l-5 5a1 1 0 0 0 0 1.414l5 5a1 1 0 0 0 1.414-1.414z"></path></svg>
@@ -89,6 +91,7 @@
             </button>
         </nav>
     </div>
+    {% endif %}
     {% if not _config.fields and not records %}
     <div class="list-records__nodata">No data found</div>  
     {% else %}
