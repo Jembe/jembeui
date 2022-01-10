@@ -41,7 +41,7 @@ class Link(ABC):
         styling: Optional[Dict[str, Any]] = None,
     ):
         self.params: dict = dict()
-        self._binded_to: Optional["jembe.Component"] = None
+        self._component: Optional["jembe.Component"] = None
 
         self._active_for_pathnames: Optional[Tuple[str, ...]] = (
             tuple(active_for_pathnames) if active_for_pathnames is not None else None
@@ -59,18 +59,18 @@ class Link(ABC):
 
     def bind_to(self, component: "jembe.Component") -> "Link":
         blink = copy(self)
-        blink._binded_to = component
+        blink._component = component
         return blink
 
     @property
     def binded(self) -> bool:
-        return self._binded_to is not None
+        return self._component is not None
 
     @property
-    def binded_to(self) -> "jembe.Component":
-        if self._binded_to is None:
+    def component(self) -> "jembe.Component":
+        if self._component is None:
             raise JembeUIError("Action link is not binded to component")
-        return self._binded_to
+        return self._component
 
     def _chek_binded(self):
         if not self.binded:
@@ -411,11 +411,11 @@ class ActionLink(Link):
     def _component_reference(self) -> "jembe.ComponentReference":
         self._chek_binded()
         if isinstance(self._to, str):
-            return self._str_to_component_reference_lambda(self._to)(self._binded_to)
+            return self._str_to_component_reference_lambda(self._to)(self._component)
         elif isinstance(self._to, ComponentReference):
             return self._to
         else:
-            return self._to(self._binded_to)
+            return self._to(self._component)
 
     def _str_to_component_reference_lambda(
         self, to_str: str
