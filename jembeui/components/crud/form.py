@@ -171,9 +171,9 @@ class CFormBase(Component):
                 if submited_record is None:
                     submited_record_id = None
                 elif isinstance(submited_record, dict):
-                    submited_record_id = submited_record["id"]
+                    submited_record_id = submited_record.get("id", None)
                 else:
-                    submited_record_id = submited_record.id
+                    submited_record_id = getattr(submited_record, "id", None)
 
                 self.emit(
                     "submit",
@@ -215,9 +215,9 @@ class CFormBase(Component):
         if self.form.is_disabled:
             self.emit(
                 "cancel",
-                id=self.record["id"]
+                id=self.record.get("id", None)
                 if isinstance(self.record, dict)
-                else self.record.id,
+                else getattr(self.record, "id", None),
                 record=self.record,
             )
         # update and create
@@ -227,9 +227,9 @@ class CFormBase(Component):
             self.emit(
                 "cancel",
                 record=self.record,
-                record_id=self.record["id"]
+                record_id=self.record.get("id", None)
                 if isinstance(self.record, dict)
-                else self.record.id,
+                else getattr(self.record, "id", None),
             )
             return redisplay
         else:
@@ -279,7 +279,7 @@ class CForm(CFormBase):
             ] = None,
             redisplay_on_submit: bool = False,
             redisplay_on_cancel: bool = False,
-            grab_focus_on_display: bool=False,
+            grab_focus_on_display: bool = False,
             db: Optional["SQLAlchemy"] = None,
             title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
             template: Optional[Union[str, Iterable[str]]] = None,
