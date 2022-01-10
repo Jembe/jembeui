@@ -1,9 +1,10 @@
 from typing import TYPE_CHECKING, Callable, Dict, Iterable, Optional, Tuple, Union
-from jembe.component_config import listener
+from flask import current_app
+import jembe
+from jembe import listener
 from ..settings import settings
 from ..helpers import get_component_template_variants
 from ..exceptions import JembeUIError
-import jembe
 
 if TYPE_CHECKING:
     import jembe
@@ -145,8 +146,22 @@ class Component(jembe.Component):
 
     @listener(event="ac_update")
     def jui_on_ac_update(self, event: "jembe.Event"):
-        self.update_ac()
-        return False
+        avaiable = self.ac_check()
+        try:
+            self.update_ac()
+        except Exception:
+            self.ac_deny()
+            if current_app.debug or current_app.testing:
+                current_app.logger.warning(
+                    "Exception in {}.update_ac. Access to compomonent {} is denied.".format(
+                        self.__class__.__name__, self.exec_name
+                    )
+                )
+                import traceback
+
+                traceback.print_exc()
+
+        return avaiable != self.ac_check() and avaiable == False
 
     def update_ac(self):
         pass
