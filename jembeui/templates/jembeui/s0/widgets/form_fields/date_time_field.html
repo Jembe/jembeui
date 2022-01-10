@@ -17,7 +17,7 @@
             "form.{fname} = (new Date($self.value)).toISOString(); console.log(form);"
             + (" modified_fields.indexOf('{fname}') === -1 && modified_fields.push('{fname}');" if "modified_fields" in state else "")
         ).format(form_field.name) if is_not_disabled else none,
-        "jmb-on:keydown.enter.ctrl": "$self.blur();$self.focus();submit()" if is_not_disabled and "submit" in _config.component_actions else none,
+        "jmb-on:keydown.enter": "$self.blur();$self.focus();submit()" if is_not_disabled and "submit" in _config.component_actions else none,
         "value": form_field.data|datetimeformat,
     }
 )%}

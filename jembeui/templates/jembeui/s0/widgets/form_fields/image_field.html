@@ -20,7 +20,7 @@
             + (" modified_fields.indexOf('{fname}') === -1 && modified_fields.push('{fname}');" if "modified_fields" in state else "")
             + (" validate(true);" if "validate" in _config.component_actions else "")
         ).format(fname=form_field.name) if is_not_disabled else none,
-        "jmb-on:keydown.enter.ctrl": "$self.blur();$self.focus();submit();" if is_not_disabled and "submit" in _config.component_actions else none,
+        "jmb-on:keydown.enter": "$self.blur();$self.focus();submit();" if is_not_disabled and "submit" in _config.component_actions else none,
     }
 )%}
 <div {{form.attr_kw(render_kw._field|default({}, true))|xmlattr}} jmb-scope="{showEnlarged: false, imgUrl: ''}">

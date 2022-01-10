@@ -26,7 +26,12 @@ if TYPE_CHECKING:
 
 @dataclass
 class Menu:
-    items: Sequence[Union["jembeui.Link", "jembeui.Menu"]] = field(default_factory=list)
+    items: Union[
+        Sequence[Union["jembeui.Link", "jembeui.Menu"]],
+        Callable[["jembe.Component"], Sequence[Union["jembeui.Link", "jembeui.Menu"]]],
+    ] = field(
+        default_factory=list
+    )  # type:ignore
     title: Optional[Union[str, Callable[["jembeui.Menu"], str]]] = None
     description: Optional[Union[str, Callable[["jembeui.Menu"], str]]] = None
     icon: Optional[Union[str, Callable[["jembeui.Menu"], str]]] = None
@@ -53,7 +58,9 @@ class Menu:
             params=self.params,
         )
         binded_menu.id = self.id
-        binded_menu.items = [item.bind_to(component) for item in self.items]
+        binded_menu.items = [
+            item.bind_to(component) for item in self.get_items(component)
+        ]
         binded_menu.binded = True
         return binded_menu
 
@@ -61,7 +68,7 @@ class Menu:
     def is_accessible(self) -> bool:
         if not self.binded:
             raise ValueError("Menu must be binded to component!")
-        for item in self.items:
+        for item in self.get_items():
             if item.is_accessible:
                 return True
         return False
@@ -70,7 +77,7 @@ class Menu:
     def is_empty(self) -> bool:
         if not self.binded:
             raise ValueError("Menu must be binded to component!")
-        for item in self.items:
+        for item in self.get_items():
             if item.is_accessible:
                 return False
         return True
@@ -107,6 +114,21 @@ class Menu:
             template = self.template_variants[variant]
         context = {"menu": self}
         return Markup(render_template(template, **context))
+
+    def get_items(self, component: Optional["jembe.Component"] = None):
+        self._items: Sequence[Union["jembeui.Link", "jembeui.Menu"]]
+        if not component:
+            try:
+                return self._items
+            except AttributeError:
+                pass
+        if isinstance(self.items, (tuple, list)):
+            self._items = self.items
+        elif component:
+            self._items = self.items(component) # type:ignore
+        else:
+            raise JembeUIError("Cant get items of unbinded menu")
+        return self._items
 
     def get_title(self):
         if isinstance(self.title, str) or self.title is None:

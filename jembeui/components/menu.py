@@ -62,4 +62,3 @@ class CMenu(Component):
     def is_empty(self) -> bool:
         self.hydrate()
         return self.menu.is_empty
-

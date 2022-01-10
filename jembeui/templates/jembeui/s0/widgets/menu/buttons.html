@@ -1,5 +1,5 @@
 {% macro display_menu_items(menu, level) -%}
-    {% for mi in menu.items  %}
+    {% for mi in menu.get_items()  %}
         {% if mi.is_menu %}
             {{display_menu(mi, level+1)}}
         {% else %}

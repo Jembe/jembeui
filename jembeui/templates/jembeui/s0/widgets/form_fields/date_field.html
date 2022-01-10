@@ -26,7 +26,7 @@
             + (" validate();" if instant_validate  else "")
             + (" submit();" if instant_submit else "")
         ).format(fname=form_field.name) if is_not_disabled  and (instant_validate or instant_submit) else none,
-        "jmb-on:keydown.enter.ctrl": "$self.blur();$self.focus();submit()" if is_not_disabled if "submit" in _config.component_actions else none,
+        "jmb-on:keydown.enter": "$self.blur();$self.focus();submit()" if is_not_disabled if "submit" in _config.component_actions else none,
         "jmb-on:ready.once": (
             "if($self.__datepicker === undefined){{$self.__datepicker = new Datepicker($self, {{format:'{}', language:'{}', container:'#{}--datepicker'}})}}"
         ).format(jembeui_get_js_date_format('datepicker'), jembeui_get_locale_code('-'), field_id) if is_not_disabled else none,
