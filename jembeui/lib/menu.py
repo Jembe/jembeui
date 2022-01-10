@@ -9,6 +9,7 @@ from typing import (
     Any,
     ClassVar,
 )
+from jembe.component import component
 from markupsafe import Markup
 from functools import cached_property
 from dataclasses import dataclass, field
@@ -28,14 +29,14 @@ if TYPE_CHECKING:
 class Menu:
     items: Union[
         Sequence[Union["jembeui.Link", "jembeui.Menu"]],
-        Callable[["jembeui.Menu"], Sequence[Union["jembeui.Link", "jembeui.Menu"]]],
+        Callable[["jembe.Component"], Sequence[Union["jembeui.Link", "jembeui.Menu"]]],
     ] = field(
         default_factory=list
     )  # type:ignore
-    title: Optional[Union[str, Callable[["jembeui.Menu"], str]]] = None
-    description: Optional[Union[str, Callable[["jembeui.Menu"], str]]] = None
-    icon: Optional[Union[str, Callable[["jembeui.Menu"], str]]] = None
-    icon_html: Optional[Union[str, Callable[["jembeui.Menu"], str]]] = None
+    title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None
+    description: Optional[Union[str, Callable[["jembe.Component"], str]]] = None
+    icon: Optional[Union[str, Callable[["jembe.Component"], str]]] = None
+    icon_html: Optional[Union[str, Callable[["jembe.Component"], str]]] = None
     params: Dict[str, Any] = field(default_factory=dict)
     styling: Dict[str, Any] = field(default_factory=dict)
 
@@ -60,9 +61,8 @@ class Menu:
         )
         binded_menu.id = self.id
         binded_menu._component = component
-        binded_menu.items = self.items
         binded_menu.items = [
-            item.bind_to(component) for item in self._get_items(binded_menu)
+            item.bind_to(component) for item in self._get_items(component)
         ]
         return binded_menu
 
@@ -132,29 +132,29 @@ class Menu:
             raise JembeUIError("Cant get items from unbinded menu")
         return self.items
 
-    def _get_items(self, binded_menu: "jembeui.Menu"):
+    def _get_items(self, component: "jembe.Component"):
         if isinstance(self.items, (tuple, list)):
             self._items = self.items
         else:
-            self._items = self.items(binded_menu)  # type:ignore
+            self._items = self.items(component)  # type:ignore
         return self._items
 
     def get_title(self):
         if isinstance(self.title, str) or self.title is None:
             return self.title
-        return self.title(self)
+        return self.title(self.component)
 
     def get_description(self):
         if isinstance(self.description, str) or self.description is None:
             return self.description
-        return self.description(self)
+        return self.description(self.component)
 
     def get_icon(self):
         if isinstance(self.icon, str) or self.icon is None:
             return self.icon
-        return self.icon(self)
+        return self.icon(self.component)
 
     def get_icon_html(self):
         if isinstance(self.icon_html, str) or self.icon_html is None:
             return self.icon_html
-        return self.icon_html(self)
+        return self.icon_html(self.component)

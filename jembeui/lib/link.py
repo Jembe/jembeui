@@ -298,10 +298,10 @@ class ActionLink(Link):
             "jembe.ComponentReference",
             Callable[["jembe.Component"], "jembe.ComponentReference"],
         ],
-        title: Optional[Union[str, Callable[["jembeui.Link"], str]]] = None,
-        description: Optional[Union[str, Callable[["jembeui.Link"], str]]] = None,
-        icon: Optional[Union[str, Callable[["jembeui.Link"], str]]] = None,
-        icon_html: Optional[Union[str, Callable[["jembeui.Link"], str]]] = None,
+        title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
+        description: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
+        icon: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
+        icon_html: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
         styling: Optional[Dict[str, Any]] = None,
         active_for_pathnames: Optional[Sequence[str]] = None,
         active_for_exec_names: Optional[Sequence[str]] = None,
@@ -372,7 +372,7 @@ class ActionLink(Link):
             ):
                 return self._component_reference.action.title()
             return self._component_reference.component_instance.title
-        return self._title(self)
+        return self._title(self.component)
 
     @property
     def description(self) -> Optional[str]:
@@ -381,7 +381,7 @@ class ActionLink(Link):
         elif isinstance(self._description, str):
             return self._description
         self._chek_binded()
-        return self._description(self)
+        return self._description(self.component)
 
     @property
     def icon(self) -> Optional[str]:
@@ -391,7 +391,7 @@ class ActionLink(Link):
         elif isinstance(self._icon, str):
             return self._icon
         self._chek_binded()
-        return self._icon(self)
+        return self._icon(self.component)
 
     @property
     def icon_html(self) -> Optional[str]:
@@ -405,7 +405,7 @@ class ActionLink(Link):
         elif isinstance(self._icon_html, str):
             return self._icon_html
         self._chek_binded()
-        return self._icon_html(self)
+        return self._icon_html(self.component)
 
     @cached_property
     def _component_reference(self) -> "jembe.ComponentReference":
