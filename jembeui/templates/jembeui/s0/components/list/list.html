@@ -1,14 +1,18 @@
 <div>
-    {% if menu %}
+{% block menu -%}
+    {% if menu -%}
     <div class="list-records__menu">
     {{menu.as_html('buttons')}} 
     </div>
-    {% endif %}
-    {% if not ( total_records == 0 and _config.search_filter is none and not _config.choice_filters and _config.search_filter is none and choice_filters_config|length == 0) %}
+    {% endif -%}
+{%- endblock menu %}
+{% block toolbar -%}
+    
+    {% if not ( total_records == 0 and _config.search_filter is none and not _config.choice_filters and _config.search_filter is none and jui_choice_filters_config|length == 0) %}
     <div class="list-records__toolbar">
         {% if _config.search_filter is not none or _config.choice_filters %}
         <div class="list-records__toolbar__clear-filters">
-            <button type="button" class="button button--ghost button--toolbar" jmb-on:click.prevent="search=''; choice_filters=null" title="Clear all filters">
+            <button type="button" class="button button--ghost button--toolbar" jmb-on:click.prevent="search=''; choice_filters={}; order_by=null" title="Clear all filters">
                 <!-- This SVG Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. that You can obtain one at http://mozilla.org/MPL/2.0/. -->
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill="context-fill" d="M6.5 12a.5.5 0 0 0 .5-.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 0 .5.5zm2 0a.5.5 0 0 0 .5-.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 0 .5.5zm2 0a.5.5 0 0 0 .5-.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 0 .5.5z"></path><path fill="context-fill" d="M14 2h-3.05a2.5 2.5 0 0 0-4.9 0H3a1 1 0 0 0 0 2v9a3 3 0 0 0 3 3h5a3 3 0 0 0 3-3V4a1 1 0 0 0 0-2zM8.5 1a1.489 1.489 0 0 1 1.391 1H7.109A1.489 1.489 0 0 1 8.5 1zM12 13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4h7z"></path></svg>            
             </button>
@@ -20,7 +24,7 @@
         </div>
         {% endif %}
         <div class="list-records__toolbar__choice-filters">
-            {% for filter_name, choice_filter in choice_filters_config.items() if not choice_filter.is_grouped  %}
+            {% for filter_name, choice_filter in jui_choice_filters_config.items() if not choice_filter.is_grouped  %}
             {% for choice in choice_filter.choices  %}
             <label class="button button--micro button--switch button--switch--toolbar
                 {% if choice_filters and filter_name in choice_filters and choice.value_str in choice_filters[filter_name] %}
@@ -41,11 +45,11 @@
             </label> 
             {% endfor %} 
             {% endfor %}
-            {% if choice_filters_config.values()|selectattr('is_grouped')|list|length > 0 %}
+            {% if jui_choice_filters_config.values()|selectattr('is_grouped')|list|length > 0 %}
             <div class="list-records__toolbar__choice-filters-other" jmb-scope="{opened:false}" jmb-on:click.away="$scope().opened = false; ">
                 {% set ns = namespace(other_selected = false) %}
                 <div class="list-records__toolbar__choice-filters-other__dropdown" jmb-show="$scope().opened" jmb-cloak>
-                {% for filter_name, choice_filter in choice_filters_config.items() if choice_filter.is_grouped  %}
+                {% for filter_name, choice_filter in jui_choice_filters_config.items() if choice_filter.is_grouped  %}
                 {% for choice in choice_filter.choices  %}
                 <label class="button button--micro button--switch button--switch--toolbar
                     {% if choice_filters and filter_name in choice_filters and choice.value_str in choice_filters[filter_name] %}
@@ -76,6 +80,46 @@
             </div>
             {% endif %}
         </div>
+        {% block toolbar__order_by %}
+        {% if _config.order_by %}
+        <div class="list-records__toolbar__order-by">
+            <div class="list-records__toolbar__order-by-list" jmb-scope="{opened:false}" jmb-on:click.away="$scope().opened = false; ">
+                {% set ns = namespace(ordered = false) %}
+                <div class="list-records__toolbar__order-by-list__dropdown" jmb-show="$scope().opened" jmb-cloak>
+                {% for order_name, order_title in _config.order_by.items()  %}
+                <label class="button button--micro button--switch button--switch--toolbar
+                    {% if order_by == order_name %}
+                    button--switch--on
+                    {% set ns.ordered = true %}
+                    {% endif %}">
+                    <input type="checkbox" jmb-on:change="order_by= '{{order_name if order_by != order_name else '' }}'"
+                        value="{{order_name}}"
+                        {% if order_by == order_name %} checked {% endif %} >
+                    {{order_title}}
+                </label> 
+                <label class="button button--micro button--switch button--switch--toolbar
+                    {% if order_by == '-' + order_name %}
+                    button--switch--on
+                    {% set ns.ordered = true %}
+                    {% endif %}">
+                    <input type="checkbox" jmb-on:change="order_by= '{{ '-' +order_name if order_by != '-' + order_name else '' }}'"
+                        value="-{{order_name}}"
+                        {% if order_by == '-' + order_name %} checked {% endif %} >
+                    {{order_title}} desc
+                </label> 
+                {% endfor %}
+                </div>
+                <button type="button" class="list-records__toolbar__order-by-list__button button button--micro button--select--toolbar {%if ns.ordered%}button--select--toolbar--on{% endif %}" jmb-on:click.prevent="$scope().opened = !$scope().opened; " title="Sort result">
+                    Sort
+                    <!-- This Source Code Form is subject to the terms of the Mozilla Public
+                    - License, v. 2.0. If a copy of the MPL was not distributed with this
+                    - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="context-fill"><path d="M11 7H5a1 1 0 0 0 0 2h6a1 1 0 0 0 0-2zm-3 4H5a1 1 0 0 0 0 2h3a1 1 0 0 0 0-2zm6-8H5a1 1 0 0 0 0 2h9a1 1 0 0 0 0-2zM2 3a1 1 0 1 0 1 1 1 1 0 0 0-1-1zm0 4a1 1 0 1 0 1 1 1 1 0 0 0-1-1zm0 4a1 1 0 1 0 1 1 1 1 0 0 0-1-1z"></path></svg>
+                </button>
+            </div>
+        </div>
+        {% endif %}
+        {% endblock toolbar__order_by %}
         {# <nav class="list-records__toolbar__pagination" {%if total_records == 0 %}style="visibility:hidden;"{%endif%}> #}
         <nav class="list-records__toolbar__pagination">
             <button type="button" class="button button--ghost button--toolbar" jmb-on:click="page = page - 1" {% if page == 0 %} disabled {% endif %}>
@@ -92,54 +136,7 @@
         </nav>
     </div>
     {% endif %}
-    {% if not _config.fields and not records %}
-    <div class="list-records__nodata">No data found</div>  
-    {% else %}
-    <table class="table">
-        <thead class="table__head">
-            <tr>
-                {% for field_name,field_title in _config.fields.items() %}
-                {% if field_name in _config.field_order_by %}
-                    {% if order_by == field_name %}
-                    <th class="table__head__th--selected">
-                        <a href="" class="table__head__order-link" jmb-on:click.prevent="order_by='-{{field_name}}'; page=0"> {{field_title|capitalize}}<span>&#9650;</span></a>
-                    </th>
-                    {% elif order_by == "-" + field_name %}
-                    <th class="table__head__th--selected">
-                        <a href="" class="table__head__order-link" jmb-on:click.prevent="order_by=null; page=0">{{field_title|capitalize}}<span>&#9660;</span></a>
-                    </th>
-                    {% else %}
-                    <th>
-                        <a href="" class="table__head__order-link" jmb-on:click.prevent="order_by='{{field_name}}'; page=0">{{field_title|capitalize}}</a>
-                    </th>
-                    {% endif %}
-                {% else %}
-                <th>
-                    {{field_title|capitalize}}
-                </th>
-                {% endif %}
-                {% endfor %}
-                {% if _config.record_menu %}
-                <th><span class="table__head__order-link">Actions</span></th>
-                {% endif %}
-            </tr>
-        </thead>
-        <tbody>
-    {% for record in records  %}
-        <tr class="table__body__row {{loop.cycle('table__body__row--even','table__body__row--odd')}}">
-            {% for field_name in _config.fields.keys() %}
-            <td>
-                {{field_values[field_name](record, field_name)|default("", True)}}
-            </td>
-            {% endfor %}
-            {% if _config.record_menu %}
-            <td>
-            {{get_record_menu(record).as_html('links')}}
-            </td> 
-            {% endif %}
-        </tr>
-    {% endfor %}
-        </tbody>
-    </table>
-    {% endif %}
+{%- endblock toolbar %}
+{% block content -%}
+{% endblock content %}
 </div>

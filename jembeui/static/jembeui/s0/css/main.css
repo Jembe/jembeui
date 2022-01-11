@@ -806,17 +806,20 @@ a.main-menu__sub-menu__title:hover {
     flex-grow: 1;
     flex-basis: 0;
 }
-.list-records__toolbar__choice-filters {
+.list-records__toolbar__choice-filters,
+.list-records__toolbar__order-by {
     flex-shrink: 0;
     display: flex;
     align-items: center;
     flex-direction: row;
     gap: 4px;
 }
-.list-records__toolbar__choice-filters-other {
+.list-records__toolbar__choice-filters-other,
+.list-records__toolbar__order-by-list {
     position: relative;
 }
-.list-records__toolbar__choice-filters-other__dropdown {
+.list-records__toolbar__choice-filters-other__dropdown,
+.list-records__toolbar__order-by-list__dropdown {
     z-index: 900;
     position: absolute;
     top: 100%;
@@ -829,7 +832,8 @@ a.main-menu__sub-menu__title:hover {
     border: solid 1px var(--grey-90-a20);
     box-shadow: 0 4px 16px var(--grey-90-a10);
 }
-.list-records__toolbar__choice-filters-other__button {
+.list-records__toolbar__choice-filters-other__button,
+.list-records__toolbar__order-by-list__button {
     z-index: 900;
     position:relative;
     top: 0;
