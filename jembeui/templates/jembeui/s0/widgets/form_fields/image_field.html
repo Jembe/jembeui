@@ -53,10 +53,15 @@
             </div>
         </div>
     </div>
-    <div class="image-input" >
-        <div class="image-input__thumbnail" style="height: {{form_field.thumbnail_size[1]}}px;">
+    <div class="image-input {{"input--error" if form_field.errors else ""}}" >
+        <div class="image-input__thumbnail" style="height: {{form_field.thumbnail_size[1]}}px; {%if is_not_disabled and not form_field.data%} display:flex; justify-content:center; align-items:center;{%endif%}">
             {% if form_field.data %}
             <img src="{{form_field.thumbnail().url}}" alt="{{form_field.data.basename}} thumbnail" style="max-height: {{form_field.thumbnail_size[1]}}px;">
+            {% elif is_not_disabled %}
+                <label for="{{field_id}}" class="button button--like button--ghost" style="width:64px; height:64px; padding:18px;margin:auto; color: var(--grey-40)" title="Upload image">
+                    <!-- The Source Code of followint svg is subject to the terms of the Mozilla Public License, v. 2.0. You can obtain MPL at http://mozilla.org/MPL/2.0/. -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 16 16" style="width: 32px; height:32px"><path fill="context-fill" d="M14 3h-2v2h2v8H2V5h7V3h-.849L6.584 1.538A2 2 0 0 0 5.219 1H2a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zM2 3h3.219l1.072 1H2z"></path><path fill="context-fill" d="M8.146 6.146a.5.5 0 0 0 0 .707l2 2a.5.5 0 0 0 .707 0l2-2a.5.5 0 1 0-.707-.707L11 7.293V.5a.5.5 0 0 0-1 0v6.793L8.854 6.146a.5.5 0 0 0-.708 0z"></path></svg>
+                </label>
             {% endif %}
         </div>
         {% if form_field.data %}

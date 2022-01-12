@@ -9,9 +9,10 @@ from typing import (
     Tuple,
     Any,
 )
-from jembe import NotFound, listener, action
-from flask_sqlalchemy import Model
 import sqlalchemy as sa
+from flask_sqlalchemy import Model
+from flask import current_app
+from jembe import NotFound, listener, action
 
 from ..component import Component
 from ...helpers import get_jembeui
@@ -183,6 +184,10 @@ class CFormBase(Component):
                 return self.on_submit_success(submited_record)
             except Exception as error:
                 self.on_submit_exception(error)
+                if current_app.debug or current_app.testing:
+                    import traceback
+
+                    traceback.print_exc()
         else:
             self.on_invalid_form()
         if not isinstance(self.record, dict):

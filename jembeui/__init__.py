@@ -6,6 +6,7 @@ import flask_babel
 from flask_babel import get_locale
 
 from .exceptions import JembeUIError
+from .sqlalchemy import SaFile
 from .lib import (
     Link,
     ActionLink,
@@ -50,6 +51,7 @@ __all__ = (
     "BreadcrumbList",
     "FormBase",
     "Form",
+    "SaFile",
     "FileField",
     "ImageField",
     "SelectMultipleField",

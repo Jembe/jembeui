@@ -192,6 +192,15 @@ a:focus-visible {
     margin: auto;
     margin-top: 10vh;
 }
+.modal__dialog--fullscreen {
+    inset: 0;
+    position: absolute;
+    margin: 0;
+    width: unset;
+    max-width: unset;
+    display: flex;
+    flex-direction: column;
+}
 .modal__dialog__head {
     background-color: var(--grey-20);
     display: flex;
@@ -215,6 +224,10 @@ a:focus-visible {
 }
 .modal__dialog__content {
     padding: 16px;
+}
+.modal__dialog--fullscreen .modal__dialog__content {
+    flex-grow: 1;
+    overflow-y: auto;
 }
 .modal__dialog__footer {
     padding: 16px;
@@ -438,7 +451,7 @@ a:focus-visible {
 .page-layout__notifications {
     position: absolute;
     inset: 0;
-    z-index: 10000000;
+    z-index: 100000;
     pointer-events: none;
 }
 .page-layout__notifications--width {
@@ -446,6 +459,7 @@ a:focus-visible {
     margin: auto;
     display: flex;
     flex-direction: row-reverse;
+    box-sizing: border-box;
     height: 100%;
     padding-top: 52px;
 }

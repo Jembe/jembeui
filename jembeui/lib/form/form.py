@@ -476,9 +476,9 @@ class Form(FormBase):
                 # if file field is changed before canceling form
                 # remove new file from server
                 record_field = (
-                    record[field.name]
+                    record.get(field.name,None)
                     if isinstance(record, dict)
-                    else getattr(record, field.name)
+                    else getattr(record, field.name, None)
                 )
                 if field.data and (
                     field.data.in_temp_storage() or field.data != record_field
