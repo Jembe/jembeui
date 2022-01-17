@@ -11,7 +11,7 @@ from typing import (
     Any,
 )
 from collections import namedtuple
-from functools import partial, cached_property
+from functools import cached_property
 from math import ceil
 import sqlalchemy as sa
 from jembe import action
@@ -265,8 +265,8 @@ class CList(Component):
         if len(self.state.choice_filters[filter_name]) == 0:
             del self.state.choice_filters[filter_name]
 
-        if len(self.state.choice_filters) == 0:
-            self.state.choice_filters = None
+        # if len(self.state.choice_filters) == 0:
+        #     self.state.choice_filters = None
 
         self.state.page = 0
 

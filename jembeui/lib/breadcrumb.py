@@ -262,6 +262,8 @@ class Breadcrumb:
         if menu is None:
             return BreadcrumbList()
         menu_source: "Menu" = Menu(menu) if not isinstance(menu, Menu) else menu
+        if not isinstance(menu_source.items, (tuple, list)):
+            return BreadcrumbList()
         if not first_home:
             return cls._from_menu_item(menu_source)
         else:

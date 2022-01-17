@@ -192,6 +192,11 @@ a:focus-visible {
     margin: auto;
     margin-top: 10vh;
 }
+.modal__dialog--wide {
+    max-width: 90%;
+    width: 1024px;
+    min-width: 350px;
+}
 .modal__dialog--fullscreen {
     inset: 0;
     position: absolute;

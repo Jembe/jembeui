@@ -38,6 +38,8 @@ class FormBase(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
     - CForm should call Form methods submit and cancel when user executes those
       actions on CForm
     """
+    # TODO
+    # __template__
 
     TEMPLATE_VARIANTS: dict
     TEMPLATE_VARIANTS_CACHE: dict
@@ -64,6 +66,26 @@ class FormBase(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
         super().__init__(
             formdata=formdata, obj=obj, prefix=prefix, data=data, meta=meta, **kwargs
         )
+        # copy class var RENDER_KW to instance var RENDER_KW
+        if "RENDER_KW" not in self.__class__.__dict__:
+            self.__class__.RENDER_KW = dict()
+            for field in self:
+                self.RENDER_KW[field.name] = {}
+                if field.render_kw:
+                    self.RENDER_KW[field.name] = field.render_kw.copy()
+                    field.render_kw = {
+                        k: v
+                        for k, v in field.render_kw.items()
+                        if not k.endswith("+") and not k.startswith("_")
+                    }
+
+        # to change render_kw dynamicaly by subclasses we must
+        # oweride render_kw of every field instance with fresh copy
+        # otherwise changes to render_kw will be permanent
+        for field in self:
+            setattr(
+                field, "render_kw", field.render_kw.copy() if field.render_kw else {}
+            )
 
     @classmethod
     def dump_init_param(cls, value: Any) -> Any:
@@ -122,27 +144,22 @@ class FormBase(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
                 )
             )
         if not self.is_mounted:
-            # copy class var RENDER_KW to instance var RENDER_KW
             self.cform = cform
-            if "RENDER_KW" not in self.__class__.__dict__:
-                self.__class__.RENDER_KW = dict()
-                for field in self:
-                    self.RENDER_KW[field.name] = {}
-                    if field.render_kw:
-                        self.RENDER_KW[field.name] = field.render_kw.copy()
-                        field.render_kw = {
-                            k: v
-                            for k, v in field.render_kw.items()
-                            if not k.endswith("+") and not k.startswith("_")
-                        }
 
             # if field is Jembe UI Field call jembe ui mount
             # to associate form and form compoennt to field instance
             for field in self:
                 if isinstance(field, JUIFieldMixin):
                     field.jui_mount(self)
+
+            self.init()
             self.is_mounted = True
         return self
+
+    def init(self):
+        """Called only once when form instance is mounted/ready to be displayed/validated
+        Place to alter form behavior"""
+        pass
 
     def submit(self, record: Union["Model", dict]) -> Optional[Union["Model", dict]]:
         if isinstance(record, dict):
@@ -415,8 +432,6 @@ class FormBase(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
     def _field_setdefault(
         self, field: "wtforms.Field", param_name: str, value: Any
     ) -> Any:
-        if field.render_kw is None:
-            field.render_kw = dict()
         return field.render_kw.setdefault(param_name, value)
 
 
@@ -476,7 +491,7 @@ class Form(FormBase):
                 # if file field is changed before canceling form
                 # remove new file from server
                 record_field = (
-                    record.get(field.name,None)
+                    record.get(field.name, None)
                     if isinstance(record, dict)
                     else getattr(record, field.name, None)
                 )
