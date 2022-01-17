@@ -442,13 +442,13 @@ class Form(FormBase):
     Olso adds instant validate and submit switches
     """
 
-    # If INASTANT_VALIDATE is True, validate action will be called
+    # If __instant_validate__ is True, validate action will be called
     # after field value is changed by user
-    INSTANT_VALIDATE: bool = False
-    # If INASTANT_SUBMIT is True, submit action will be called
+    __instant_validate__: bool = False
+    # If __instant_submit__ is True, submit action will be called
     # after field value is changed by user
-    INSTANT_SUBMIT: bool = False
-    # INSTANT_VALIDATE and INSTANT_SUBMIT functionality should be implemnted by
+    __instant_submit__: bool = False
+    # __instant_validate__ and __instant_submit__ functionality should be implemnted by
     # field templates
 
     def mount(

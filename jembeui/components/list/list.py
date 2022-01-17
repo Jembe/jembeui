@@ -1,3 +1,4 @@
+from tkinter import W
 from typing import (
     TYPE_CHECKING,
     List,
@@ -292,7 +293,10 @@ class CList(Component):
         cleaned_choice_filters = dict()
         if self.state.choice_filters:
             for name in self.state.choice_filters.keys():
-                if name in self.jui_choice_filters_config.keys():
+                if (
+                    name in self.jui_choice_filters_config.keys()
+                    and self.state.choice_filters[name]
+                ):
                     cf = self.jui_choice_filters_config[name]
                     str_value = self.state.choice_filters[name]
                     self.records = cf.expr(self.records, cf.map_values(str_value))
