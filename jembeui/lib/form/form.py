@@ -39,7 +39,8 @@ class FormBase(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
       actions on CForm
     """
     # TODO
-    # __template__
+    # __template__: str full path name of template
+    # __template__ = Form.template_variant("inline")
 
     TEMPLATE_VARIANTS: dict
     TEMPLATE_VARIANTS_CACHE: dict
