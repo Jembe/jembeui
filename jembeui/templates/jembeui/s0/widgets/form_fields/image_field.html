@@ -122,6 +122,7 @@
         {% endif %}
         {% if form_field.data and form_field.enable_image_edit %}
         <div jmb-show="$scope().showEdit" jmb-cloak class="image-input__edit">
+            <div id="{{field_id}}-editor" class="image-input__edit__editor"></div>
             <div class="buttons-menu buttons-menu--modal">
                 <button jmb-on:click="
                     juiSaveTuiImage($scope().editor).then(function(files){
@@ -134,7 +135,6 @@
                     })" type="button" class="button button--primary">Apply</button>
                 <button jmb-on:click="$scope().editor.destroy(); $scope().showEdit=false;" type="button" class="button button--grey">Cancel</button>
             </div>
-            <div id="{{field_id}}-editor" class="image-input__edit__editor"></div>
         </div>
         {% endif %}
         {{form_field(**form.attr_kw(render_kw))}}
