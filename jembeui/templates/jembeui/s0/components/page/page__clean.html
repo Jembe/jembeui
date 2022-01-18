@@ -8,6 +8,11 @@
     {{component("_title")}}
     {# seo tag + description #}
     <link rel="stylesheet" href="{{url_for('jembeui.static', filename='jembeui/s0/css/main.css')}}">
+    <link rel="stylesheet" href="https://code.cdn.mozilla.net/fonts/fira.css">
+    <link rel="stylesheet" href="{{url_for('jembeui.static', filename='jembeui/s0/css/datepicker.css')}}">
+    {% if _config.enable_image_edit_support -%}
+    <link rel="stylesheet" href="{{url_for('jembeui.static', filename='jembeui/s0/tui/tui-image-editor.min.css')}}">
+    {%- endif %}
 </head>
 <body>
     {{component("_update_indicator")}}
@@ -29,7 +34,10 @@
     </script> 
     <script src="{{url_for('jembeui.static', filename='jembeui/s0/js/datepicker-full.min.js')}}"></script>
     <script src="{{url_for('jembeui.static', filename='jembeui/s0/js/i18n.js')}}"></script>
-    <script src="{{url_for('jembeui.static', filename='jembeui/s0/js/screenshot.js')}}"></script>
+    <script src="{{url_for('jembeui.static', filename='jembeui/s0/js/image-field.js')}}"></script>
+    {% if _config.enable_image_edit_support -%}
+    <script src="{{url_for('jembeui.static', filename='jembeui/s0/tui/tui-image-editor.min.js')}}"></script>
+    {%- endif %}
     {% with locale_code = jembeui_get_locale_code('-') %}
     {% if locale_code != 'en' %}
     <script src="{{url_for('jembeui.static', filename='jembeui/s0/js/datepicker-locales/{}.js'.format(locale_code))}}"></script>

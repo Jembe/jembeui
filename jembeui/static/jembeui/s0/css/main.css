@@ -1113,6 +1113,31 @@ a.main-menu__sub-menu__title:hover {
 .image-input__enlarged .button--close:hover{
     color: var(--white-100);
 }
+.image-input__edit {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    z-index: 2000;
+    background-color: var(--grey-90-a90);
+}
+
+.image-input__edit > .buttons-menu {
+    padding: 4px;
+}
+.button--grey{
+    background-color: var(--grey-10-a80);
+}
+.button--grey:hover:not([disabled]){
+    background-color: var(--grey-20);
+}
+.image-input__edit__editor {
+    background-color: red;
+    flex-grow: 1;
+}
 .form-field--boolean {
     margin-top: 22px;
 }

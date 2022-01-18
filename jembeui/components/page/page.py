@@ -42,6 +42,7 @@ class CPage(Component):
             breadcrumbs: Optional[
                 Union["jembeui.Breadcrumb", Sequence["jembeui.Breadcrumb"]]
             ] = None,
+            enable_image_edit_support: bool = False,
             title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
             template: Optional[Union[str, Iterable[str]]] = None,
             components: Optional[Dict[str, "jembe.ComponentRef"]] = None,
@@ -92,6 +93,9 @@ class CPage(Component):
                     CBreadcrumb,
                     CBreadcrumb.Config(breadcrumbs=breadcrumbs),
                 )
+
+            # flags for css and js imports
+            self.enable_image_edit_support = enable_image_edit_support
             super().__init__(
                 title=title,
                 template=template,

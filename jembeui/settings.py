@@ -59,4 +59,5 @@ class Settings:
     def supported_locales(self):
         return current_app.config.get("JEMBEUI_SUPPORTED_LOCALES", [])
 
+
 settings = Settings()
