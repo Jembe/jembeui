@@ -88,24 +88,14 @@
                 <div class="list-records__toolbar__order-by-list__dropdown" jmb-show="$scope().opened" jmb-cloak>
                 {% for order_name, order_title in _config.order_by.items()  %}
                 <label class="button button--micro button--switch button--switch--toolbar
-                    {% if order_by == order_name %}
+                    {% if order_by == order_name  or order_by == '-' + order_name %}
                     button--switch--on
                     {% set ns.ordered = true %}
                     {% endif %}">
-                    <input type="checkbox" jmb-on:change="order_by= '{{order_name if order_by != order_name else '' }}'"
+                    <input type="checkbox" jmb-on:change="order_by= '{% if not order_by %}{{order_name}}{%elif order_by == order_name %}-{{order_name}}{% else %}{% endif %}'"
                         value="{{order_name}}"
-                        {% if order_by == order_name %} checked {% endif %} >
-                    {{order_title}}
-                </label> 
-                <label class="button button--micro button--switch button--switch--toolbar
-                    {% if order_by == '-' + order_name %}
-                    button--switch--on
-                    {% set ns.ordered = true %}
-                    {% endif %}">
-                    <input type="checkbox" jmb-on:change="order_by= '{{ '-' +order_name if order_by != '-' + order_name else '' }}'"
-                        value="-{{order_name}}"
-                        {% if order_by == '-' + order_name %} checked {% endif %} >
-                    {{order_title}} desc
+                        {% if order_by == order_name or order_by == '-' + order_name %} checked {% endif %} >
+                     {{order_title}} {% if order_by == '-' + order_name %}-{% endif %}
                 </label> 
                 {% endfor %}
                 </div>

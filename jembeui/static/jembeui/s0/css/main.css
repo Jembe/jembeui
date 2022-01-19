@@ -1080,10 +1080,12 @@ a.main-menu__sub-menu__title:hover {
     /* border: solid 1px var(--grey-90-a20); */
     /* background-color: var(--grey-90-a05); */
     background-color: var(--white-100);
+    display: flex;
 }
 .image-input__thumbnail img {
-    width: 100%;
+    /* width: 100%; */
     object-fit: contain;
+    margin:auto;
 }
 .image-input__enlarged {
     position: fixed;
