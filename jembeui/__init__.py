@@ -35,7 +35,7 @@ from .components import (
     CViewRecord,
     CDeleteRecord,
 )
-from .helpers import convert_py_date_format_to_js, camel_to_snake
+from .helpers import convert_py_date_format_to_js, camel_to_snake, create_thumbnail
 
 if TYPE_CHECKING:
     from flask_sqlalchemy import SQLAlchemy
@@ -68,6 +68,7 @@ __all__ = (
     "CCreateRecord",
     "CViewRecord",
     "CDeleteRecord",
+    "create_thumbnail"
 )
 
 

@@ -2,6 +2,7 @@ from typing import Optional, Tuple
 from jembe import File
 from .file import FileField
 from PIL import Image, ImageOps
+from ...helpers import create_thumbnail
 
 
 __all__ = ("ImageField",)
@@ -49,23 +50,5 @@ class ImageField(FileField):
     def thumbnail(self, size: Optional[Tuple[int, int]] = None) -> Optional["File"]:
         thumbnail_size = size if size else self.thumbnail_size
         if self.data:
-            thumb = self.data.get_cache_version(
-                "thumbnail_{}_{}.jpg".format(*thumbnail_size)
-            )
-            if not thumb.exists():
-                try:
-                    with Image.open(self.data.open(mode="rb")) as img:
-                        img.verify()
-                except Exception:
-                    return None
-                with Image.open(self.data.open(mode="rb")) as img:
-                    if img.mode != "RGB":
-                        img = img.convert("RGB")
-                    img = ImageOps.exif_transpose(img)
-                    img.thumbnail(thumbnail_size, Image.BICUBIC)
-                    with thumb.open("wb") as tfo:
-                        img.save(tfo, "JPEG")
-                        return thumb
-            else:
-                return thumb
+            return create_thumbnail(self.data, thumbnail_size)
         return None

@@ -1137,7 +1137,6 @@ a.main-menu__sub-menu__title:hover {
     background-color: var(--grey-20);
 }
 .image-input__edit__editor {
-    background-color: red;
     flex-grow: 1;
 }
 .form-field--boolean {

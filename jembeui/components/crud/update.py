@@ -99,7 +99,9 @@ class CUpdateRecord(CForm):
     def on_submit_success(
         self, submited_record: Optional[Union["Model", dict]]
     ) -> Optional[bool]:
-        self.jui_push_notification("Saved sucessefuly", "success")
+        self.jui_push_notification(
+            "Saved '{}' sucessefuly".format(self.title), "success"
+        )
         self.state.modified_fields = ()
         return super().on_submit_success(submited_record)
 

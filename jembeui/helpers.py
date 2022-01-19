@@ -1,11 +1,13 @@
-from typing import TYPE_CHECKING, List, Dict
+from typing import TYPE_CHECKING, List, Dict, Optional, Tuple
 import re
+from PIL import Image, ImageOps
 from flask import current_app
 from jembe import get_jembe
 from .exceptions import JembeUIError
 from .settings import settings
 
 if TYPE_CHECKING:
+    import jembe
     from jembeui import JembeUI
 
 __all__ = (
@@ -14,6 +16,7 @@ __all__ = (
     "get_component_template_variants",
     "camel_to_snake",
     "convert_py_date_format_to_js",
+    "create_thumbnail",
 )
 
 
@@ -70,8 +73,8 @@ def camel_to_snake(name: str) -> str:
 
 
 BABEL_DATETIME_FORMAT_TO_DATEPICKER_JS = {
-    "dd":"dd",
-    "d":"d",
+    "dd": "dd",
+    "d": "d",
     "EEEE": "DD",
     "EEE": "D",
     "MMMM": "MM",
@@ -82,7 +85,7 @@ BABEL_DATETIME_FORMAT_TO_DATEPICKER_JS = {
 }
 
 
-def convert_py_date_format_to_js(format_str, usefor:str="datepicker"):
+def convert_py_date_format_to_js(format_str, usefor: str = "datepicker"):
     """
     * Description: Convert a python format string to javascript format string
     * Example:     "%m/%d/%Y" to "MM/DD/YYYY"
@@ -90,9 +93,31 @@ def convert_py_date_format_to_js(format_str, usefor:str="datepicker"):
     * @return: the javascript format string
     */
     """
-    wordbook =  {}
+    wordbook = {}
     if usefor == "datepicker":
         wordbook = BABEL_DATETIME_FORMAT_TO_DATEPICKER_JS
     for key in wordbook.keys():
         format_str = wordbook[key].join(format_str.split(key))
     return format_str
+
+
+def create_thumbnail(
+    image: "jembe.File", thumbnail_size: Tuple[int, int]
+) -> "jembe.File":
+    thumb = image.get_cache_version("thumbnail_{}_{}.jpg".format(*thumbnail_size))
+    if not thumb.exists():
+        try:
+            with Image.open(image.open(mode="rb")) as img:
+                img.verify()
+        except Exception:
+            return None
+        with Image.open(image.open(mode="rb")) as img:
+            if img.mode != "RGB":
+                img = img.convert("RGB")
+            img = ImageOps.exif_transpose(img)
+            img.thumbnail(thumbnail_size, Image.BICUBIC)
+            with thumb.open("wb") as tfo:
+                img.save(tfo, "JPEG")
+                return thumb
+    else:
+        return thumb
