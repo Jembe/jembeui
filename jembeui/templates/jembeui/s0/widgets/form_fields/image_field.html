@@ -45,7 +45,7 @@
                 </button>
                 {% endif %}
                 {% endif %}
-                {% if form_field.data and form_field.enable_image_edit %}
+                {% if is_not_disabled and form_field.data and form_field.enable_image_edit %}
                 <button jmb-on:click="
                     $scope().showEdit = true;
                     $scope().editor = new tui.ImageEditor(
