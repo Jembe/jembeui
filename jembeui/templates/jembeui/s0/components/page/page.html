@@ -29,7 +29,7 @@
         <div class="h-1 bg-grey-50">
             {{component("page_update_indicator")}}
         </div>
-        <div class="flex-grow grid grid-cols-1 grid-rows-[auto_auto_auto_1fr] sm:grid-cols-[minmax(100px,_25%)_minmax(0,1fr)] sm:grid-rows-[_auto_1fr] gap-y-1"
+        <div class="flex-grow grid grid-cols-1 grid-rows-[auto_auto_auto_1fr] sm:grid-cols-[minmax(100px,_25%)_minmax(0,1fr)] sm:grid-rows-[_auto_1fr]"
             jmb-bind:class="{'grid-rows-[auto_1fr]': ! $local.mainMenuOpen}">
             {# Title and open menu button #}
             <div class="flex items-center gap-1 pl-1 border-b border-b-grey-300 sm:pr-4">
@@ -50,7 +50,7 @@
 
             {# Main menu #}
             {% if "page_main_menu" in _config.components and not component("page_main_menu").component_instance.is_empty() %}
-            <div jmb-cloak jmb-bind:class="{'hidden': ! $local.mainMenuOpen}" class="sm:row-start-2 sm:px-2 sm:border-r sm:border-r-grey-300">
+            <div jmb-cloak jmb-bind:class="{'hidden': ! $local.mainMenuOpen}" class="sm:row-start-2 sm:border-r sm:border-r-grey-200">
             {% block main_menu -%}
                 {{component("page_main_menu")}}
             {%- endblock main_menu %}

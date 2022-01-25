@@ -4,7 +4,7 @@
 {% macro display_system_menu(menu) %}
     <div jmb-scope="{opened:null, active:null, timeout:null}"
             jmb-on:jembe-update-page.camel.window="$scope().active = null;"
-            class="flex flex-col gap-2 py-4 pl-4 pr-2 bg-white border-b border-grey-300 sm:bg-transparent sm:border-none sm:flex-row sm:items-center sm:justify-end sm:h-full sm:gap-2 sm:py-0 sm:pr-2 sm:px-0">
+            class="flex flex-col gap-2 pt-4 pb-2 pl-4 pr-2 bg-white border-b border-grey-300 sm:bg-transparent sm:border-none sm:flex-row sm:items-center sm:justify-end sm:h-full sm:gap-2 sm:py-0 sm:pr-2 sm:px-0">
         {% set ns = namespace(topMenuId = none) %}
         {% for mi in menu.get_items() recursive %}
             {% if mi.is_accessible %}
@@ -13,11 +13,11 @@
                         <div jmb-on:mouseleave="if ($scope().opened === '{{mi.id}}') {$scope().timeout=setTimeout(function(){console.log($scope().pened);$scope().opened=null}, 50)}" 
                              jmb-on:click.away="if ($scope().opened === '{{mi.id}}') {$scope().opened=null}"
                              jmb-on:mouseover="clearTimeout($scope().timeout); $scope().opened = '{{mi.id}}'"
-                             class="relative my-2 sm:m-0">
+                             class="relative my-4 sm:m-0">
                             <button type="button"
                                 jmb-on:focus="$scope().opened='{{mi.id}}'"
-                                jmb-bind:class="{'sm:text-grey-600 sm:font-semibold': $scope().active === '{{mi.id}}'}"
-                                class="block mb-2 text-sm font-light tracking-wider uppercase focus-visible:outline-none sm:mb-0 text-grey-500 sm:tracking-normal sm:font-normal sm:text-base sm:normal-case sm:hover:underline sm:focus-visible:underline">
+                                jmb-bind:class="{'sm:font-semibold': $scope().active === '{{mi.id}}'}"
+                                class="block mb-2 text-sm font-light tracking-wider uppercase focus-visible:outline-none sm:mb-0 text-grey-600 sm:tracking-normal sm:font-normal sm:text-base sm:normal-case sm:hover:underline sm:focus-visible:underline">
                                 {{mi.get_title()}}
                             </button>
                             <div jmb-cloak 
@@ -37,6 +37,59 @@
                             </div>
                         </div>
                     {% else %}
+                        <div class="pt-2 text-grey-500">
+                            {{mi.get_title()}}
+                        </div>
+                        <div class="pl-2">
+                            {{loop(mi.get_items())}}
+                        </div>
+                    {% endif %}
+                {% else %}
+                   {% if loop.depth == 1 %}
+                        {% set ns.topMenuId = mi.id %}
+                   {% endif %} 
+                        {# class="top-menu__link {% if loop.depth > 1 %}top-menu__link--indropdown{% endif %}"> #}
+                    <a href="{{mi.url}}" 
+                        {% if mi.jrl %}jmb-on:click.prevent="{{mi.jrl}}"{% endif %} 
+                        jmb-bind:class="{
+                        'font-semibold': 
+                            (   
+                                {{mi.active_for_exec_names|tojson|forceescape}}.some(function(en){return $jmb.componentsOnPage().includes(en)})
+                                || {{mi.active_for_pathnames|tojson|forceescape}}.some(function(pn){return window.location.pathname === pn})
+                            ) 
+                            {# Add ns.topMenuid to active #}
+                            {% if ns.topMenuId is not none -%}
+                            && ($scope().active = '{{ns.topMenuId}}')
+                            {%- endif %}
+                        }"
+                        class="block text-grey-600 hover:underline focus-visible:outline-none focus-visible:underline">
+                        {{mi.title}}
+                    </a>
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+    </div> 
+{% endmacro%}
+
+{# DISPLAY MAIN MENU #}
+{% macro display_main_menu(menu) %}
+    <div jmb-scope="{active:null}"
+            jmb-on:jembe-update-page.camel.window="$scope().active = null; $updateDom();"
+            class="flex flex-col h-full gap-2 pt-4 pb-2 pl-4 pr-2 bg-white ">
+        {% for mi in menu.get_items() recursive %}
+            {% if mi.is_accessible %}
+                {% if mi.is_menu %}
+                    {% if loop.depth == 1 %}
+                        <div class="my-4">
+                            <button type="button"
+                                class="block mb-2 text-sm font-light tracking-wider uppercase focus-visible:outline-none text-grey-600 ">
+                                {{mi.get_title()}}
+                            </button>
+                            <div class="flex flex-col gap-2 pl-4 ">
+                                {{loop(mi.get_items())}}
+                            </div>
+                        </div>
+                    {% else %}
                         <div class="pt-2 text-grey-400">
                             {{mi.get_title()}}
                         </div>
@@ -45,26 +98,17 @@
                         </div>
                     {% endif %}
                 {% else %}
-                    <div {% if loop.depth == 1 %}
-                         jmb-on:mouseover="clearTimeout($scope().timeout); $scope().opened = '{{menu.id}}'"
-                         {% endif %}
-                          class="top-menu__link {% if loop.depth > 1 %}top-menu__link--indropdown{% endif %}">
-                        <a href="{{mi.url}}" {% if mi.jrl %}jmb-on:click.prevent="{{mi.jrl}}"{% endif %} 
-                            jmb-bind:class="{
-                            'text-grey-600 font-semibold': 
-                                (   
-                                    {{mi.active_for_exec_names|tojson|forceescape}}.some(function(en){return $jmb.componentsOnPage().includes(en)})
-                                    || {{mi.active_for_pathnames|tojson|forceescape}}.some(function(pn){return window.location.pathname === pn})
-                                ) 
-                                {# Add ns.topMenuid to active #}
-                                {% if ns.topMenuId is not none  %}
-                                && ($scope().active = '{{ns.topMenuId}}')
-                                {% endif %}
-                            }"
-                            class="block text-grey-500 hover:underline focus-visible:outline-none focus-visible:underline">
-                            {{mi.title}}
-                        </a>
-                    </div>
+                    <a href="{{mi.url}}" {% if mi.jrl %}jmb-on:click.prevent="{{mi.jrl}}"{% endif %} 
+                        jmb-bind:class="{
+                        'font-semibold': 
+                            (   
+                                {{mi.active_for_exec_names|tojson|forceescape}}.some(function(en){return $jmb.componentsOnPage().includes(en)})
+                                || {{mi.active_for_pathnames|tojson|forceescape}}.some(function(pn){return window.location.pathname === pn})
+                            ) 
+                        }"
+                        class="block text-grey-600 hover:underline focus-visible:outline-none focus-visible:underline">
+                        {{mi.title}} <span jmb-text="$scope().active"></span>
+                    </a>
                 {% endif %}
             {% endif %}
         {% endfor %}

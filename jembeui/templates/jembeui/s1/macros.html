@@ -1,0 +1,56 @@
+{# M E N U S #}
+
+{# DISPLAY SYSTEM MENU #}
+{% macro display_system_menu(menu, is_right=True) %}
+    <div jmb-scope="{opened:null, active:null}"
+            jmb-on:jembe-update-page.camel.window="$scope().active = null; $updateDom()"
+            style="display:inherit;">
+        {% set ns = namespace(topMenuId = none) %}
+        {% for mi in menu.get_items() recursive %}
+            {% if mi.is_accessible %}
+                {% if mi.is_menu %}
+                    {% if loop.depth == 1 %}
+                        <div class="navbar-item has-dropdown is-hoverable">
+                            <div class="navbar-link is-arrowless"
+                                jmb-bind:class="{'is-active': $scope().active === '{{mi.id}}'}">
+                                {{mi.get_title()}}
+                            </div>
+                            <div class="navbar-dropdown {{'is-right' if is_right else ''}}">
+                                {% set ns.topMenuId = mi.id %}
+                                {{loop(mi.get_items())}}
+                            </div>
+                        </div>
+                    {% else %}
+                        <hr class="navbar-divider">
+                        {{loop(mi.get_items())}}
+                    {% endif %}
+                {% else %}
+                   {% if loop.depth == 1 %}
+                        {% set ns.topMenuId = mi.id %}
+                   {% endif %} 
+                    <a href="{{mi.url}}" 
+                        {% if mi.jrl %}jmb-on:click.prevent="{{mi.jrl}}"{% endif %} 
+                        jmb-bind:class="{
+                        'font-semibold': 
+                            (   
+                                {{mi.active_for_exec_names|tojson|forceescape}}.some(function(en){return $jmb.componentsOnPage().includes(en)})
+                                || {{mi.active_for_pathnames|tojson|forceescape}}.some(function(pn){return window.location.pathname === pn})
+                            ) 
+                            {# Add ns.topMenuid to active #}
+                            {% if ns.topMenuId is not none -%}
+                            && ($scope().active = '{{ns.topMenuId}}')
+                            {%- endif %}
+                        }"
+                        class="navbar-item">
+                        {{mi.title}}
+                    </a>
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+    </div> 
+{% endmacro%}
+
+{# DISPLAY MAIN MENU #}
+{% macro display_main_menu(menu) %}
+    {{display_system_menu(menu, false)}}
+{% endmacro%}
