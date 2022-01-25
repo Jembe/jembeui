@@ -9,7 +9,6 @@ from typing import (
     Any,
     ClassVar,
 )
-from jembe.component import component
 from markupsafe import Markup
 from functools import cached_property
 from dataclasses import dataclass, field

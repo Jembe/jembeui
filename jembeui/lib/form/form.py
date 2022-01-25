@@ -63,7 +63,6 @@ class FormBase(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
         self.is_disabled = disabled
         self.is_mounted = False
         self.cform: "jembeui.CForm"
-
         super().__init__(
             formdata=formdata, obj=obj, prefix=prefix, data=data, meta=meta, **kwargs
         )

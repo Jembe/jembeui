@@ -1,1 +1,2 @@
-<div>{{menu.as_html('system_menu')}}</div>
+{% import "jembeui/s0/macros.html" as macros%}
+{{macros.display_system_menu(menu)}}

@@ -1,0 +1,45 @@
+{% set field_id = "{}--{}".format(exec_name.replace("/","-"), form_field.name)%}
+{% set is_not_disabled = "disabled" not in raw_render_kw %}
+{% set instant_validate = ((form.__instant_validate__ and raw_render_kw.get('_field',{}).get('_instant_validate', none) in (none, true)) or raw_render_kw.get('_field',{}).get('_instant_validate', none) == true) and "validate" in _config.component_actions  %}
+{% set instant_submit = ((form.__instant_submit__ and raw_render_kw.get('_field',{}).get('_instant_submit', none) in (none, true)) or raw_render_kw.get('_field',{}).get('_instant_submit', none) == true ) and "submit" in _config.component_actions %}
+{% set render_kw = form.resolve_kw(
+    raw_render_kw,
+    {
+        "id":field_id,
+        "class":" ".join(
+            [
+                "checkbox",
+                form_field.widget.__class__.__name__|jembeui_camel_to_snake|replace("_","-"),  
+                "checkbox--error" if form_field.errors else ""
+            ]
+        ),
+        "_field" : {
+            "class":"form-field form-field--{}".format(form_field.type.replace('Field', '').lower())
+        },
+        "jmb-on:change.defer": (
+            "form.{fname} = $self.checked;"  
+            + (" modified_fields.indexOf('{fname}') === -1 && modified_fields.push('{fname}');" if "modified_fields" in state else "")
+        ).format(fname=form_field.name) if is_not_disabled and not instant_validate and not instant_submit else none,
+        "jmb-on:change": (
+            "form.{fname} = $self.checked;"  
+            + (" modified_fields.indexOf('{fname}') === -1 && modified_fields.push('{fname}');" if "modified_fields" in state else "")
+            + (" validate();" if instant_validate  else "")
+            + (" submit();" if instant_submit else "")
+        ).format(fname=form_field.name) if is_not_disabled and (instant_validate or instant_submit) else none,
+        "jmb-on:keydown.enter": "$self.blur();$self.focus();submit()" if is_not_disabled and "submit" in _config.component_actions else none,
+    }
+)%}
+<div {{form.attr_kw(render_kw._field|default({}, true))|xmlattr}}>
+    <div class="form-field__checkbox-holder">
+        {{form_field(**form.attr_kw(render_kw))}}
+        <div class="form-field__label">
+            <label for="{{field_id}}" class="checkbox-label">{{form_field.label.text}}</label>
+            <div class="checkbox-info">
+            {% if form_field.description %}{{description}}{% endif %}
+            </div>
+        </div>
+    </div>
+    {% for error in form_field.errors %}
+    <div class="form-field__error form-field__error--checkbox">{{error}}</div>
+    {% endfor %}
+</div>

@@ -1,0 +1,68 @@
+{% macro display_menu(menu, level=0, menuIds=[]) -%}
+    {% if menu.is_accessible %}
+        {% if level > 0 %}
+        <div class="">
+            <a href="#" 
+                jmb-on:click.prevent="
+                    mid ='{{menu.id}}'; 
+                    if ($scope().opened.includes(mid)) {
+                        $scope().opened = $scope().opened.filter(function(id){return id !== mid});
+                    } else {
+                        {# $scope().opened = {{(menuIds + [menu.id])|tojson|forceescape}}; #}
+                        Array.prototype.push.apply($scope().opened, {{(menuIds +[menu.id])|tojson|forceescape}}.filter(function(e){return !$scope().opened.includes(e)}))
+                    }" 
+                class="main-menu__sub-menu__title"
+                jmb-bind:class="{'main-menu__sub-menu__title--active': $scope().active.includes('{{menu.id}}')}">
+                {{menu.get_title()}}
+            </a>
+        {% endif %}
+        <div 
+        {% if level == 0 -%}
+             jmb-scope="{opened:[], active:[]}"
+             jmb-on:jembe-update-page.camel.window="$scope().active=[];$updateDom();"
+            class="main-menu"
+        {%- else -%}
+            class="main-menu__sub-menu main-menu__sub-menu--{{level}}"
+            jmb-bind:class="{
+                'main-menu__sub-menu--open': $scope().opened.includes('{{menu.id}}') || $scope().active.includes('{{menu.id}}')
+            }"
+        {%- endif %}
+        >
+        {% for mi in menu.get_items()  %}
+            {% if mi.is_menu %}
+                {{display_menu(mi, level + 1, menuIds + [menu.id])}}
+            {% else %}
+                {{display_link(mi, level, menuIds + [menu.id])}}
+            {% endif %}
+        {% endfor %}
+        </div>
+        {% if level > 0 %}
+        </div>
+        {% endif %}
+    {% endif %}
+{%- endmacro %}
+
+{% macro display_link(link, level=0, menuIds=[]) -%}
+    {% if link.is_accessible %}
+    <div class="main-menu__item"
+         jmb-bind:class="{
+             'main-menu__item--active': 
+                (   
+                    {{link.active_for_exec_names|tojson|forceescape}}.some(function(en){return $jmb.componentsOnPage().includes(en)})
+                    || {{link.active_for_pathnames|tojson|forceescape}}.some(function(pn){return window.location.pathname === pn})
+                ) 
+                {# Add menuids to active menues if not already exist #}
+                && (
+                    !{{menuIds|tojson|forceescape}}.every(function(mid){return $scope().active.includes(mid)}) ?  
+                        Array.prototype.push.apply($scope().active, {{menuIds|tojson|forceescape}}.filter(function(e){return !$scope().active.includes(e)})) !== undefined : true
+                ) 
+        }">
+        <a href="{{link.url}}" 
+           {% if link.jrl %}jmb-on:click.prevent="{{link.jrl}}"{% endif %}>
+           {{link.title}}
+        </a>
+    </div>
+    {% endif %}
+{%- endmacro %}
+
+{{display_menu(menu)}}

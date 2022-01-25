@@ -1,0 +1,132 @@
+<div>
+{% block menu -%}
+    {% if menu -%}
+    <div class="list-records__menu">
+    {{menu.as_html('buttons')}} 
+    </div>
+    {% endif -%}
+{%- endblock menu %}
+{% block toolbar -%}
+    
+    {% if not ( total_records == 0 and _config.search_filter is none and not _config.choice_filters and _config.search_filter is none and jui_choice_filters_config|length == 0) %}
+    <div class="list-records__toolbar">
+        {% if _config.search_filter is not none or _config.choice_filters %}
+        <div class="list-records__toolbar__clear-filters">
+            <button type="button" class="button button--ghost button--toolbar" jmb-on:click.prevent="search=''; choice_filters={}; order_by=null" title="Clear all filters">
+                <!-- This SVG Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. that You can obtain one at http://mozilla.org/MPL/2.0/. -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill="context-fill" d="M6.5 12a.5.5 0 0 0 .5-.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 0 .5.5zm2 0a.5.5 0 0 0 .5-.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 0 .5.5zm2 0a.5.5 0 0 0 .5-.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 0 .5.5z"></path><path fill="context-fill" d="M14 2h-3.05a2.5 2.5 0 0 0-4.9 0H3a1 1 0 0 0 0 2v9a3 3 0 0 0 3 3h5a3 3 0 0 0 3-3V4a1 1 0 0 0 0-2zM8.5 1a1.489 1.489 0 0 1 1.391 1H7.109A1.489 1.489 0 0 1 8.5 1zM12 13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4h7z"></path></svg>            
+            </button>
+        </div>
+        {% endif %}
+        {% if _config.search_filter is not none  %}
+        <div class="list-records__toolbar__search">
+            <input jmb-on:input="page=0;search=$self.value;" value="{{search}}" type="text" placeholder="Search..." class="input input--toolbar">
+        </div>
+        {% endif %}
+        <div class="list-records__toolbar__choice-filters">
+            {% for filter_name, choice_filter in jui_choice_filters_config.items() if not choice_filter.is_grouped  %}
+            {% for choice in choice_filter.choices  %}
+            <label class="button button--micro button--switch button--switch--toolbar
+                {% if choice_filters and filter_name in choice_filters and choice.value_str in choice_filters[filter_name] %}
+                button--switch--on
+                {% endif %}">
+                <input type="checkbox" jmb-on:change="
+                    if($self.checked) {
+                        jui_apply_choice_filter('{{filter_name}}','{{choice.value_str}}');
+                    }else{
+                        jui_remove_choice_filter('{{filter_name}}','{{choice.value_str}}')
+                    }"  
+                    value="{{choice.value_str}}"
+                    {% if choice_filters and filter_name in choice_filters and choice.value_str in choice_filters[filter_name] %}
+                    checked
+                    {% endif %}
+                    >
+                {{choice.title}}
+            </label> 
+            {% endfor %} 
+            {% endfor %}
+            {% if jui_choice_filters_config.values()|selectattr('is_grouped')|list|length > 0 %}
+            <div class="list-records__toolbar__choice-filters-other" jmb-scope="{opened:false}" jmb-on:click.away="$scope().opened = false; ">
+                {% set ns = namespace(other_selected = false) %}
+                <div class="list-records__toolbar__choice-filters-other__dropdown" jmb-show="$scope().opened" jmb-cloak>
+                {% for filter_name, choice_filter in jui_choice_filters_config.items() if choice_filter.is_grouped  %}
+                {% for choice in choice_filter.choices  %}
+                <label class="button button--micro button--switch button--switch--toolbar
+                    {% if choice_filters and filter_name in choice_filters and choice.value_str in choice_filters[filter_name] %}
+                    button--switch--on
+                    {% set ns.other_selected = true %}
+                    {% endif %}">
+                    <input type="checkbox" jmb-on:change="
+                        if($self.checked) {
+                            jui_apply_choice_filter('{{filter_name}}','{{choice.value_str}}');
+                        }else{
+                            jui_remove_choice_filter('{{filter_name}}','{{choice.value_str}}')
+                        };"
+                        value="{{choice.value_str}}"
+                        {% if choice_filters and filter_name in choice_filters and choice.value_str in choice_filters[filter_name] %}
+                        checked
+                        {% endif %}
+                        >
+                    {{choice.title}}
+                </label> 
+                {% endfor %} 
+                {% endfor %}
+                </div>
+                <button type="button" class="list-records__toolbar__choice-filters-other__button button button--micro button--select--toolbar {%if ns.other_selected%}button--select--toolbar--on{% endif %}" jmb-on:click.prevent="$scope().opened = !$scope().opened; " title="Other filters">
+                    Filters
+                    <!-- This SVG Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. that You can obtain one at http://mozilla.org/MPL/2.0/. -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill="context-fill" d="M8 12a1 1 0 0 1-.707-.293l-5-5a1 1 0 0 1 1.414-1.414L8 9.586l4.293-4.293a1 1 0 0 1 1.414 1.414l-5 5A1 1 0 0 1 8 12z"></path></svg>
+                </button>
+            </div>
+            {% endif %}
+        </div>
+        {% block toolbar__order_by %}
+        {% if _config.order_by %}
+        <div class="list-records__toolbar__order-by">
+            <div class="list-records__toolbar__order-by-list" jmb-scope="{opened:false}" jmb-on:click.away="$scope().opened = false; ">
+                {% set ns = namespace(ordered = false) %}
+                <div class="list-records__toolbar__order-by-list__dropdown" jmb-show="$scope().opened" jmb-cloak>
+                {% for order_name, order_title in _config.order_by.items()  %}
+                <label class="button button--micro button--switch button--switch--toolbar
+                    {% if order_by == order_name  or order_by == '-' + order_name %}
+                    button--switch--on
+                    {% set ns.ordered = true %}
+                    {% endif %}">
+                    <input type="checkbox" jmb-on:change="order_by= '{% if not order_by %}{{order_name}}{%elif order_by == order_name %}-{{order_name}}{% else %}{% endif %}'"
+                        value="{{order_name}}"
+                        {% if order_by == order_name or order_by == '-' + order_name %} checked {% endif %} >
+                     {{order_title}} {% if order_by == '-' + order_name %}-{% endif %}
+                </label> 
+                {% endfor %}
+                </div>
+                <button type="button" class="list-records__toolbar__order-by-list__button button button--micro button--select--toolbar {%if ns.ordered%}button--select--toolbar--on{% endif %}" jmb-on:click.prevent="$scope().opened = !$scope().opened; " title="Sort result">
+                    Sort
+                    <!-- This Source Code Form is subject to the terms of the Mozilla Public
+                    - License, v. 2.0. If a copy of the MPL was not distributed with this
+                    - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="context-fill"><path d="M11 7H5a1 1 0 0 0 0 2h6a1 1 0 0 0 0-2zm-3 4H5a1 1 0 0 0 0 2h3a1 1 0 0 0 0-2zm6-8H5a1 1 0 0 0 0 2h9a1 1 0 0 0 0-2zM2 3a1 1 0 1 0 1 1 1 1 0 0 0-1-1zm0 4a1 1 0 1 0 1 1 1 1 0 0 0-1-1zm0 4a1 1 0 1 0 1 1 1 1 0 0 0-1-1z"></path></svg>
+                </button>
+            </div>
+        </div>
+        {% endif %}
+        {% endblock toolbar__order_by %}
+        {# <nav class="list-records__toolbar__pagination" {%if total_records == 0 %}style="visibility:hidden;"{%endif%}> #}
+        <nav class="list-records__toolbar__pagination">
+            <button type="button" class="button button--ghost button--toolbar" jmb-on:click="page = page - 1" {% if page == 0 %} disabled {% endif %}>
+                <!-- This SVG Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. that You can obtain one at http://mozilla.org/MPL/2.0/. -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill="context-fill" d="M6.414 8l4.293-4.293a1 1 0 0 0-1.414-1.414l-5 5a1 1 0 0 0 0 1.414l5 5a1 1 0 0 0 1.414-1.414z"></path></svg>
+            </button>
+            <div class="list-records__toolbar__pagination__text">
+                {{page + 1 if total_pages > 0 else 0}} / {{total_pages}} (rows: {{total_records}})
+            </div>
+            <button type="button" class="button button--ghost button--toolbar" jmb-on:click="page = page + 1" {% if page == total_pages - 1 or total_pages == 0 %} disabled {% endif %}>
+                <!-- This SVG Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. that You can obtain one at http://mozilla.org/MPL/2.0/. -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill="context-fill" d="M6 14a1 1 0 0 1-.707-1.707L9.586 8 5.293 3.707a1 1 0 0 1 1.414-1.414l5 5a1 1 0 0 1 0 1.414l-5 5A1 1 0 0 1 6 14z"></path></svg>
+            </button>
+        </nav>
+    </div>
+    {% endif %}
+{%- endblock toolbar %}
+{% block content -%}
+{% endblock content %}
+</div>

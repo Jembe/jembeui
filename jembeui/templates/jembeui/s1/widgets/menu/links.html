@@ -1,0 +1,60 @@
+{% macro display_menu_items(menu, level) -%}
+    {% for mi in menu.get_items()  %}
+        {% if mi.is_menu %}
+            {{display_menu(mi, level+1)}}
+        {% else %}
+            {{display_link(mi, level)}}
+        {% endif %}
+    {% endfor %}
+{%- endmacro %}
+
+{% macro display_menu(menu, level=0) -%}
+    {% if menu.is_accessible %}
+        {% if level == 0 %}
+            <div class="links-menu"
+                jmb-scope="{opened:null, timeout:null}">
+                {{display_menu_items(menu, level)}}
+            </div>
+        {% elif level == 1 %}
+            <div class="links-menu__dropdown-container"
+                jmb-on:click.away="if ($scope().opened === '{{menu.id}}') {$scope().opened=null}">
+                <div class="links-menu__link">
+                    <a href="#" jmb-on:click.prevent="if ($scope().opened === '{{menu.id}}'){$scope().opened = null}else{$scope().opened = '{{menu.id}}'}">
+                        {% if menu.title %}
+                        {{menu.title}}
+                        {% elif menu.icon_html %}
+                        {{menu.icon_html}}
+                        {% else %}
+                        <!-- This SVG source code is subject to the terms of the Mozilla Public
+                        - License, v. 2.0. obtainable at http://mozilla.org/MPL/2.0/. -->
+                        <svg class="links-menu__link__icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill="context-fill" d="M2 6a2 2 0 1 0 2 2 2 2 0 0 0-2-2zm6 0a2 2 0 1 0 2 2 2 2 0 0 0-2-2zm6 0a2 2 0 1 0 2 2 2 2 0 0 0-2-2z"></path></svg>
+                        {% endif %}
+                    </a>
+                </div>
+                <div class="links-menu__dropdown" 
+                     jmb-bind:class="{'links-menu__dropdown--open': $scope().opened == '{{menu.id}}'}">
+                    {{display_menu_items(menu, level)}}
+                </div>
+            </div>
+        {% else %}
+            <div class="links-menu__dropdown__submenu-title">
+                {{menu.title}}
+            </div>
+            <div class="links-menu__dropdown__submenu">
+                {{display_menu_items(menu, level)}}
+            </div>
+        {% endif %}
+    {% endif %}
+{%- endmacro %}
+
+{% macro display_link(link, level) -%}
+    {% if link.is_accessible %}
+        <div class="links-menu__link {% if level > 0 %}links-menu__link--indropdown{% endif %}">
+            <a href="{{link.url}}"{% if link.jrl %}jmb-on:click.prevent="{{link.jrl}}"{% endif %}>
+                {{link.title}}
+            </a>
+        </div>
+    {% endif %}
+{%- endmacro %}
+
+{{display_menu(menu)}}

@@ -1,0 +1,24 @@
+<div class="modal">
+    <div class="modal__dialog">
+        <div class="modal__dialog__head">
+            <div jmb-ref="title">
+                {%- block title -%}
+                {{title}}
+                {%- endblock title -%}
+            </div>
+            <button jmb-on:click="{%- if component('cancel').is_accesible %}cancel(){% else %}$jmb.emit('cancel'){% endif -%}" type="button" title="Close">X</button>
+        </div>
+        <div class="modal__dialog__content">
+            {%- block content -%}
+            {{form.as_html()}}
+            {%- endblock content -%}
+        </div>
+        <div class="modal__dialog__footer">
+            <div>
+                {%- block buttons -%}
+                {{menu.as_html('buttons_modal')}}
+                {%- endblock buttons -%}
+            </div>
+        </div>
+    </div>
+</div>

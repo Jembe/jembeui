@@ -4,18 +4,19 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    {{component("_title")}}
+    {{component("page_title")}}
     {# seo tag + description #}
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.2/css/bulma.min.css">
+    <link rel="stylesheet" href="{{url_for('jembeui.static', filename='jembeui/s1/css/fontawesome5.min.css')}}">
     <link rel="stylesheet" href="{{url_for('jembeui.static', filename='jembeui/s1/css/main.css')}}">
 </head>
 <body class="has-navbar-fixed-top">
-    {{component("_update_indicator")}}
+    {# Update indicator #}
+    {{component("page_update_indicator")}}
+
     {# Navigation #}
-    <nav class="navbar container has-shadow is-fixed-top" role="navigation" aria-label="main navigation">
+    <nav class="container navbar has-shadow is-fixed-top" role="navigation" aria-label="main navigation">
     <div class="navbar-brand">
         <a class="navbar-item has-text-weight-medium is-size-5" href="{{url_for('index')}}">{{title}}</a>
-
         <a jmb-bind:class="{'is-active': $local.navbarOpen}" jmb-on:click.prevent="$local.navbarOpen = !$local.navbarOpen;" role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
         <span aria-hidden="true"></span>
         <span aria-hidden="true"></span>
@@ -27,35 +28,50 @@
          jmb-on:click.prevent="$local.navbarOpen = false" 
          id="navbarBasicExample" class="navbar-menu" >
         <div class="navbar-start">
-        {{component('_main_menu')}}
+
+        {# Main menu #}
+        {% if "page_main_menu" in _config.components %}
+        {% block main_menu %}
+            {{component('page_main_menu')}}
+        {% endblock main_menu %}
+        {% endif %}
         </div>
 
+        {# System menu #}
         <div class="navbar-end">
-        {{component('_system_menu')}}
+        {% if "page_system_menu" in _config.components %}
+        {% block system_menu %}
+            {{component('page_system_menu')}}
+        {% endblock system_menu %}
+        {% endif %}
         </div>
     </div>
     </nav>
 
-    <div class="container my-2 px-3">
-        {{component("_breadcrumb")}}
+    {# Breadcrumb #}
+    {% if "page_breadcrumb" in _config.components %}
+    <div class="container px-3 my-2">
+        {{component("page_breadcrumb")}}
     </div>
-
-    {# <section class="section">
-        <div class="container">
-            <h1 class="title">Hello World</h1>
-            <p class="subtitle">My first website with Bulma</p>
-        </div>
-    </section> #}
+    {% endif %}
 
     <section class="section">
-        <div class="container">
-            {% block page_content %}{% endblock page_content %}
+        <div class="container" style="min-height:62vh;">
+            {% block content %}{% endblock content %}
         </div>
     </section>
 
-    {{component("_notifications")}}
-    {{component("_syserror")}}
-    {{component("_action_confirmation")}}
+    {# Footer #}
+    <div class="footer">
+        {% block footer -%}
+        <div class="content has-text-centered is-size-7 has-text-weight-light">
+            Build with <a href="https://jembe.io" class="" target="blank">jembe.io</a>
+        </div>
+        {%- endblock footer %}
+    </div>
+    {{component("page_notifications")}}
+    {{component("page_syserror")}}
+    {{component("page_action_confirmation")}}
     <script src="{{ url_for('jembe.static', filename='js/jembe.js') }}" defer></script>
     <script defer>
     window.addEventListener('DOMContentLoaded', function(event){

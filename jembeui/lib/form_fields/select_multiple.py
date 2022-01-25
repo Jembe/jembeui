@@ -20,8 +20,7 @@ class SelectMultipleField(JUIFieldMixin, wtforms.Field):
     Field used to select multiple values that supports:
     - Searching from list
     - Display list of values as table
-    - Viewing selected values
-    - Updateing selected values
+    - Viewing selected values - Updateing selected values
     - Creating new values in list
 
     List of values is displayed and searched within jembe component that
@@ -48,32 +47,32 @@ class SelectMultipleField(JUIFieldMixin, wtforms.Field):
         create_component: Optional["jembe.ComponentReference"] = None,
         display_update_link: bool = True,
         coerce=int,
-        filters=tuple(),
+        filters=(),
         description="",
         id=None,
         default=None,
         widget=None,
         render_kw=None,
+        name=None,
         _form=None,
-        _name=None,
         _prefix="",
         _translations=None,
         _meta=None,
     ):
         super().__init__(
-            label=label,
-            validators=validators,
-            filters=filters,
-            description=description,
-            id=id,
-            default=default,
-            widget=widget,
-            render_kw=render_kw,
-            _form=_form,
-            _name=_name,
-            _prefix=_prefix,
-            _translations=_translations,
-            _meta=_meta,
+            label,
+            validators,
+            filters,
+            description,
+            id,
+            default,
+            widget,
+            render_kw,
+            name,
+            _form,
+            _prefix,
+            _translations,
+            _meta,
         )
         self.coerce = coerce
         if choices is None:

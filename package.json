@@ -1,0 +1,17 @@
+{
+  "scripts": {
+    "s0-start": "npx tailwindcss -i ./jembeui/src/jembeui/s0/css/main.css -o ./jembeui/static/jembeui/s0/css/main.css --watch",
+    "s1-css-build": "node-sass --omit-source-map-url jembeui/src/jembeui/s1/sass/main.scss jembeui/static/jembeui/s1/css/main.css",
+    "s1-css-watch": "npm run s1-css-build -- -watch",
+    "s1-start": "npm run s1-css-watch"
+  },
+  "devDependencies": {
+    "bulma": "^0.9.3",
+    "node-sass": "^7.0.1",
+    "tailwindcss": "^3.0.15"
+  },
+  "dependencies": {
+    "@tailwindcss/forms": "^0.4.0",
+    "@tailwindcss/typography": "^0.5.0"
+  }
+}

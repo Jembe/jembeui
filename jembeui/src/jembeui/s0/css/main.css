@@ -1,0 +1,34 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+[jmb-cloak] {
+    @apply hidden;
+}
+
+@layer components {
+    .btn {
+        @apply bg-grey-300  text-grey-900 rounded-sm h-8 px-2 text-sm min-w-[132px] cursor-pointer hover:bg-grey-300 hover:bg-opacity-60 focus-visible:outline-none focus-visible:shadow-focus disabled:bg-grey-300 disabled:opacity-40 disabled:cursor-default;
+    }
+    .btn-short {
+        @apply btn min-w-[unset];
+    }
+    .btn-ghost {
+        @apply w-8 h-8 text-sm bg-transparent rounded-sm cursor-pointer text-grey-100 text-opacity-80 hover:bg-grey-300 hover:bg-opacity-60 focus-visible:outline-none focus-visible:shadow-focus disabled:bg-grey-300 disabled:opacity-40;
+    }
+    .btn--primary {
+        @apply text-white bg-primary-600 hover:bg-primary-700 active:bg-primary-800 disabled:bg-primary-300; 
+    }
+    .btn--brand {
+        @apply text-white bg-brand-600 hover:bg-brand-700 active:bg-brand-800 disabled:bg-brand-300; 
+    }
+    .btn--secondary {
+        @apply text-white bg-secondary-500 hover:bg-secondary-600 active:bg-secondary-700 disabled:bg-secondary-300; 
+    }
+    .btn--danger {
+        @apply text-white bg-error-600 hover:bg-error-700 active:bg-error-800 disabled:bg-error-300 focus-visible:shadow-focus-danger; 
+    }
+    .href {
+        @apply text-primary-600 hover:underline focus-visible:shadow-focus focus-visible:outline-none;
+    }
+}
