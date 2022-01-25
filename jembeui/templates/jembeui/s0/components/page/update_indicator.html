@@ -1,11 +1,10 @@
 <div
-    class="page-update-indicator-container"
+    class="sticky top-0 z-50 h-1 bg-grey-50"
     jmb-local="{requestsInProgress:0}"
     jmb-ignore 
     jmb-on:jembe-start-update-page.camel.delay.25ms.window="if($event.detail.inputsDisabled) {$local.requestsInProgress += 1;}"
     jmb-on:jembe-update-page.camel.window="if($event.detail.isXUpdate && $event.detail.inputsDisabled) {$local.requestsInProgress -= 1;}"
     jmb-on:jembe-update-page-error.camel.window="if($event.detail.inputsDisabled) {$local.requestsInProgress = -1}"
     > 
-
-    <div jmb-cloak jmb-show="$local.requestsInProgress > 0" class="page-update-indicator"></div>
+    <div jmb-cloak jmb-show="$local.requestsInProgress > 0" class="h-1 bg-brand-600 animate-progress"></div>
 </div>

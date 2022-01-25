@@ -75,7 +75,7 @@
 {% macro display_main_menu(menu) %}
     <div jmb-scope="{active:null}"
             jmb-on:jembe-update-page.camel.window="$scope().active = null; $updateDom();"
-            class="flex flex-col h-full gap-2 pt-4 pb-2 pl-4 pr-2 bg-white ">
+            class="flex flex-col h-full gap-2 pt-4 pb-2 pl-4 pr-2">
         {% for mi in menu.get_items() recursive %}
             {% if mi.is_accessible %}
                 {% if mi.is_menu %}
