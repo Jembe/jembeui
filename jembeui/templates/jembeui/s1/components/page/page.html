@@ -65,7 +65,9 @@
     <div class="footer">
         {% block footer -%}
         <div class="content has-text-centered is-size-7 has-text-weight-light">
-            Build with <a href="https://jembe.io" class="" target="blank">jembe.io</a>
+            {%- block footer_text %}
+            Build with <a href="https://jembe.io" target="blank">jembe.io</a>
+            {% endblock footer_text -%}
         </div>
         {%- endblock footer %}
     </div>

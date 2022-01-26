@@ -32,7 +32,7 @@
         <div class="flex-grow grid grid-cols-1 grid-rows-[auto_auto_auto_1fr] sm:grid-cols-[minmax(100px,_25%)_minmax(0,1fr)] sm:grid-rows-[_auto_1fr] "
             jmb-bind:class="{'grid-rows-[auto_1fr]': ! $local.mainMenuOpen}">
             {# Title and open menu button #}
-            <div class="sticky z-40 flex items-center gap-1 pl-1 border-b top-1 border-b-grey-300 sm:pr-4 bg-grey-100 opacity-95">
+            <div class="sticky z-40 flex items-center gap-2 pl-1 border-b top-1 border-b-grey-300 sm:pr-4 bg-grey-100 opacity-95">
                 {# Open close main menu #}
                 {% if "__main_menu" in _config.components and not component("__main_menu").component_instance.is_empty() %}
                 <button class="btn-ghost w-7 h-7" type="button" 
@@ -83,7 +83,11 @@
         {# Footer #}
         <div class="h-4">
         {% block footer -%}
-            <div class="text-xs font-light text-center text-grey-700">Build with <a href="https://jembe.io" class="href" target="blank">jembe.io</a></div>
+            <div class="text-xs font-light text-center text-grey-700">
+            {% block footer_text %}
+            Build with <a href="https://jembe.io" class="href" target="blank">jembe.io</a>
+            {% endblock footer_text %}
+            </div>
         {%- endblock footer %}
         </div>
     </div>

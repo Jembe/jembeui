@@ -8,17 +8,16 @@ from typing import (
     Dict,
     Any,
 )
-from markupsafe import Markup
 from abc import ABC, abstractmethod
 from functools import cached_property
 from copy import copy
 from urllib.parse import urlparse
-from jembe import ComponentReference, ComponentConfig
+from markupsafe import Markup
 from flask import render_template
+from jembe import ComponentReference, ComponentConfig
 
 from ..exceptions import JembeUIError
 from ..settings import settings
-from ..helpers import get_widget_variants
 
 if TYPE_CHECKING:
     import jembe
@@ -32,7 +31,8 @@ __all__ = (
 
 
 class Link(ABC):
-    TEMPLATE_VARIANTS: Dict[str, str]
+    DEFAULT_HREF_TEMPLATE_EXP = "jembeui/{style}/widgets/href.html"
+    DEFAULT_BUTTON_TEMPLATE_EXP = "jembeui/{style}/widgets/button.html"
 
     def __init__(
         self,
@@ -140,49 +140,30 @@ class Link(ABC):
     def is_menu(self) -> bool:
         return False
 
-    @property
-    def template_variants(self) -> Dict[str, str]:
-        try:
-            return self.__class__.TEMPLATE_VARIANTS
-        except AttributeError:
-            self.__class__.TEMPLATE_VARIANTS = get_widget_variants(
-                settings.link_widgets_variants_dirs
-            )
-        return self.__class__.TEMPLATE_VARIANTS
-
-    def as_html(self, variant: str = "href", html_attrs: Optional[dict] = None) -> str:
-        if "/" in variant:
-            # variant is template name
-            template = variant
-        else:
-            if variant not in self.template_variants.keys():
-                raise JembeUIError(
-                    "Link variant '{}' does not exist! Valid variants are :{}".format(
-                        variant, self.template_variants.keys()
-                    )
-                )
-            template = self.template_variants[variant]
-
-        html_attrs = dict() if html_attrs is None else html_attrs
-        context = {"link": self, "attrs": html_attrs}
-        return Markup(render_template(template, **context))
-
-    def as_href(self, html_attrs: Optional[dict] = None) -> str:
-        """Renders link as simple regular <a href></a> link"""
+    def as_html(self, template: str) -> str:
         if not self.is_accessible:
             return ""
-        return self.as_html(html_attrs=html_attrs)
+        return Markup(render_template(template, link=self))
 
-    def as_button(
-        self, html_attrs: Optional[dict] = None, show_disabled: bool = False
-    ) -> str:
+    def as_href(self) -> str:
+        return self.as_html(
+            self.__class__.DEFAULT_HREF_TEMPLATE_EXP.format(
+                style=settings.default_style
+            ),
+        )
+
+    def as_button(self) -> str:
         """Renders link as simple regular <button></button>"""
-        if not self.is_accessible and not show_disabled:
-            return ""
-        html_attrs = dict() if html_attrs is None else html_attrs
-        if show_disabled:
-            html_attrs["disabled"] = True
-        return self.as_html("button", html_attrs=html_attrs)
+        return self.as_html(
+            self.__class__.DEFAULT_BUTTON_TEMPLATE_EXP.format(
+                style=settings.default_style
+            ),
+        )
+        # if not self.is_accessible and not show_disabled:
+        #     return ""
+        # html_attrs = dict() if html_attrs is None else html_attrs
+        # if show_disabled:
+        #     html_attrs["disabled"] = True
 
 
 class URLLink(Link):

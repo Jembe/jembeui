@@ -1,3 +1,4 @@
+{% from "jembeui/s0/macros.html" import display_menu_as_links %}
 {% extends "jembeui/s0/components/list/list.html" %}
 {% block toolbar__order_by %}
 {% endblock toolbar__order_by %}
@@ -44,7 +45,8 @@
             {% endfor %}
             {% if _config.record_menu %}
             <td>
-            {{get_record_menu(record).as_html('links')}}
+                {{display_menu_as_links(get_record_menu(record))}}
+            {# {{get_record_menu(record).as_html('links')}} #}
             </td> 
             {% endif %}
         </tr>

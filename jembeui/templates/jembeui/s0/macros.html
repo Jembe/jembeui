@@ -1,3 +1,29 @@
+{# I C O N S #}
+{% macro display_icon(icon_name=none, icon_html=none, default_icon_name="checkmark-circle-outline") %}
+{% endmacro %}
+{# L I N K S #}
+
+{# Display link as HREF #}
+{% macro display_link_as_href(link) %}
+    {% if link.is_accessible %}
+        <a href="{{link.url}}"{% if link.jrl %} jmb-on:click.prevent="{{link.jrl}}"{% endif %} class="href">{{link.title}}</a>
+    {% endif %}
+{% endmacro %}
+
+{# Display link as Button #}
+{% macro display_link_as_button(link, button_class="btn") %}
+    {# button_class can be btn, btn-short, btn-micro, btn-large #}
+    {% if link.is_accessible %}
+        <button type="button" class="{{button_class}}
+        {%- if link.styling._style %}
+        btn--{{link.styling._style}}
+        {%- endif %}" jmb-on:click.prevent="{{link.jrl}}">
+            {{link.title}}
+        </button>
+    {% endif %}
+{% endmacro %}
+
+
 {# M E N U S #}
 
 {# DISPLAY SYSTEM MENU #}
@@ -6,11 +32,11 @@
             jmb-on:jembe-update-page.camel.window="$scope().active = null;$updateDom();"
             class="flex flex-col gap-2 pt-4 pb-2 pl-4 pr-2 bg-white border-b border-grey-300 sm:bg-transparent sm:border-none sm:flex-row sm:items-center sm:justify-end sm:h-full sm:gap-2 sm:py-0 sm:pr-2 sm:px-0">
         {% set ns = namespace(topMenuId = none) %}
-        {% for mi in menu.get_items() recursive %}
+        {% for mi in menu.items recursive %}
             {% if mi.is_accessible %}
                 {% if mi.is_menu %}
                     {% if loop.depth == 1 %}
-                        <div jmb-on:mouseleave="if ($scope().opened === '{{mi.id}}') {$scope().timeout=setTimeout(function(){console.log($scope().pened);$scope().opened=null}, 50)}" 
+                        <div jmb-on:mouseleave="if ($scope().opened === '{{mi.id}}') {$scope().timeout=setTimeout(function(){$scope().opened=null}, 50)}" 
                              jmb-on:click.away="if ($scope().opened === '{{mi.id}}') {$scope().opened=null}"
                              jmb-on:mouseover="clearTimeout($scope().timeout); $scope().opened = '{{mi.id}}'"
                              class="relative my-4 sm:m-0">
@@ -18,7 +44,7 @@
                                 jmb-on:focus="$scope().opened='{{mi.id}}'"
                                 jmb-bind:class="{'sm:!font-semibold': $scope().active === '{{mi.id}}'}"
                                 class="block mb-2 text-sm font-light tracking-wider uppercase focus-visible:outline-none sm:mb-0 text-grey-600 sm:tracking-normal sm:font-normal sm:text-base sm:normal-case sm:hover:underline sm:focus-visible:underline">
-                                {{mi.get_title()}}
+                                {{mi.title}}
                             </button>
                             <div jmb-cloak 
                                 class="sm:absolute sm:right-0 sm:z-50 sm:-mt-2"
@@ -32,16 +58,16 @@
                                 {# dropdown #}
                                 <div class="pl-4 sm:px-4 sm:py-4 sm:-mt-[1px] sm:bg-white sm:border sm:rounded-sm sm:shadow-md sm:border-grey-200 sm:whitespace-nowrap flex flex-col gap-2 sm:min-w-[8rem]">
                                     {% set ns.topMenuId = mi.id %}
-                                    {{loop(mi.get_items())}}
+                                    {{loop(mi.items)}}
                                 </div>
                             </div>
                         </div>
                     {% else %}
                         <div class="pt-2 text-grey-500">
-                            {{mi.get_title()}}
+                            {{mi.title}}
                         </div>
                         <div class="pl-2">
-                            {{loop(mi.get_items())}}
+                            {{loop(mi.items)}}
                         </div>
                     {% endif %}
                 {% else %}
@@ -76,25 +102,25 @@
     <div jmb-scope="{active:null}"
             jmb-on:jembe-update-page.camel.window="$scope().active = null; $updateDom();"
             class="flex flex-col h-full gap-2 pt-4 pb-2 pl-4 pr-2">
-        {% for mi in menu.get_items() recursive %}
+        {% for mi in menu.items recursive %}
             {% if mi.is_accessible %}
                 {% if mi.is_menu %}
                     {% if loop.depth == 1 %}
                         <div class="my-4">
                             <button type="button"
                                 class="block mb-2 text-sm font-light tracking-wider uppercase focus-visible:outline-none text-grey-600 ">
-                                {{mi.get_title()}}
+                                {{mi.title}}
                             </button>
                             <div class="flex flex-col gap-2 pl-4 ">
-                                {{loop(mi.get_items())}}
+                                {{loop(mi.items)}}
                             </div>
                         </div>
                     {% else %}
                         <div class="pt-2 text-grey-400">
-                            {{mi.get_title()}}
+                            {{mi.title}}
                         </div>
                         <div class="pl-2">
-                            {{loop(mi.get_items())}}
+                            {{loop(mi.items)}}
                         </div>
                     {% endif %}
                 {% else %}
@@ -107,7 +133,7 @@
                             ) 
                         }"
                         class="block text-grey-600 hover:underline focus-visible:outline-none focus-visible:underline">
-                        {{mi.title}} <span jmb-text="$scope().active"></span>
+                        {{mi.title}} 
                     </a>
                 {% endif %}
             {% endif %}
@@ -117,8 +143,91 @@
 
 
 {# DISPLAY MENU AS BUTTONS #}
-{% macro display_menu_as_buttons(menu, aligh_right=false, size="base")%}
+{% macro display_menu_as_buttons(menu, aligh_right=false, button_class="btn")%}
+    <div jmb-scope="{opened:null}" class="flex gap-1">
+        {% for mi in menu.items recursive %}
+            {% if mi.is_accessible %}
+                {% if mi.is_menu %}
+                    {% if loop.depth == 1 %}
+                        <div class="relative"
+                             jmb-on:click.away="if ($scope().opened === '{{mi.id}}'){$scope().opened=null}">
+                             <button class="
+                                flask gap-1
+                                {%- if menu.title %}
+                                {{button_class}}
+                                {%- else %}
+                                btn-ghost
+                                {%- endif %}
+                                {% if mi.styling._style %}btn--{{mi.styling._style}}{% endif %}"
+                                      jmb-on:click.prevent="if ($scope().opened === '{{mi.id}}'){$scope().opened = null}else{$scope().opened = '{{mi.id}}'}">
+                                    <div>{{mi.title|default("", true)}}</div>
+                                    {{display_icon(mi.icon, mi.icon_html, "chevron-down-outline")}}
+                            </button>
+                            <div class="absolute z-40 hidden px-4 py-2 mt-2 bg-white rounded-sm shadow -right-4 border-grey-300 whitespace-nowrap"
+                                 jmb-bind:class="{'': $scope().opened === '{{mi.id}}'}"
+                                 jmb-cloak
+                                 jmb-on:click.prevent="if($event.target.tagName ==='A'){$scope().opened=null}">
+                                {{loop(mi.items)}}
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="pt-2 text-right text-grey-400">
+                            {{mi.title}}
+                        </div>
+                        <div class="pl-2">
+                            {{loop(mi.items)}}
+                        </div>
+                    {% endif %}
+                {% else %}
+                    {% if loop.depth == 1 %}
+                        {{display_link_as_button(mi)}}
+                    {% else %}
+                        {{display_link_as_href(mi)}}
+                    {% endif %}
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+    </div> 
+{% endmacro%}
+
+{# DISPLAY MENU AS LINKS #}
+{% macro display_menu_as_links(menu)%}
     {# size can be micro, short, base, large #}
+    {% if menu.is_accessible %}
+    <div jmb-scope="{opened:null}" class="flex flex-row items-center gap-2">
+        {% for mi in menu.items recursive %}
+            {% if mi.is_accessible %}
+                {% if mi.is_menu %}
+                    {% if loop.depth == 1 %}
+                        <div class="relative"
+                             jmb-on:click.away="if ($scope().opened === '{{mi.id}}'){$scope().opened=null}">
+                             <div>
+                                <a href="#" jmb-on:click.prevent="if ($scope().opened === '{{menu.id}}'){$scope().opened = null}else{$scope().opened = '{{menu.id}}'}">
+                                    {{menu.title|default("", true)}}
+                                    {{display_icon(mi.icon, mi.icon_html, "ellipsis-horizontal-outline" if not menu.title else "")}}
+                                </a>
+                             </div>
+                            <div class="absolute z-40 hidden px-4 py-2 mt-2 bg-white rounded-sm shadow -right-4 border-grey-300 whitespace-nowrap"
+                                 jmb-bind:class="{'': $scope().opened === '{{mi.id}}'}"
+                                 jmb-cloak>
+                                {{loop(mi.items)}}
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="pt-2 text-right text-grey-400">
+                            {{mi.title}}
+                        </div>
+                        <div class="pl-2">
+                            {{loop(mi.items)}}
+                        </div>
+                    {% endif %}
+                {% else %}
+                    {{display_link_as_href(mi)}}
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+    </div> 
+    {% endif %}
 {% endmacro%}
 
 

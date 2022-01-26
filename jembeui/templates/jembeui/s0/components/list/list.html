@@ -1,11 +1,14 @@
+{% from "jembeui/s0/macros.html" import display_menu_as_buttons %}
 <div>
-{% block menu -%}
+{% block header -%}
     {% if menu -%}
-    <div class="list-records__menu">
-    {{menu.as_html('buttons')}} 
+    {# <div class="list-records__menu">
+    {{menu.as_html('buttons')}}  #}
+    <div class="">
+        {{display_menu_as_buttons(menu)}}
     </div>
     {% endif -%}
-{%- endblock menu %}
+{%- endblock header %}
 {% block toolbar -%}
     
     {% if not ( total_records == 0 and _config.search_filter is none and not _config.choice_filters and _config.search_filter is none and jui_choice_filters_config|length == 0) %}

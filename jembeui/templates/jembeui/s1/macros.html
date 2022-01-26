@@ -6,23 +6,23 @@
             jmb-on:jembe-update-page.camel.window="$scope().active = null; $updateDom()"
             style="display:inherit;">
         {% set ns = namespace(topMenuId = none) %}
-        {% for mi in menu.get_items() recursive %}
+        {% for mi in menu.items recursive %}
             {% if mi.is_accessible %}
                 {% if mi.is_menu %}
                     {% if loop.depth == 1 %}
                         <div class="navbar-item has-dropdown is-hoverable">
                             <div class="navbar-link is-arrowless"
                                 jmb-bind:class="{'is-active': $scope().active === '{{mi.id}}'}">
-                                {{mi.get_title()}}
+                                {{mi.title}}
                             </div>
                             <div class="navbar-dropdown {{'is-right' if is_right else ''}}">
                                 {% set ns.topMenuId = mi.id %}
-                                {{loop(mi.get_items())}}
+                                {{loop(mi.items)}}
                             </div>
                         </div>
                     {% else %}
                         <hr class="navbar-divider">
-                        {{loop(mi.get_items())}}
+                        {{loop(mi.items)}}
                     {% endif %}
                 {% else %}
                    {% if loop.depth == 1 %}

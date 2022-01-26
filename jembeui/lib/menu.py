@@ -1,23 +1,20 @@
 from typing import (
     Callable,
-    ClassVar,
     Sequence,
     TYPE_CHECKING,
     Optional,
     Union,
     Dict,
     Any,
-    ClassVar,
 )
-from markupsafe import Markup
+
 from functools import cached_property
 from dataclasses import dataclass, field
 from uuid import uuid4
-from flask import render_template
+
 
 from ..exceptions import JembeUIError
-from ..settings import settings
-from ..helpers import get_widget_variants
+
 
 if TYPE_CHECKING:
     import jembe
@@ -41,9 +38,6 @@ class Menu:
 
     id: str = field(default="", init=False)
 
-    # template supoprted template variant calculated based on settings.menu_widgets_variants_dirs
-    TEMPLATE_VARIANTS: ClassVar[dict]
-
     def __post_init__(self):
         self._items: Sequence[Union["jembeui.Link", "jembeui.Menu"]]
         self._component: Optional["jembe.Component"] = None
@@ -61,8 +55,28 @@ class Menu:
         binded_menu.id = self.id
         binded_menu._component = component
         binded_menu.items = [
-            item.bind_to(component) for item in self._get_items(component)
+            item.bind_to(component) for item in self.__get_items(component)
         ]
+        binded_menu.title = (
+            self.title
+            if isinstance(self.title, str) or self.title is None
+            else self.title(component)
+        )
+        binded_menu.description = (
+            self.description
+            if isinstance(self.description, str) or self.description is None
+            else self.description(component)
+        )
+        binded_menu.icon = (
+            self.icon
+            if isinstance(self.icon, str) or self.icon is None
+            else self.icon(component)
+        )
+        binded_menu.icon_html = (
+            self.icon_html
+            if isinstance(self.icon_html, str) or self.icon_html is None
+            else self.icon_html(component)
+        )
         return binded_menu
 
     @property
@@ -79,7 +93,7 @@ class Menu:
     def is_accessible(self) -> bool:
         if not self.binded:
             raise ValueError("Menu must be binded to component!")
-        for item in self.get_items():
+        for item in self.items:  # type:ignore
             if item.is_accessible:
                 return True
         return False
@@ -88,7 +102,7 @@ class Menu:
     def is_empty(self) -> bool:
         if not self.binded:
             raise ValueError("Menu must be binded to component!")
-        for item in self.get_items():
+        for item in self.items:  # type:ignore
             if item.is_accessible:
                 return False
         return True
@@ -97,63 +111,9 @@ class Menu:
     def is_menu(self) -> bool:
         return True
 
-    @property
-    def template_variants(self) -> Dict[str, str]:
-        try:
-            return self.__class__.TEMPLATE_VARIANTS
-        except AttributeError:
-            self.__class__.TEMPLATE_VARIANTS = get_widget_variants(
-                settings.menu_widgets_variants_dirs
-            )
-        return self.__class__.TEMPLATE_VARIANTS
-
-    def as_html(self, variant: str = "default") -> str:
-        if not self.binded:
-            raise JembeUIError(
-                "Menu must be binded to component in order to be rendered to html"
-            )
-        if "/" in variant or "." in variant:
-            # variant is template name
-            template = variant
-        else:
-            if variant not in self.template_variants.keys():
-                raise JembeUIError(
-                    "Menu variant '{}' does not exist! Valid variants are :{}".format(
-                        variant, self.template_variants.keys()
-                    )
-                )
-            template = self.template_variants[variant]
-        context = {"menu": self}
-        return Markup(render_template(template, **context))
-
-    def get_items(self):
-        if not self.binded:
-            raise JembeUIError("Cant get items from unbinded menu")
-        return self.items
-
-    def _get_items(self, component: "jembe.Component"):
+    def __get_items(self, component: "jembe.Component"):
         if isinstance(self.items, (tuple, list)):
             self._items = self.items
         else:
             self._items = self.items(component)  # type:ignore
         return self._items
-
-    def get_title(self):
-        if isinstance(self.title, str) or self.title is None:
-            return self.title
-        return self.title(self.component)
-
-    def get_description(self):
-        if isinstance(self.description, str) or self.description is None:
-            return self.description
-        return self.description(self.component)
-
-    def get_icon(self):
-        if isinstance(self.icon, str) or self.icon is None:
-            return self.icon
-        return self.icon(self.component)
-
-    def get_icon_html(self):
-        if isinstance(self.icon_html, str) or self.icon_html is None:
-            return self.icon_html
-        return self.icon_html(self.component)
