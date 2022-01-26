@@ -10,7 +10,7 @@ module.exports = {
             black: colors.black,
             white: colors.white,
             grey: colors.neutral,
-            primary: colors.sky,
+            primary: colors.emerald,
             secondary: colors.cyan,
             tertiary: colors.fuchsia,
             brand: colors.green,
