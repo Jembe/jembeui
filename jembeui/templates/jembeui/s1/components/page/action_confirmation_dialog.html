@@ -1,22 +1,10 @@
+{% from "jembeui/s1/macros.html" import display_card_modal %}
 {% if confirmation %}
-<div class="modal is-active">
-  <div class="modal-background"></div>
-  <div class="modal-card">
-    {% if confirmation.title %}
-    <header class="modal-card-head">
-      <p class="modal-card-title">{{confirmation.title}}</p>
-      <button jmb-on:click="cancel()" class="delete" aria-label="close"></button>
-    </header>
-    {% endif %}
-    {% if confirmation.question %}
-    <section class="modal-card-body">
+    {% set menu %}
+        <button jmb-on:click="confirm()" jmb-on:ready="$self.focus()" class="button is-success">{{confirmation.confirm_title}}</button>
+        <button jmb-on:click="cancel()" class="button">Cancel</button>
+    {%endset%}
+    {% call display_card_modal(component, confirmation.title, menu) %}
         {{confirmation.question}}
-    </section>
-    {% endif %}
-    <footer class="modal-card-foot">
-      <button jmb-on:click="confirm()" jmb-on:ready="$self.focus()" class="button is-success">OK</button>
-      <button jmb-on:click="cancel()" class="button">Cancel</button>
-    </footer>
-  </div>
-</div>
+    {% endcall%}
 {% endif %}

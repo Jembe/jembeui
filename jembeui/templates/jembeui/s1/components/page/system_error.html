@@ -1,6 +1,4 @@
-<div 
-    jmb-ignore
-    jmb-local="{show:false, networkError: false}"
+<div jmb-local="{show:false, networkError: false}"
     jmb-on:jembe-update-page-error.camel.window="
         $refs.title.innerText = '';
         $refs.content.innerHTML = '';
@@ -21,8 +19,8 @@
     "
     jmb-bind:class="{'is-active':$local.show}"
     jmb-cloak
-    class="modal"
-    >
+    jmb-ignore
+    class="modal">
   <div class="modal-background"></div>
   <div class="modal-card">
     <header class="modal-card-head has-background-danger has-text-danger-light">

@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    {{component("page_title")}}
+    {{component("__title")}}
     {# seo tag + description #}
     <link rel="stylesheet" href="{{url_for('jembeui.static', filename='jembeui/s1/css/fontawesome5.min.css')}}">
     <link rel="stylesheet" href="{{url_for('jembeui.static', filename='jembeui/s1/css/main.css')}}">
 </head>
 <body class="has-navbar-fixed-top">
     {# Update indicator #}
-    {{component("page_update_indicator")}}
+    {{component("__update_indicator")}}
 
     {# Navigation #}
     <nav class="container navbar has-shadow is-fixed-top" role="navigation" aria-label="main navigation">
@@ -30,18 +30,18 @@
         <div class="navbar-start">
 
         {# Main menu #}
-        {% if "page_main_menu" in _config.components %}
+        {% if "__main_menu" in _config.components %}
         {% block main_menu %}
-            {{component('page_main_menu')}}
+            {{component('__main_menu')}}
         {% endblock main_menu %}
         {% endif %}
         </div>
 
         {# System menu #}
         <div class="navbar-end">
-        {% if "page_system_menu" in _config.components %}
+        {% if "__system_menu" in _config.components %}
         {% block system_menu %}
-            {{component('page_system_menu')}}
+            {{component('__system_menu')}}
         {% endblock system_menu %}
         {% endif %}
         </div>
@@ -49,9 +49,9 @@
     </nav>
 
     {# Breadcrumb #}
-    {% if "page_breadcrumb" in _config.components %}
+    {% if "__breadcrumb" in _config.components %}
     <div class="container px-3 my-2">
-        {{component("page_breadcrumb")}}
+        {{component("__breadcrumb")}}
     </div>
     {% endif %}
 
@@ -69,9 +69,9 @@
         </div>
         {%- endblock footer %}
     </div>
-    {{component("page_notifications")}}
-    {{component("page_syserror")}}
-    {{component("page_action_confirmation")}}
+    {{component("__notifications")}}
+    {{component("__syserror")}}
+    {{component("__action_confirmation")}}
     <script src="{{ url_for('jembe.static', filename='js/jembe.js') }}" defer></script>
     <script defer>
     window.addEventListener('DOMContentLoaded', function(event){

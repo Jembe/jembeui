@@ -3,7 +3,7 @@
 {# DISPLAY SYSTEM MENU #}
 {% macro display_system_menu(menu) %}
     <div jmb-scope="{opened:null, active:null, timeout:null}"
-            jmb-on:jembe-update-page.camel.window="$scope().active = null;"
+            jmb-on:jembe-update-page.camel.window="$scope().active = null;$updateDom();"
             class="flex flex-col gap-2 pt-4 pb-2 pl-4 pr-2 bg-white border-b border-grey-300 sm:bg-transparent sm:border-none sm:flex-row sm:items-center sm:justify-end sm:h-full sm:gap-2 sm:py-0 sm:pr-2 sm:px-0">
         {% set ns = namespace(topMenuId = none) %}
         {% for mi in menu.get_items() recursive %}
@@ -16,7 +16,7 @@
                              class="relative my-4 sm:m-0">
                             <button type="button"
                                 jmb-on:focus="$scope().opened='{{mi.id}}'"
-                                jmb-bind:class="{'sm:font-semibold': $scope().active === '{{mi.id}}'}"
+                                jmb-bind:class="{'sm:!font-semibold': $scope().active === '{{mi.id}}'}"
                                 class="block mb-2 text-sm font-light tracking-wider uppercase focus-visible:outline-none sm:mb-0 text-grey-600 sm:tracking-normal sm:font-normal sm:text-base sm:normal-case sm:hover:underline sm:focus-visible:underline">
                                 {{mi.get_title()}}
                             </button>
@@ -63,7 +63,7 @@
                             {%- endif %}
                         }"
                         class="block text-grey-600 hover:underline focus-visible:outline-none focus-visible:underline">
-                        {{mi.title}}
+                        {{mi.title}} 
                     </a>
                 {% endif %}
             {% endif %}
@@ -114,3 +114,67 @@
         {% endfor %}
     </div> 
 {% endmacro%}
+
+
+{# DISPLAY MENU AS BUTTONS #}
+{% macro display_menu_as_buttons(menu, aligh_right=false, size="base")%}
+    {# size can be micro, short, base, large #}
+{% endmacro%}
+
+
+
+
+
+{# M O D A L S #}
+
+
+{#  DISPLAY MODAL #}
+{% macro display_modal(component, title=none, menu=none, closable=true, size="base", close_button_title=none)%}
+    {# size in small, base, wide, fullscreen #}
+    {% set display_header = title is not none or closable %}
+    {% set display_footer = menu is not none or (closable and close_button_title is not none)%}
+
+    <div class="fixed inset-0 z-50 bg-opacity-80 bg-grey-900">
+        <div class="min-w-[280px] m-auto mt-[5vh]
+        {%- if size == 'small' %}
+            max-w-[80%] w-[420px]
+        {%- elif size == 'base' %}
+            max-w-[80%] w-[650px]
+        {%- elif size == 'wide' %}
+            max-w-[80%] w-4/5
+        {%- elif size == 'fullscreen' %}
+        {%- endif %}">
+            {# header #}
+            {% if display_header %}
+            <div class="flex items-center justify-between py-1 pl-4 pr-2 text-xl font-light leading-6 rounded-t-sm bg-grey-200">
+                <div>{{title|default('', true)}}</div>
+                {% if closable %}
+                <button jmb-on:click="{%- if component('cancel()').is_accessible %}cancel(){% else %}$jmb.emit('cancel'){% endif -%}" type="button" title="Close" class="btn-ghost">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><title>Close</title><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M368 368L144 144M368 144L144 368"/></svg>
+                </button>
+                {% endif %}
+            </div>
+            {% endif %}
+            {# content #}
+            <div class="p-4 bg-grey-50 {% if not display_header %}rounded-t-sm{% endif %} {% if not display_footer %}rounded-b-sm{% endif %}">
+                {{caller()}}
+            </div>
+            {# footer #}
+            {% if display_footer %}
+            <div class="p-4 rounded-b-sm bg-grey-50">
+                {% if menu is not none  %}
+                    {% if menu is string() %}
+                    {{menu}}
+                    {% else %}
+                    {{display_menu_as_buttons(menu, aligh_right=true)}}
+                    {% endif %}
+                {% elif menu is none and closable and close_button_title %}
+                    <div class="flex justify-end">
+                        <button jmb-on:click="{%- if component('cancel()').is_accessible %}cancel(){% else %}$jmb.emit('cancel'){% endif -%}" jmb-on:ready="$self.focus()" type="button" class="btn btn-primary">{{close_button_title}}</button>
+                    </div>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+{% endmacro %}

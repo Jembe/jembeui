@@ -54,42 +54,42 @@ class CPage(Component):
             url_query_params: Optional[Dict[str, str]] = None,
         ):
             components = components if components is not None else dict()
-            if "page_title" not in components:
-                components["page_title"] = (
+            if "__title" not in components:
+                components["__title"] = (
                     CPageTitle,
                     CPageTitle.Config(title=title if title else self.default_title),
                 )
-            if "page_notifications" not in components:
-                components["page_notifications"] = CPageNotifications
-            if "page_notice" not in components:
-                components["page_notice"] = CPageNotice
-            if "page_syserror" not in components:
-                components["page_syserror"] = CPageSystemError
-            if "page_action_confirmation" not in components:
-                components["page_action_confirmation"] = CActionConfirmationDialog
-            if "page_update_indicator" not in components:
-                components["page_update_indicator"] = CPageUpdateIndicator
-            if "page_main_menu" not in components and main_menu is not None:
-                components["page_main_menu"] = (
+            if "__notifications" not in components:
+                components["__notifications"] = CPageNotifications
+            if "__notice" not in components:
+                components["__notice"] = CPageNotice
+            if "__syserror" not in components:
+                components["__syserror"] = CPageSystemError
+            if "__action_confirmation" not in components:
+                components["__action_confirmation"] = CActionConfirmationDialog
+            if "__update_indicator" not in components:
+                components["__update_indicator"] = CPageUpdateIndicator
+            if "__main_menu" not in components and main_menu is not None:
+                components["__main_menu"] = (
                     CMenu,
                     CMenu.Config(
                         menu=main_menu,
                         template=CMenu.Config.template_variant("page_main"),
                     ),
                 )
-            if "page_system_menu" not in components and system_menu is not None:
-                components["page_system_menu"] = (
+            if "__system_menu" not in components and system_menu is not None:
+                components["__system_menu"] = (
                     CMenu,
                     CMenu.Config(
                         menu=system_menu,
                         template=CMenu.Config.template_variant("page_system"),
                     ),
                 )
-            if "page_breadcrumb" not in components and breadcrumbs is not None:
+            if "__breadcrumb" not in components and breadcrumbs is not None:
                 if isinstance(breadcrumbs, Breadcrumb):
                     breadcrumbs = [breadcrumbs]
 
-                components["page_breadcrumb"] = (
+                components["__breadcrumb"] = (
                     CBreadcrumb,
                     CBreadcrumb.Config(breadcrumbs=breadcrumbs),
                 )

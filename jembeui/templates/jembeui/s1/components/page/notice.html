@@ -1,0 +1,6 @@
+{% from "jembeui/s1/macros.html" import display_modal %}
+{% if message %}
+    {% call display_card_modal(component, title) %}
+        {{message}}
+    {% endcall%}
+{% endif %}

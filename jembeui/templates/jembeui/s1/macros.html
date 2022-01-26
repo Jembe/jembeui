@@ -54,3 +54,51 @@
 {% macro display_main_menu(menu) %}
     {{display_system_menu(menu, false)}}
 {% endmacro%}
+
+{# DISPLAY MENU AS BUTTONS #}
+{% macro display_menu_as_buttons(menu, aligh_right=false, size="base")%}
+    {# size can be micro, short, base, large #}
+{% endmacro%}
+
+
+
+
+
+{# M O D A L S #}
+
+
+{#  DISPLAY MODAL #}
+{% macro display_card_modal(component, title=none, menu=none, closable=true, close_button_title=none)%}
+    {# size in small, base, wide, fullscreen #}
+    {% set display_header = title is not none or closable %}
+    {% set display_footer = menu is not none or (closable and close_button_title is not none)%}
+
+    <div class="modal is-active">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+        {% if display_header %}
+        <header class="modal-card-head">
+            <p class="modal-card-title">{{title|default('', ture)}}</p>
+            {% if closable %}
+            <button jmb-on:click="{%- if component('cancel()').is_accessible %}cancel(){% else %}$jmb.emit('cancel'){% endif -%}" class="delete" aria-label="close"></button>
+            {% endif %}
+        </header>
+        {% endif %}
+        <section class="modal-card-body">
+            {{caller()}}
+        </section>
+        {% if display_footer %}
+        <footer class="modal-card-foot">
+            {% if menu is not none  %}
+                {% if menu is string() %}
+                {{menu}}
+                {% else %}
+                {{display_menu_as_buttons(menu, aligh_right=true)}}
+                {% endif %}
+            {% elif menu is none and closable and close_button_title %}
+                <button jmb-on:click="cancel()" jmb-on:ready="$self.focus()" class="button">Cancel</button>
+            {% endif %}
+        </footer>
+        {% endif %}
+    </div>
+{% endmacro %}

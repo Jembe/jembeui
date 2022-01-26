@@ -25,7 +25,6 @@ module.exports = {
             },
             boxShadow: {
                 'focus': '0 0 0 1px #0ea5e9 inset, 0 0 0 1px #0ea5e9, 0 0 0 4px #0ea5e94d',
-                'focus-danger': '0 0 0 1px #e64f43 inset, 0 0 0 1px #e64f43, 0 0 0 4px #e64f434d',
             },
             animation: {
                 'progress': 'running-progress 2s cubic-bezier(0.4, 0, 0.2, 1) infinite'

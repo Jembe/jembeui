@@ -4442,7 +4442,7 @@ button.dropdown-item {
     .modal-card {
       margin: 0 auto;
       max-height: calc(100vh - 40px);
-      width: 640px; } }
+      width: 740px; } }
 
 /* line 65, node_modules/bulma/sass/components/modal.sass */
 .modal-close {
@@ -10200,13 +10200,13 @@ a.has-text-danger-dark:hover, a.has-text-danger-dark:focus {
   background-color: #fafafa;
   padding: 3rem 1.5rem 6rem; }
 
-/* line 4, jembeui/src/jembeui/s1/sass/main.scss */
+/* line 5, jembeui/src/jembeui/s1/sass/main.scss */
 .notifications {
   bottom: 0;
   right: 0;
   position: absolute; }
 
-/* line 9, jembeui/src/jembeui/s1/sass/main.scss */
+/* line 10, jembeui/src/jembeui/s1/sass/main.scss */
 .loader-wrapper {
   position: absolute;
   top: 0;
@@ -10222,24 +10222,24 @@ a.has-text-danger-dark:hover, a.has-text-danger-dark:focus {
   align-items: center;
   border-radius: 6px; }
 
-/* line 25, jembeui/src/jembeui/s1/sass/main.scss */
+/* line 26, jembeui/src/jembeui/s1/sass/main.scss */
 .loader-wrapper .loader {
   height: 80px;
   width: 80px; }
 
-/* line 30, jembeui/src/jembeui/s1/sass/main.scss */
+/* line 31, jembeui/src/jembeui/s1/sass/main.scss */
 .loader-wrapper.is-active {
   opacity: 0.8;
   z-index: 1000; }
 
 /* breadcrumb */
-/* line 35, jembeui/src/jembeui/s1/sass/main.scss */
+/* line 36, jembeui/src/jembeui/s1/sass/main.scss */
 .breadcrumb span {
   align-items: center;
   display: flex;
   justify-content: center;
   padding: 0 .75em; }
 
-/* line 41, jembeui/src/jembeui/s1/sass/main.scss */
+/* line 42, jembeui/src/jembeui/s1/sass/main.scss */
 .breadcrumb li:first-child span {
   padding-left: 0; }
