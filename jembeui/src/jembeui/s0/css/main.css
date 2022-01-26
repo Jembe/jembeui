@@ -29,6 +29,6 @@
         @apply text-white bg-error-600 hover:bg-error-700 active:bg-error-800 disabled:bg-error-300 focus-visible:shadow-focus focus-visible:shadow-error-200; 
     }
     .href {
-        @apply text-primary-600 hover:underline focus-visible:shadow-focus focus-visible:outline-none;
+        @apply text-primary-700 hover:underline focus-visible:shadow-focus focus-visible:outline-none;
     }
 }

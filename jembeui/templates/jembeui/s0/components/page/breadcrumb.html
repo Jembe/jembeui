@@ -1,16 +1,18 @@
-<div class="breadcrumb">
+<div>
 {% if bitems|length > 1  or (bitems|length == 1 and not bitems[0].is_hidden )%}
+<div class="flex flex-row items-center gap-1 mt-2 text-sm flex-nowrap">
     {% for bitem in bitems %}
         {% if not bitem.is_hidden %}
             {% if bitem.url and not loop.last %}
-                <a href="{{bitem.url}}" {% if bitem.jrl %}jmb-on:click.prevent="{{bitem.jrl}}"{% endif %}>{{bitem.title}}</a>
+                <a href="{{bitem.url}}" {% if bitem.jrl %}jmb-on:click.prevent="{{bitem.jrl}}"{% endif %} class="block href visited:text-primary-800">{{bitem.title}}</a>
             {% else %}
-                <span>{{bitem.title}}</span>
+                <div>{{bitem.title}}</div>
             {% endif %}
             {% if not loop.last %}
-                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"><path fill="context-fill" d="M9 6a1 1 0 00-.3-.7l-3-3a1 1 0 00-1.4 1.4L6.6 6 4.3 8.3a1 1 0 001.4 1.4l3-3A1 1 0 009 6z"/></svg>
+                <svg class="block w-3 h-3" xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><title>Chevron Forward</title><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="48" d="M184 112l144 144-144 144"/></svg>
             {% endif %}
         {% endif %}
     {% endfor %}
+</div>
 {% endif %}
 </div>

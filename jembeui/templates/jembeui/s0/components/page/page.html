@@ -72,9 +72,7 @@
             <div class="sm:px-2" jmb-bind:class="{'sm:col-span-2': ! $local.mainMenuOpen}">
                 {# Bradcrumb #}
                 {% if "__breadcrumb" in _config.components %}
-                <div class="flex flex-row items-center ">
-                    {{component("__breadcrumb")}}
-                </div>
+                {{component("__breadcrumb")}}
                 {% endif %}
 
                 {# Content #}
