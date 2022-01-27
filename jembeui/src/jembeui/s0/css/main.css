@@ -14,7 +14,10 @@
         @apply btn min-w-[unset];
     }
     .btn-ghost {
-        @apply w-6 h-6 text-sm bg-transparent rounded-sm cursor-pointer text-grey-700 text-opacity-80 hover:bg-grey-300 hover:bg-opacity-60 focus-visible:outline-none focus-visible:shadow-focus disabled:bg-grey-300 disabled:opacity-40;
+        @apply w-8 h-8 text-sm bg-transparent rounded-sm cursor-pointer text-grey-700 text-opacity-80 hover:bg-grey-300 hover:bg-opacity-60 focus-visible:outline-none focus-visible:shadow-focus disabled:bg-grey-300 disabled:opacity-40;
+    }
+    .btn-ghost-micro {
+        @apply w-6 h-6 btn-ghost;
     }
     .btn--primary {
         @apply text-white bg-primary-600 hover:bg-primary-700 active:bg-primary-800 disabled:bg-primary-300; 

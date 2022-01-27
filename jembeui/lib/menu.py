@@ -34,7 +34,7 @@ class Menu:
     icon: Optional[Union[str, Callable[["jembe.Component"], str]]] = None
     icon_html: Optional[Union[str, Callable[["jembe.Component"], str]]] = None
     params: Dict[str, Any] = field(default_factory=dict)
-    styling: Dict[str, Any] = field(default_factory=dict)
+    styling: Sequence[str] = field(default_factory=tuple)
 
     id: str = field(default="", init=False)
 

@@ -1,25 +1,102 @@
 {# I C O N S #}
-{% macro display_icon(icon_name=none, icon_html=none, default_icon_name="checkmark-circle-outline") %}
+{% macro display_icon(icon_name=none, icon_html=none, default_icon_name="checkmark-circle-outline", class=none) %}
+    {%- if icon_html %}
+        {{icon_html}}
+    {%- elif icon_name %}
+        {%- include "jembeui/s0/icons/{}.svg".format(icon_name) with context %}
+    {%- elif default_icon_name %}
+        {%- include "jembeui/s0/icons/{}.svg".format(default_icon_name) with context %}
+    {%- endif %}
 {% endmacro %}
 {# L I N K S #}
 
 {# Display link as HREF #}
-{% macro display_link_as_href(link) %}
+{% macro display_link_as_href(link, styling=()) %}
     {% if link.is_accessible %}
+        {% if "as_button" in link.styling %}
+            {{display_link_as_button(link)}}
+        {% endif %}
+        {% set styling = styling if styling else link.styling %}
         <a href="{{link.url}}"{% if link.jrl %} jmb-on:click.prevent="{{link.jrl}}"{% endif %} class="href">{{link.title}}</a>
     {% endif %}
 {% endmacro %}
 
 {# Display link as Button #}
-{% macro display_link_as_button(link, button_class="btn") %}
-    {# button_class can be btn, btn-short, btn-micro, btn-large #}
+{% macro display_button(title=none, jrl=none, icon_name=none, icon_html=none, default_icon_name=none, styling=(), attrs=none) %}
+    {% set has_icon = icon_name  or icon_html %}
+    {% set is_ghost = (has_icon or default_icon_name) and (not title or "ghost" in styling or "ghost-micro" in "styling") %}
+    {% set attrs = attrs if attrs else {} %}
+    <button type="button" class="
+        {%- if is_ghost %}
+            {%- if 'ghost-micro' in styling%}
+                btn-ghost-micro
+            {%- else %}
+                btn-ghost
+            {%- endif %}
+        {%- elif 'micro' in styling %}
+            btn-micro
+        {%- elif 'short' in styling %}
+            btn-short
+        {%- else %}
+            btn
+        {%- endif %}
+        {%- if not is_ghost and has_icon %}
+        flex items-center
+        {%- endif %}
+        {%- if 'primary' in styling %}
+            btn--primary
+        {%- elif 'secondary' in styling %}
+            btn--secondary
+        {%- elif 'brand' in styling %}
+            btn--brand
+        {%- elif 'danger' in styling %}
+            btn--danger
+        {%- endif %}" 
+        {%- if jrl %}
+        jmb-on:click.prevent="{{jrl}}"
+        {%- endif %}
+        {%- if is_ghost and title %}
+        title="{{title}}"
+        {%- endif %}
+        {%- if attrs %}
+            {%- for k,v in attrs.items() %}
+                {{k}}="{{v}}"
+            {%- endfor %}
+        {%- endif %}>
+        {%- if is_ghost %}
+            {{display_icon(icon_name, icon_html, class="p-1")}} 
+        {%- elif has_icon %}
+            {%- set icon_is_last = "icon-last" in styling %}
+            {%- set icon_class = "w-8 h-8 p-1" if "micro" not in styling else "w-6 h-6 p-1" %}
+            {%- if has_icon and not icon_is_last %}
+                {{display_icon(icon_name, icon_html, class=icon_class)}} 
+            {%- endif -%}
+            <div class="grow">
+                {{title|default('',true)}}
+            </div>
+            {%- if has_icon and icon_is_last %}
+                {{display_icon(icon_name, icon_html, class=icon_class)}} 
+            {%- endif -%}
+        {%- else %}
+            {{title|default('',true)}}
+        {%- endif -%}
+    </button>
+{% endmacro %}
+
+{% macro display_link_as_button(link, styling=(), attrs=none) %}
     {% if link.is_accessible %}
-        <button type="button" class="{{button_class}}
-        {%- if link.styling._style %}
-        btn--{{link.styling._style}}
-        {%- endif %}" jmb-on:click.prevent="{{link.jrl}}">
-            {{link.title}}
-        </button>
+        {% if "as_href" in link.styling %}
+            {{display_link_as_href(link)}}
+        {% endif %}
+        {% set styling = styling if styling else link.styling %}
+        {{display_button(
+            title=link.title,
+            jrl=link.jrl,
+            icon_name=link.icon_name,
+            icon_html=link.icon_html,
+            styling=styling,
+            attrs=attrs
+        )}}
     {% endif %}
 {% endmacro %}
 
@@ -151,20 +228,18 @@
                     {% if loop.depth == 1 %}
                         <div class="relative"
                              jmb-on:click.away="if ($scope().opened === '{{mi.id}}'){$scope().opened=null}">
-                             <button class="
-                                flask gap-1
-                                {%- if menu.title %}
-                                {{button_class}}
-                                {%- else %}
-                                btn-ghost
-                                {%- endif %}
-                                {% if mi.styling._style %}btn--{{mi.styling._style}}{% endif %}"
-                                      jmb-on:click.prevent="if ($scope().opened === '{{mi.id}}'){$scope().opened = null}else{$scope().opened = '{{mi.id}}'}">
-                                    <div>{{mi.title|default("", true)}}</div>
-                                    {{display_icon(mi.icon, mi.icon_html, "chevron-down-outline")}}
-                            </button>
-                            <div class="absolute z-40 hidden px-4 py-2 mt-2 bg-white rounded-sm shadow -right-4 border-grey-300 whitespace-nowrap"
-                                 jmb-bind:class="{'': $scope().opened === '{{mi.id}}'}"
+                             {{display_button(
+                                 title=mi.title, 
+                                 icon_name=mi.icon_name if mi.icon_name or mi.icon_html else "chevron-down-outline", 
+                                 icon_html=mi.icon_html, 
+                                 styling=mi.styling + ("icon-last",),
+                                 attrs={
+                                    'jmb-on:click.prevent': 
+                                        "if ($scope().opened === '{0}'){{$scope().opened = null}}else{{$scope().opened = '{0}'}}".format(mi.id)
+                                }
+                             )}}
+                            <div class="absolute z-40 px-4 py-2 mt-2 bg-white rounded-sm shadow -right-4 border-grey-300 whitespace-nowrap"
+                                 jmb-show="$scope().opened === '{{mi.id}}'"
                                  jmb-cloak
                                  jmb-on:click.prevent="if($event.target.tagName ==='A'){$scope().opened=null}">
                                 {{loop(mi.items)}}

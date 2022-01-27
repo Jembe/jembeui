@@ -38,7 +38,7 @@ class Link(ABC):
         self,
         active_for_pathnames: Optional[Sequence[str]] = None,
         active_for_exec_names: Optional[Sequence[str]] = None,
-        styling: Optional[Dict[str, Any]] = None,
+        styling: Sequence[str] = (),
     ):
         self.params: dict = dict()
         self._component: Optional["jembe.Component"] = None
@@ -49,7 +49,7 @@ class Link(ABC):
         self._active_for_exec_names: Optional[Tuple[str, ...]] = (
             tuple(active_for_exec_names) if active_for_exec_names is not None else None
         )
-        self.styling = styling if styling else dict()
+        self.styling = styling
 
     @property
     @abstractmethod
@@ -177,7 +177,7 @@ class URLLink(Link):
         icon_html: Optional[Union[str, Callable[["jembeui.Link"], str]]] = None,
         active_for_pathnames: Optional[Sequence[str]] = None,
         active_for_exec_names: Optional[Sequence[str]] = None,
-        styling: Optional[Dict[str, Any]] = None,
+        styling: Sequence[str] = (),
     ):
         self._url = url
         self._title = title
@@ -283,7 +283,7 @@ class ActionLink(Link):
         description: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
         icon: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
         icon_html: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
-        styling: Optional[Dict[str, Any]] = None,
+        styling: Sequence[str] = (),
         active_for_pathnames: Optional[Sequence[str]] = None,
         active_for_exec_names: Optional[Sequence[str]] = None,
         params: Optional[dict] = None,
