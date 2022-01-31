@@ -5,19 +5,41 @@
 [jmb-cloak] {
     @apply hidden;
 }
+@layer base{
+    [type='text'],
+    [type='email'],
+    [type='url'],
+    [type='password'],
+    [type='number'],
+    [type='date'],
+    [type='datetime-local'],
+    [type='month'],
+    [type='search'],
+    [type='tel'],
+    [type='time'],
+    [type='week'],
+    [multiple],
+    textarea,
+    select {
+        @apply box-border border outline-none border-grey-300 hover:border-grey-400 focus:border-primary-500/80 focus:shadow-focus focus:shadow-primary-500/30 focus:outline-none;
+    }
+}
 
 @layer components {
     .btn {
-        @apply bg-grey-300  text-grey-900 rounded-sm h-8 px-2 text-sm min-w-[132px] cursor-pointer hover:bg-grey-300 hover:bg-opacity-60 focus-visible:outline-none focus-visible:shadow-focus disabled:bg-grey-300 disabled:opacity-40 disabled:cursor-default;
+        @apply bg-grey-300  text-grey-900 rounded h-8 px-2 text-sm min-w-[132px] cursor-pointer hover:bg-grey-300 hover:bg-opacity-60 focus-visible:outline-none focus-visible:shadow-focus focus-visible:shadow-primary-500/30 disabled:bg-grey-200 disabled:opacity-40 disabled:cursor-default;
     }
     .btn-short {
         @apply btn min-w-[unset];
     }
+    .btn-micro {
+        @apply h-6 px-2 text-xs rounded-sm cursor-pointer bg-grey-300 text-grey-900 hover:bg-grey-300 hover:bg-opacity-60 focus-visible:outline-none focus-visible:shadow-focus focus-visible:shadow-primary-500/30 disabled:bg-grey-200 disabled:opacity-40 disabled:cursor-default;
+    }
     .btn-ghost {
-        @apply w-8 h-8 text-sm bg-transparent rounded-sm cursor-pointer text-grey-700 text-opacity-80 hover:bg-grey-300 hover:bg-opacity-60 focus-visible:outline-none focus-visible:shadow-focus disabled:bg-grey-300 disabled:opacity-40;
+        @apply w-8 h-8 text-sm bg-transparent rounded-sm cursor-pointer text-grey-900 text-opacity-80 hover:bg-grey-300 hover:bg-opacity-60 focus-visible:outline-none focus-visible:shadow-focus focus-visible:shadow-primary-500/30 disabled:bg-grey-100 disabled:opacity-20;
     }
     .btn-ghost-micro {
-        @apply w-6 h-6 btn-ghost;
+        @apply w-6 h-6 p-[1px] btn-ghost;
     }
     .btn--primary {
         @apply text-white bg-primary-600 hover:bg-primary-700 active:bg-primary-800 disabled:bg-primary-300; 
@@ -29,9 +51,15 @@
         @apply text-white bg-secondary-500 hover:bg-secondary-600 active:bg-secondary-700 disabled:bg-secondary-300; 
     }
     .btn--danger {
-        @apply text-white bg-error-600 hover:bg-error-700 active:bg-error-800 disabled:bg-error-300 focus-visible:shadow-focus focus-visible:shadow-error-200; 
+        @apply text-white bg-error-600 hover:bg-error-700 active:bg-error-800 disabled:bg-error-300 focus-visible:shadow-focus focus-visible:shadow-primary-500/30 focus-visible:shadow-error-200; 
+    }
+    .btn--on {
+        @apply bg-primary-200 hover:bg-primary-300/70 disabled:bg-primary-100 text-primary-900; 
     }
     .href {
-        @apply text-primary-700 hover:underline focus-visible:shadow-focus focus-visible:outline-none;
+        @apply text-primary-700 hover:underline focus-visible:shadow-focus focus-visible:shadow-primary-500/30 focus-visible:outline-none;
+    }
+    .toolbar-input {
+        @apply px-2 py-[2px] text-sm leading-5 rounded-sm grow;
     }
 }

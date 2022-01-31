@@ -69,7 +69,7 @@
             {%- endblock system_menu %}
             </div>
 
-            <div class="sm:px-2" jmb-bind:class="{'sm:col-span-2': ! $local.mainMenuOpen}">
+            <div class="px-2 sm:px-4" jmb-bind:class="{'sm:col-span-2': ! $local.mainMenuOpen}">
                 {# Bradcrumb #}
                 {% if "__breadcrumb" in _config.components %}
                 {{component("__breadcrumb")}}

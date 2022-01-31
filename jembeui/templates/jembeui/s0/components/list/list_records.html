@@ -1,7 +1,27 @@
-{% from "jembeui/s0/macros.html" import display_menu_as_links %}
-{% extends "jembeui/s0/components/list/list.html" %}
-{% block toolbar__order_by %}
-{% endblock toolbar__order_by %}
+{% from "jembeui/s0/macros.html" import 
+    display_menu_as_buttons, 
+    display_list_clear_filters_button, 
+    display_list_search_input,
+    display_list_choice_filters,
+    display_list_pagination
+%}
+<div class="py-4">
+{%- block header %}
+    {{display_menu_as_buttons(menu)}}
+{%- endblock header %}
+
+{%- block toolbar %}
+    <div class="flex flex-wrap items-center justify-end gap-1 pt-2">
+        {{display_list_clear_filters_button(_config.search_filter, jui_choice_filters_config)}}
+        {{display_list_search_input(search, _config.search_filter)}}
+        {% if  _config.search_filter %}
+        <div class="h-0 basis-full sm:hidden"></div>
+        {% endif %}
+        {{display_list_choice_filters(choice_filters, jui_choice_filters_config, jui_apply_choice_filter, jui_remove_choice_filter)}}
+        {{display_list_pagination(page, total_pages, total_records)}}
+    </div>
+{%- endblock toolbar %}
+
 {% block content %}
     {% if not _config.fields and not records %}
     <div class="list-records__nodata">No data found</div>  
@@ -55,3 +75,4 @@
     </table>
     {% endif %}
 {% endblock content %}
+</div>

@@ -92,6 +92,7 @@ class CListRecords(CList):
         ):
             # field names
             self.fields = fields if fields is not None else dict()
+            self.fields = {k: v if v is not None else k for k, v in self.fields.items()}
             if isinstance(query, sa.orm.Query) and not self.fields:
                 self.fields = {
                     ca["name"]: ca["name"].replace("_", " ")

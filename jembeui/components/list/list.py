@@ -68,7 +68,7 @@ class CList(Component):
             self.expr = expr
             self.choices: List[Tuple[str, str, Any]] = [
                 self.ListChoiceType(
-                    c[0], c[1], c[2] if len(c) == 3 else c[1]  # type:ignore
+                    c[0], str(c[1]), c[2] if len(c) == 3 else c[1]  # type:ignore
                 )
                 for c in choices
             ]
@@ -79,6 +79,7 @@ class CList(Component):
             self.default_choices = default_choices
 
         def map_values(self, str_values: Iterable[str]) -> Iterable[Any]:
+            """Map str values to actual valuse when passing to choicde expression"""
             mapping = {c[1]: c[2] for c in self.choices}
             return tuple(mapping[v] for v in str_values if v in mapping.keys())
 
@@ -102,7 +103,7 @@ class CList(Component):
                 )
                 cfcopy.choices.extend(
                     self.ListChoiceType(
-                        c[0], c[1], c[2] if len(c) == 3 else c[1]  # type:ignore
+                        c[0], str(c[1]), c[2] if len(c) == 3 else c[1]  # type:ignore
                     )
                     for c in self._dynamic_choices(component)  # type:ignore
                 )
@@ -231,10 +232,10 @@ class CList(Component):
         return self._config.db.session
 
     @action
-    def jui_apply_choice_filter(self, filter_name, filter_value):
+    def jui_apply_choice_filter(self, filter_name, filter_value_str):
         if (
             filter_name not in self.jui_choice_filters_config
-            or filter_value
+            or filter_value_str
             not in self.jui_choice_filters_config[filter_name].str_values
         ):
             return
@@ -243,26 +244,26 @@ class CList(Component):
         #     self.state.choice_filters = dict()
 
         if filter_name not in self.state.choice_filters:
-            self.state.choice_filters[filter_name] = [filter_value]
+            self.state.choice_filters[filter_name] = [filter_value_str]
         else:
-            self.state.choice_filters[filter_name].append(filter_value)
+            self.state.choice_filters[filter_name].append(filter_value_str)
 
         self.state.page = 0
 
     @action
-    def jui_remove_choice_filter(self, filter_name, filter_value):
+    def jui_remove_choice_filter(self, filter_name, filter_value_str):
         if (
             filter_name not in self.jui_choice_filters_config
-            or filter_value
+            or filter_value_str
             not in self.jui_choice_filters_config[filter_name].str_values
         ):
             return
         if filter_name not in self.state.choice_filters:
             return
-        if filter_value not in self.state.choice_filters[filter_name]:
+        if filter_value_str not in self.state.choice_filters[filter_name]:
             return
 
-        self.state.choice_filters[filter_name].remove(filter_value)
+        self.state.choice_filters[filter_name].remove(filter_value_str)
         if len(self.state.choice_filters[filter_name]) == 0:
             del self.state.choice_filters[filter_name]
 

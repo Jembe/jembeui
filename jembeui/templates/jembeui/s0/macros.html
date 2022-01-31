@@ -11,13 +11,48 @@
 {# L I N K S #}
 
 {# Display link as HREF #}
-{% macro display_link_as_href(link, styling=()) %}
+{% macro display_link(title=none, url=none, jrl=none, icon_name=none, icon_html=none, styling=(), attrs=none) %}
+    {% set has_icon = icon_name  or icon_html %}
+    {% set attrs = attrs if attrs else {} %}
+    <a  href="{{url if url else '#'}}"{% if jrl %} jmb-on:click.prevent="{{jrl}}"{% endif %} 
+        class="href"
+        {%- if attrs %}
+            {%- for k,v in attrs.items() %}
+                {{k}}="{{v}}"
+            {%- endfor %}
+        {%- endif %}>
+        {%- if has_icon %}
+            {%- set icon_is_last = "icon-last" in styling %}
+            {%- set icon_class = "inline-block  align-bottom w-6 h-6 p-1 mx-1 hover:bg-grey-200"  %}
+            {%- if has_icon and not icon_is_last %}
+                {{display_icon(icon_name, icon_html, class=icon_class)}} 
+            {%- endif -%}
+                {{title|default('',true)}}
+            {%- if has_icon and icon_is_last %}
+                {{display_icon(icon_name, icon_html, class=icon_class)}} 
+            {%- endif -%}
+        {%- else %}
+            {{title|default('',true)}}
+        {%- endif -%}
+    </a>
+{% endmacro %}
+
+
+{% macro display_link_as_href(link, styling=(), attrs=none) %}
     {% if link.is_accessible %}
         {% if "as_button" in link.styling %}
             {{display_link_as_button(link)}}
         {% endif %}
         {% set styling = styling if styling else link.styling %}
-        <a href="{{link.url}}"{% if link.jrl %} jmb-on:click.prevent="{{link.jrl}}"{% endif %} class="href">{{link.title}}</a>
+        {{display_link(
+            title=link.title,
+            url=link.url,
+            jrl=link.jrl,
+            icon_name=link.icon_name,
+            icon_html=link.icon_html,
+            styling=styling,
+            attrs=attrs
+        )}}
     {% endif %}
 {% endmacro %}
 
@@ -51,7 +86,10 @@
             btn--brand
         {%- elif 'danger' in styling %}
             btn--danger
-        {%- endif %}" 
+        {%- endif %} 
+        {%- if 'on' in styling %}
+            btn--on
+        {%- endif %}"
         {%- if jrl %}
         jmb-on:click.prevent="{{jrl}}"
         {%- endif %}
@@ -60,14 +98,20 @@
         {%- endif %}
         {%- if attrs %}
             {%- for k,v in attrs.items() %}
+                {%- if v is boolean %} 
+                    {%- if v==true %}
+                        {{k}} 
+                    {%- endif %}
+                {%- else %}
                 {{k}}="{{v}}"
+                {%- endif %}
             {%- endfor %}
         {%- endif %}>
         {%- if is_ghost %}
             {{display_icon(icon_name, icon_html, class="p-1")}} 
         {%- elif has_icon %}
             {%- set icon_is_last = "icon-last" in styling %}
-            {%- set icon_class = "w-8 h-8 p-1" if "micro" not in styling else "w-6 h-6 p-1" %}
+            {%- set icon_class = "w-8 h-8 p-1" if "micro" not in styling else "w-5 h-5 p-1" %}
             {%- if has_icon and not icon_is_last %}
                 {{display_icon(icon_name, icon_html, class=icon_class)}} 
             {%- endif -%}
@@ -102,6 +146,53 @@
 
 
 {# M E N U S #}
+
+{# DISPLAY MENU DROP DOWN #}
+{% macro display_menu_dropdown(menu, from_link=false, open_styling=()) %}
+    {% if menu.is_accessible %}
+        <div class="relative {% if from_link %}inline{% else%}h-8{% endif %}"
+            jmb-on:click.away="if ($scope().opened === '{{menu.id}}'){$scope().opened=null}">
+            {% if from_link %}
+            {{display_link(
+                title=menu.title, 
+                icon_name=menu.icon_name if menu.icon_name or menu.icon_html else ("ellipsis-vertical-outline" if not menu.title else none), 
+                icon_html=menu.icon_html, 
+                styling=open_styling +  ("icon-last",),
+                attrs={
+                    'jmb-on:click.prevent': 
+                        "if ($scope().opened === '{0}'){{$scope().opened = null}}else{{$scope().opened = '{0}'}}".format(menu.id)
+                }
+            )}}
+            {% else %}
+            {{display_button(
+                title=menu.title, 
+                icon_name=menu.icon_name if menu.icon_name or menu.icon_html else "chevron-down-outline", 
+                icon_html=menu.icon_html, 
+                styling=open_styling + ("icon-last",),
+                attrs={
+                    'jmb-on:click.prevent': 
+                        "if ($scope().opened === '{0}'){{$scope().opened = null}}else{{$scope().opened = '{0}'}}".format(menu.id)
+                }
+            )}}
+            {% endif %}
+            <div jmb-cloak 
+                jmb-show="$scope().opened === '{{menu.id}}'"
+                jmb-on:click.prevent="if($event.target.tagName ==='A'){$scope().opened=null}"
+                class="absolute right-0 z-50 -mt-2">
+                {# arrow on top of dropdown #}
+                <div class="flex justify-end mr-1">
+                    <div class="w-6 overflow-hidden">
+                        <div class="w-4 h-4 origin-bottom-left transform rotate-45 bg-white border border-grey-200"></div>
+                    </div>
+                </div>
+                {# dropdown #}
+                <div class="px-4 py-4 -mt-[1px] bg-white border rounded-sm shadow border-grey-200 whitespace-nowrap flex flex-col gap-2 min-w-[8rem]">
+                    {{caller()}}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endmacro %}
 
 {# DISPLAY SYSTEM MENU #}
 {% macro display_system_menu(menu) %}
@@ -172,7 +263,7 @@
             {% endif %}
         {% endfor %}
     </div> 
-{% endmacro%}
+{% endmacro %}
 
 {# DISPLAY MAIN MENU #}
 {% macro display_main_menu(menu) %}
@@ -216,94 +307,69 @@
             {% endif %}
         {% endfor %}
     </div> 
-{% endmacro%}
+{% endmacro %}
 
 
 {# DISPLAY MENU AS BUTTONS #}
-{% macro display_menu_as_buttons(menu, aligh_right=false, button_class="btn")%}
-    <div jmb-scope="{opened:null}" class="flex gap-1">
-        {% for mi in menu.items recursive %}
-            {% if mi.is_accessible %}
-                {% if mi.is_menu %}
-                    {% if loop.depth == 1 %}
-                        <div class="relative"
-                             jmb-on:click.away="if ($scope().opened === '{{mi.id}}'){$scope().opened=null}">
-                             {{display_button(
-                                 title=mi.title, 
-                                 icon_name=mi.icon_name if mi.icon_name or mi.icon_html else "chevron-down-outline", 
-                                 icon_html=mi.icon_html, 
-                                 styling=mi.styling + ("icon-last",),
-                                 attrs={
-                                    'jmb-on:click.prevent': 
-                                        "if ($scope().opened === '{0}'){{$scope().opened = null}}else{{$scope().opened = '{0}'}}".format(mi.id)
-                                }
-                             )}}
-                            <div class="absolute z-40 px-4 py-2 mt-2 bg-white rounded-sm shadow -right-4 border-grey-300 whitespace-nowrap"
-                                 jmb-show="$scope().opened === '{{mi.id}}'"
-                                 jmb-cloak
-                                 jmb-on:click.prevent="if($event.target.tagName ==='A'){$scope().opened=null}">
+{% macro display_menu_as_buttons(menu, aligh_right=false, buttons_styling=())%}
+    {% if menu.is_accessible %}
+        <div jmb-scope="{opened:null}" class="flex items-center gap-1">
+            {% for mi in menu.items recursive %}
+                {% if mi.is_accessible %}
+                    {% if mi.is_menu %}
+                        {% if loop.depth == 1 %}
+                            {% call display_menu_dropdown(mi, open_styling=mi.styling + buttons_styling)%}
+                                {{loop(mi.items)}}
+                            {% endcall %}
+                        {% else %}
+                            <div class="pt-2 text-right text-grey-400">
+                                {{mi.title}}
+                            </div>
+                            <div class="pl-2">
                                 {{loop(mi.items)}}
                             </div>
-                        </div>
+                        {% endif %}
                     {% else %}
-                        <div class="pt-2 text-right text-grey-400">
-                            {{mi.title}}
-                        </div>
-                        <div class="pl-2">
-                            {{loop(mi.items)}}
-                        </div>
-                    {% endif %}
-                {% else %}
-                    {% if loop.depth == 1 %}
-                        {{display_link_as_button(mi)}}
-                    {% else %}
-                        {{display_link_as_href(mi)}}
+                        {% if loop.depth == 1 %}
+                            {{display_link_as_button(mi, mi.styling + buttons_styling)}}
+                        {% else %}
+                            {{display_link_as_href(mi)}}
+                        {% endif %}
                     {% endif %}
                 {% endif %}
-            {% endif %}
-        {% endfor %}
-    </div> 
-{% endmacro%}
+            {% endfor %}
+        </div> 
+    {% endif %}
+{% endmacro %}
 
 {# DISPLAY MENU AS LINKS #}
 {% macro display_menu_as_links(menu)%}
     {# size can be micro, short, base, large #}
     {% if menu.is_accessible %}
-    <div jmb-scope="{opened:null}" class="flex flex-row items-center gap-2">
-        {% for mi in menu.items recursive %}
-            {% if mi.is_accessible %}
-                {% if mi.is_menu %}
-                    {% if loop.depth == 1 %}
-                        <div class="relative"
-                             jmb-on:click.away="if ($scope().opened === '{{mi.id}}'){$scope().opened=null}">
-                             <div>
-                                <a href="#" jmb-on:click.prevent="if ($scope().opened === '{{menu.id}}'){$scope().opened = null}else{$scope().opened = '{{menu.id}}'}">
-                                    {{menu.title|default("", true)}}
-                                    {{display_icon(mi.icon, mi.icon_html, "ellipsis-horizontal-outline" if not menu.title else "")}}
-                                </a>
-                             </div>
-                            <div class="absolute z-40 hidden px-4 py-2 mt-2 bg-white rounded-sm shadow -right-4 border-grey-300 whitespace-nowrap"
-                                 jmb-bind:class="{'': $scope().opened === '{{mi.id}}'}"
-                                 jmb-cloak>
+        <div jmb-scope="{opened:null}" class="flex items-center gap-1">
+            {% for mi in menu.items recursive %}
+                {% if mi.is_accessible %}
+                    {% if mi.is_menu %}
+                        {% if loop.depth == 1 %}
+                            {% call display_menu_dropdown(mi, from_link=true)%}
+                                {{loop(mi.items)}}
+                            {% endcall %}
+                        {% else %}
+                            <div class="pt-2 text-right text-grey-400">
+                                {{mi.title}}
+                            </div>
+                            <div class="pl-2">
                                 {{loop(mi.items)}}
                             </div>
-                        </div>
+                        {% endif %}
                     {% else %}
-                        <div class="pt-2 text-right text-grey-400">
-                            {{mi.title}}
-                        </div>
-                        <div class="pl-2">
-                            {{loop(mi.items)}}
-                        </div>
+                        {{display_link_as_href(mi)}}
                     {% endif %}
-                {% else %}
-                    {{display_link_as_href(mi)}}
                 {% endif %}
-            {% endif %}
-        {% endfor %}
-    </div> 
+            {% endfor %}
+        </div> 
     {% endif %}
-{% endmacro%}
+{% endmacro %}
 
 
 
@@ -361,4 +427,154 @@
             {% endif %}
         </div>
     </div>
+{% endmacro %}
+
+
+
+
+{# L I S T #}
+
+
+{# LIST CLEAR FILTERS BUTTON #}
+{% macro display_list_clear_filters_button(search_filter, choice_filters) %}
+    {% if search_filter is not none or choice_filters %}
+    <button jmb-on:click.prevent="{% if search_filter %}search='';{% endif %}{% if choice_filters %}choice_filters={};{% endif %}order_by=null;" class="btn-ghost-micro" type="button">
+        {{display_icon('trash-outline')}}
+    </button>
+    {% endif %}
+{% endmacro %}
+
+{# LIST SEARCH INPUT #}
+{% macro display_list_search_input(search, search_filter) %}
+    {% if search_filter is not none %}
+        <input jmb-on:input="page=0;search=$self.value;" value="{{search}}" type="search" placeholder="Search..." class="form-input toolbar-input" >
+    {% endif %}
+{% endmacro %}
+
+
+{# LIST CHOICE FILTERS #}
+{% macro display_list_choice_filters(choice_filters, filters_config, apply_filter, remove_filter) %}
+{%- if filters_config %}
+    {%- for filter_name, choice_filter in filters_config.items() if not choice_filter.is_grouped  %}
+    {%- for choice in choice_filter.choices  %}
+    <label class="btn-micro flex justify-center items-center
+        {%- if choice_filters and filter_name in choice_filters and choice.value_str in choice_filters[filter_name] %}
+        btn--on
+        {%- endif %}" title="{{choice.title}}">
+        <input type="checkbox" jmb-on:change="
+            if($self.checked) {
+                jui_apply_choice_filter('{{filter_name}}','{{choice.value_str}}');
+            }else{
+                jui_remove_choice_filter('{{filter_name}}','{{choice.value_str}}')
+            }"  
+            value="{{choice.value_str}}"
+            {% if choice_filters and filter_name in choice_filters and choice.value_str in choice_filters[filter_name] %}
+            checked
+            {% endif %}
+            class="hidden">
+        {{choice.title|truncate(15, true)}}
+    </label> 
+    {% endfor %} 
+    {% endfor %}
+    {% if filters_config.values()|selectattr('is_grouped')|list|length > 0 %}
+    <div jmb-scope="{opened:false}" jmb-on:click.away="$scope().opened = false;" class="relative">
+        {% set ns = namespace(other_selected = false) %}
+        <div jmb-show="$scope().opened" jmb-cloak
+             class="absolute top-7 min-w-[70px] right-0 shadow rounded-sm overflow-hidden bg-grey-50">
+        {% for filter_name, choice_filter in filters_config.items() if choice_filter.is_grouped  %}
+        {% for choice in choice_filter.choices  %}
+        <label class="btn-micro flex justify-start items-center rounded-none
+            {% if choice_filters and filter_name in choice_filters and choice.value_str in choice_filters[filter_name] %}
+            btn--on
+            {% set ns.other_selected = true %}
+            {% endif %}">
+            <input type="checkbox" jmb-on:change="
+                if($self.checked) {
+                    jui_apply_choice_filter('{{filter_name}}','{{choice.value_str}}');
+                }else{
+                    jui_remove_choice_filter('{{filter_name}}','{{choice.value_str}}')
+                };"
+                value="{{choice.value_str}}"
+                {% if choice_filters and filter_name in choice_filters and choice.value_str in choice_filters[filter_name] %}
+                checked
+                {% endif %}
+                class="hidden">
+            {{choice.title}}
+        </label> 
+        {% endfor %} 
+        {% endfor %}
+        </div>
+        {{display_button(
+            "Filters", 
+            "$scope().opened = !$scope().opened", 
+            icon_name="funnel-outline" if not ns.other_selected else "funnel", 
+            styling=("micro","icon-last") if not ns.other_selected else ("micro", "icon-last", "on"), 
+            attrs={"title": "Other filters"})
+        }}
+    </div>
+    {% endif %}
+{% endif %}
+{% endmacro %}
+
+
+{# LIST ORDER BY IN TOOLBAR #}
+{% macro display_list_order_by(order_by, order_by_config) %}
+    {% if order_by_config %}
+    <div class="relative" jmb-scope="{opened:false}" jmb-on:click.away="$scope().opened = false;">
+        {% set ns = namespace(ordered = false) %}
+        <div jmb-show="$scope().opened" jmb-cloak
+             class="absolute top-7 min-w-[70px] right-0 shadow rounded-sm overflow-hidden bg-grey-50">
+        {% for order_name, order_title in order_by_config.items()  %}
+        <label class="btn-micro flex justify-between items-center rounded-none whitespace-nowrap
+            {% if order_by == order_name  or order_by == '-' + order_name %}
+            btn--on
+            {% set ns.ordered = true %}
+            {% endif %}">
+            <input type="checkbox" jmb-on:change="order_by= '{% if not order_by %}{{order_name}}{%elif order_by == order_name %}-{{order_name}}{% else %}{% endif %}'"
+                value="{{order_name}}"
+                {% if order_by == order_name or order_by == '-' + order_name %} checked {% endif %}
+                class="hidden">
+                {{order_title}} 
+                {%- if order_by == '-' + order_name %}
+                {{display_icon('arrow-down-outline', class="w-5 h-5 p-1")}}
+                {%- elif order_by == order_name %}
+                {{display_icon('arrow-up-outline', class="w-5 h-5 p-1")}}
+                {%- else %}
+                <div class="w-5 h-5"></div>
+                {%- endif %}
+        </label> 
+        {% endfor %}
+        </div>
+        {{display_button(
+            "Sort", 
+            "$scope().opened = !$scope().opened", 
+            icon_name="filter-outline" if not ns.ordered else "filter", 
+            styling=("micro","icon-last") if not ns.ordered else ("micro", "icon-last", "on"), 
+            attrs={"title": "Sort results"})
+        }}
+    </div>
+    {% endif %}
+{% endmacro %}
+
+
+
+{# LIST PAGINATION #}
+{% macro display_list_pagination(page, total_pages, total_records) %}
+    <nav class="flex items-center gap-1 flex-nowrap">
+        {{display_button(
+            jrl="page=page-1",
+            styling=("ghost-micro"),
+            icon_name="chevron-back-outline",
+            attrs={"disabled": page==0}
+        )}}
+        <div class="text-xs font-light ">
+            {{page + 1 if total_pages > 0 else 0}} / {{total_pages}} (rows: {{total_records}})
+        </div>
+        {{display_button(
+            jrl="page=page+1",
+            styling=("ghost-micro"),
+            icon_name="chevron-forward-outline",
+            attrs={"disabled": page==total_pages -1 or total_pages==0}
+        )}}
+    </nav>
 {% endmacro %}
