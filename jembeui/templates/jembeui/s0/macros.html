@@ -8,6 +8,9 @@
         {%- include "jembeui/s0/icons/{}.svg".format(default_icon_name) with context %}
     {%- endif %}
 {% endmacro %}
+
+
+
 {# L I N K S #}
 
 {# Display link as HREF #}
@@ -56,7 +59,7 @@
     {% endif %}
 {% endmacro %}
 
-{# Display link as Button #}
+{# DISPLAY BUTTON #}
 {% macro display_button(title=none, jrl=none, icon_name=none, icon_html=none, default_icon_name=none, styling=(), attrs=none) %}
     {% set has_icon = icon_name  or icon_html %}
     {% set is_ghost = (has_icon or default_icon_name) and (not title or "ghost" in styling or "ghost-micro" in "styling") %}
@@ -127,6 +130,7 @@
     </button>
 {% endmacro %}
 
+{# DISPLAY LINK AS BUTTON #}
 {% macro display_link_as_button(link, styling=(), attrs=none) %}
     {% if link.is_accessible %}
         {% if "as_href" in link.styling %}
@@ -150,7 +154,7 @@
 {# DISPLAY MENU DROP DOWN #}
 {% macro display_menu_dropdown(menu, from_link=false, open_styling=()) %}
     {% if menu.is_accessible %}
-        <div class="relative {% if from_link %}inline{% else%}h-8{% endif %}"
+        <div class="relative {% if from_link %}inline{% else%}h-8{% endif %}" 
             jmb-on:click.away="if ($scope().opened === '{{menu.id}}'){$scope().opened=null}">
             {% if from_link %}
             {{display_link(

@@ -1,4 +1,270 @@
+{# I C O N S #}
+{% macro display_icon(icon_name=none, icon_html=none, default_icon_name="check-circle", class=none) %}
+    {%- if icon_html %}
+        {{icon_html}}
+    {%- elif icon_name %}
+        <span class="icon{% if class %} {{class}}{% endif %}">
+            {% if icon_name|replace('-','')|wordcount > 1 %}
+            <i class="{{icon_name}}"></i>
+            {% else %}
+            <i class="fas fa-{{icon_name}}"></i>
+            {% endif %}
+        </span>
+    {%- elif default_icon_name %}
+        <span class="icon{% if class %} {{class}}{% endif %}">
+            {% if icon_name|replace('-','')|wordcount > 1 %}
+            <i class="{{default_icon_name}}"></i>
+            {% else %}
+            <i class="fas fa-{{default_icon_name}}"></i>
+            {% endif %}
+        </span>
+    {%- endif %}
+{% endmacro %}
+
+
+{# L I N K S #}
+
+{# Display link as HREF #}
+{% macro display_link(title=none, url=none, jrl=none, icon_name=none, icon_html=none, styling=(), attrs=none) %}
+    {% set has_icon = icon_name  or icon_html %}
+    {% set attrs = attrs if attrs else {} %}
+    <a href="{{url if url else '#'}}"{% if jrl %} jmb-on:click.prevent="{{jrl}}"{% endif %} 
+        class="
+        {% if 'dropdown' in styling %}
+        dropdown-item
+        {% endif %}"
+        {%- if attrs %}
+            {%- for k,v in attrs.items() %}
+                {{k}}="{{v}}"
+            {%- endfor %}
+        {%- endif %}>
+        {%- if has_icon %}
+            {%- set icon_is_last = "icon-last" in styling %}
+            {# {%- set icon_class = "inline-block  align-bottom w-6 h-6 p-1 mx-1 hover:bg-grey-200"  %} #}
+            <span class="icon-text">
+            {%- if has_icon and not icon_is_last %}
+                {{display_icon(icon_name, icon_html)}} 
+            {%- endif -%}
+                <span>{{title|default('',true)}}</span>
+            {%- if has_icon and icon_is_last %}
+                {{display_icon(icon_name, icon_html)}} 
+            {%- endif -%}
+            </span>
+        {%- else %}
+            {{title|default('',true)}}
+        {%- endif -%}
+    </a>
+{% endmacro %}
+
+
+{% macro display_link_as_href(link, styling=(), attrs=none) %}
+    {% if link.is_accessible %}
+        {% if "as_button" in link.styling %}
+            {{display_link_as_button(link)}}
+        {% endif %}
+        {% set styling = styling if styling else link.styling %}
+        {{display_link(
+            title=link.title,
+            url=link.url,
+            jrl=link.jrl,
+            icon_name=link.icon_name,
+            icon_html=link.icon_html,
+            styling=styling,
+            attrs=attrs
+        )}}
+    {% endif %}
+{% endmacro %}
+
+{# DISPLAY BUTTON #}
+{% macro display_button(title=none, jrl=none, icon_name=none, icon_html=none, default_icon_name=none, styling=(), attrs=none) %}
+    {% set has_icon = icon_name  or icon_html %}
+    {% set icon_only = has_icon and "icon-only" in styling %}
+    {% set attrs = attrs if attrs else {} %}
+    <button type="button" class="
+        button
+        {%- if 'light' in styling %}
+        is-light
+        {%- endif %}
+
+        {%- if 'white' in styling %}
+        is-white
+        {%- elif 'dark' in styling %}
+        is-dark
+        {%- elif 'black' in styling %}
+        is-black
+        {%- elif 'text' in styling %}
+        is-text
+        {%- elif 'ghost' in styling %}
+        is-ghost
+        {%- elif 'primary' in styling %}
+        is-primary
+        {%- elif 'link' in styling %}
+        is-link
+        {%- elif 'info' in styling %}
+        is-info
+        {%- elif 'success' in styling %}
+        is-success
+        {%- elif 'warning' in styling %}
+        is-warning
+        {%- elif 'danger' in styling %}
+        is-danger
+        {%- endif %}
+
+        {%- if 'small' in styling %}
+        is-small
+        {%- elif 'normal' in styling %}
+        is-normal
+        {%- elif 'medium' in styling %}
+        is-medium
+        {%- elif 'large' in styling %}
+        is-large
+        {%- endif %}
+
+        {%- if 'fullwidth' in styling %}
+        is-fullwidth
+        {%- endif %}
+
+        {%- if 'dropdown' in styling %}
+        dropdown-item
+        {%- endif %}
+
+        {%- if 'outlined' in styling %}
+        is-outlined
+        {%- endif %}
+        {%- if 'inverted' in styling %}
+        is-inverted
+        {%- endif %}
+        {%- if 'rounded' in styling %}
+        is-rounded
+        {%- endif %}
+        {%- if 'loading' in styling %}
+        is-loading
+        {%- endif %}
+        {%- if 'static' in styling %}
+        is-static
+        {%- endif %}"
+        {%- if jrl %}
+        jmb-on:click.prevent="{{jrl}}"
+        {%- endif %}
+        {%- if icon_only %}
+        title="{{title}}"
+        {%- endif %}
+        {%- if attrs %}
+            {%- for k,v in attrs.items() %}
+                {%- if v is boolean %} 
+                    {%- if v==true %}
+                        {{k}} 
+                    {%- endif %}
+                {%- else %}
+                {{k}}="{{v}}"
+                {%- endif %}
+            {%- endfor %}
+        {%- endif %}>
+        {%- if icon_only %}
+            {{display_icon(icon_name, icon_html)}} 
+        {%- elif has_icon %}
+            {%- set icon_is_last = "icon-last" in styling %}
+            {%- if has_icon and not icon_is_last %}
+                {{display_icon(icon_name, icon_html)}} 
+            {%- endif -%}
+            <span>
+                {{title|default('',true)}}
+            </span>
+            {%- if has_icon and icon_is_last %}
+                {{display_icon(icon_name, icon_html)}} 
+            {%- endif -%}
+        {%- else %}
+            {{title|default('',true)}}
+        {%- endif -%}
+    </button>
+{% endmacro %}
+
+
+{# DISPLAY LINK AS BUTTON #}
+{% macro display_link_as_button(link, styling=(), attrs=none) %}
+    {% if link.is_accessible %}
+        {% if "as_href" in link.styling %}
+            {{display_link_as_href(link)}}
+        {% endif %}
+        {% set styling = styling if styling else link.styling %}
+        {{display_button(
+            title=link.title,
+            jrl=link.jrl,
+            icon_name=link.icon_name,
+            icon_html=link.icon_html,
+            styling=styling,
+            attrs=attrs
+        )}}
+    {% endif %}
+{% endmacro %}
+
+
 {# M E N U S #}
+
+{# DISPLAY MENU DROP DOWN #}
+{% macro display_menu_dropdown(menu, is_right=false, styling=()) %}
+    {% if menu.is_accessible %}
+        <div class="dropdown {% if is_right %}is-right{% endif %}" 
+             jmb-scope="{opened:false}"
+             jmb-bind:class="{'is-active': $scope().opened === '{{menu.id}}'}"
+             jmb-on:click.away="if ($scope().opened === '{{menu.id}}'){$scope().opened=null}">
+        <div class="dropdown-trigger">
+            {{display_button(
+                title=menu.title, 
+                icon_name=menu.icon_name if menu.icon_name or menu.icon_html else ("angle-down" if menu.title else "angle-down"), 
+                icon_html=menu.icon_html, 
+                styling=styling + ("icon-last",) if menu.title else ("icon-only",),
+                attrs={
+                    'jmb-on:click.prevent': 
+                        "if ($scope().opened === '{0}'){{$scope().opened = null}}else{{$scope().opened = '{0}'}}".format(menu.id),
+                    'aria-haspopup': "true",
+                    'aria-controls': "dropdown-menu"
+                }
+            )}}
+        </div>
+        <div class="dropdown-menu" id="dropdown-menu" role="menu"
+             jmb-on:click.prevent="if($event.target.tagName ==='A'){$scope().opened=null}">
+            <div class="dropdown-content">
+            {{caller()}}
+            </div>
+        </div>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{# DISPLAY MENU AS BUTTONS #}
+{% macro display_menu_as_buttons(menu, aligh_right=false, buttons_styling=()) %}
+    {% if menu.is_accessible %}
+        <div jmb-scope="{opened:null}" class="buttons has-addons{% if align_right %} is-right{% endif %}">
+            {% for mi in menu.items recursive %}
+                {% if mi.is_accessible %}
+                    {% if mi.is_menu %}
+                        {% if loop.depth == 1 %}
+                            {% call display_menu_dropdown(mi, aligh_right, styling=mi.styling + buttons_styling)%}
+                                {{loop(mi.items)}}
+                            {% endcall %}
+                        {% else %}
+                            <hr class="dropdown-divider">
+                            <div class="dropdown-item">
+                                <h3 class="is-size-5">{{mi.title}}</h3>
+                            </div>
+                            <div class="pt-2 text-right text-grey-400">
+                                {{mi.title}}
+                            </div>
+                                {{loop(mi.items)}}
+                        {% endif %}
+                    {% else %}
+                        {% if loop.depth == 1 %}
+                            {{display_link_as_button(mi, mi.styling + buttons_styling)}}
+                        {% else %}
+                            {{display_link_as_href(mi, styling=('dropdown',))}}
+                        {% endif %}
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        </div> 
+    {% endif %}
+{% endmacro %}
 
 {# DISPLAY SYSTEM MENU #}
 {% macro display_system_menu(menu, is_right=True) %}
@@ -53,11 +319,6 @@
 {# DISPLAY MAIN MENU #}
 {% macro display_main_menu(menu) %}
     {{display_system_menu(menu, false)}}
-{% endmacro%}
-
-{# DISPLAY MENU AS BUTTONS #}
-{% macro display_menu_as_buttons(menu, aligh_right=false, size="base")%}
-    {# size can be micro, short, base, large #}
 {% endmacro%}
 
 
