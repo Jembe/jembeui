@@ -578,3 +578,66 @@
         )}}
     </nav>
 {% endmacro %}
+
+
+{# TABLE #}
+{% macro display_table(records, fields_config, field_values,order_by, order_by_config, record_menu_config=none, get_record_menu=none) %}
+    {% if not fields_config and not records %}
+    <div class="text-sm text-center text-grey-500">No data found</div>  
+    {% else %}
+    <table class="w-full border border-t-0 border-grey-400/50">
+        <thead class="bg-grey-300/90">
+            <tr>
+                {% for field_name, field_title in fields_config.items() %}
+                {% if field_name in order_by_config %}
+                    {% if order_by == field_name %}
+                    <th class="font-normal text-primary-900 bg-primary-200/80">
+                        <a href="" class="flex items-center justify-between px-2 py-1" jmb-on:click.prevent="order_by='-{{field_name}}'; page=0">
+                            {{field_title|capitalize}}
+                            {{display_icon('arrow-up-outline', class="w-5 h-5")}}
+                        </a>
+                    </th>
+                    {% elif order_by == "-" + field_name %}
+                    <th class="font-normal text-primary-900 bg-primary-200/80">
+                        <a href="" class="flex items-center justify-between px-2 py-1" jmb-on:click.prevent="order_by=null; page=0">
+                            {{field_title|capitalize}}
+                            {{display_icon('arrow-down-outline', class="w-5 h-5")}}
+                        </a>
+                    </th>
+                    {% else %}
+                    <th class="font-normal ">
+                        <a href="" class="flex items-center justify-between px-2 py-1" jmb-on:click.prevent="order_by='{{field_name}}'; page=0">
+                            {{field_title|capitalize}}
+                        </a>
+                    </th>
+                    {% endif %}
+                {% else %}
+                <th>
+                    {{field_title|capitalize}}
+                </th>
+                {% endif %}
+                {% endfor %}
+                {% if record_menu_config %}
+                <th><span class="flex items-center justify-between px-2 py-1">Actions</span></th>
+                {% endif %}
+            </tr>
+        </thead>
+        <tbody class="bg-white">
+    {% for record in records  %}
+        <tr class="{{loop.cycle('bg-grey-100/80','bg-white')}} hover:bg-primary-100/60">
+            {% for field_name in fields_config.keys() %}
+            <td class="px-2 py-2">
+                {{field_values[field_name](record, field_name)|default("", True)}}
+            </td>
+            {% endfor %}
+            {% if record_menu_config %}
+            <td class="px-2 py-2">
+                {{display_menu_as_links(get_record_menu(record))}}
+            </td> 
+            {% endif %}
+        </tr>
+    {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+{% endmacro %}

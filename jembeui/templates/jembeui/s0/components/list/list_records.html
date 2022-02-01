@@ -3,7 +3,9 @@
     display_list_clear_filters_button, 
     display_list_search_input,
     display_list_choice_filters,
-    display_list_pagination
+    display_list_pagination,
+    display_table,
+    display_icon
 %}
 <div class="py-4">
 {%- block header %}
@@ -11,7 +13,7 @@
 {%- endblock header %}
 
 {%- block toolbar %}
-    <div class="flex flex-wrap items-center justify-end gap-1 pt-2">
+    <div class="flex flex-wrap items-center justify-end gap-1 pt-4">
         {{display_list_clear_filters_button(_config.search_filter, jui_choice_filters_config)}}
         {{display_list_search_input(search, _config.search_filter)}}
         {% if  _config.search_filter %}
@@ -23,56 +25,8 @@
 {%- endblock toolbar %}
 
 {% block content %}
-    {% if not _config.fields and not records %}
-    <div class="list-records__nodata">No data found</div>  
-    {% else %}
-    <table class="table">
-        <thead class="table__head">
-            <tr>
-                {% for field_name,field_title in _config.fields.items() %}
-                {% if field_name in _config.order_by %}
-                    {% if order_by == field_name %}
-                    <th class="table__head__th--selected">
-                        <a href="" class="table__head__order-link" jmb-on:click.prevent="order_by='-{{field_name}}'; page=0"> {{field_title|capitalize}}<span>&#9650;</span></a>
-                    </th>
-                    {% elif order_by == "-" + field_name %}
-                    <th class="table__head__th--selected">
-                        <a href="" class="table__head__order-link" jmb-on:click.prevent="order_by=null; page=0">{{field_title|capitalize}}<span>&#9660;</span></a>
-                    </th>
-                    {% else %}
-                    <th>
-                        <a href="" class="table__head__order-link" jmb-on:click.prevent="order_by='{{field_name}}'; page=0">{{field_title|capitalize}}</a>
-                    </th>
-                    {% endif %}
-                {% else %}
-                <th>
-                    {{field_title|capitalize}}
-                </th>
-                {% endif %}
-                {% endfor %}
-                {% if _config.record_menu %}
-                <th><span class="table__head__order-link">Actions</span></th>
-                {% endif %}
-            </tr>
-        </thead>
-        <tbody>
-    {% for record in records  %}
-        <tr class="table__body__row {{loop.cycle('table__body__row--even','table__body__row--odd')}}">
-            {% for field_name in _config.fields.keys() %}
-            <td>
-                {{field_values[field_name](record, field_name)|default("", True)}}
-            </td>
-            {% endfor %}
-            {% if _config.record_menu %}
-            <td>
-                {{display_menu_as_links(get_record_menu(record))}}
-            {# {{get_record_menu(record).as_html('links')}} #}
-            </td> 
-            {% endif %}
-        </tr>
-    {% endfor %}
-        </tbody>
-    </table>
-    {% endif %}
+    <div class="pt-2">
+        {{display_table(records, _config.fields, field_values, order_by, _config.order_by, _config.record_menu, get_record_menu)}}
+    </div>
 {% endblock content %}
 </div>

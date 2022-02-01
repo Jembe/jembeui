@@ -11,9 +11,12 @@ from typing import (
 )
 from datetime import date, datetime, time, timedelta
 from functools import partial
+from markupsafe import Markup
 import sqlalchemy as sa
 from flask_babel import format_date, format_datetime, format_time, format_timedelta
+from flask import render_template
 from jembeui.exceptions import JembeUIError
+from ...settings import settings
 from ..component import Component
 from ..menu import Menu
 from .list import CList
@@ -40,6 +43,12 @@ def default_field_value(component: "jembe.Component", record, field_name: str) -
     elif isinstance(value, timedelta):
         return format_timedelta(value)
     elif isinstance(value, bool):
+        if settings.default_style == "s0":
+            return Markup(
+                render_template(
+                    "jembeui/s0/widgets/table_boolean_field.html", value=value
+                )
+            )
         return str(value)  # TODO
     else:
         return str(value) if value is not None else ""  # type: ignore
