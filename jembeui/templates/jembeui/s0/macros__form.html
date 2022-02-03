@@ -1,0 +1,83 @@
+{% macro form_field(form, field, render_kw = none) %}
+    {% set render_kw = {} if render_kw is none else render_kw %}
+
+    {% set fclass = field.__class__.__name__ %}
+    {% if fclass == "BooleanField" %}
+    {% elif fclass == "DateField" %}
+    {% elif fclass == "DateTimeField" %}
+    {% elif fclass == "SelectMultipleField" %}
+    {% elif fclass == "FileField" %}
+    {% elif fclass == "ImageField" %}
+    {% else %}
+        {{_default_field(form, field, render_kw)}}
+    {% endif %}
+{% endmacro %}
+
+{% macro form_field_widget(form, field, render_kw = none) %}
+    {% set render_kw = {} if render_kw is none else render_kw %}
+    {% set render_kw = form.resolve_kw(form.RENDER_KW[field.name], render_kw) %}
+
+    {% set fclass = field.__class__.__name__ %}
+    {% if fclass == "BooleanField" %}
+    {% elif fclass == "DateField" %}
+    {% elif fclass == "DateTimeField" %}
+    {% elif fclass == "SelectMultipleField" %}
+    {% elif fclass == "FileField" %}
+    {% elif fclass == "ImageField" %}
+    {% else %}
+        {{_default_widget(form, field, render_kw)}}
+    {% endif %}
+{% endmacro %}
+
+
+{# S P E C I F I C   F I E L D S   I M P L E M E N T A T I O N #}
+{% macro _default_field(form, field, render_kw) %}
+    {% set field_id = "{}--{}".format(form.cform.exec_name.replace("/","-"), field.name) %}
+    {% set is_not_disabled = render_kw.get("disabled", false) == false and not form.is_disabled %}
+    <div {{form.attr_kw(form.resolve_kw(render_kw._field|default({},true), {"class":"mb-2 grow basis-0 flex flex-col"}))|xmlattr}}>
+        <label for="{{field_id}}" class="flex flex-row items-center justify-between text-sm">{{field.label.text}}</label>
+        <div class="text-grey-900/50">
+        {% if is_not_disabled and not field.flags.required %}optional{% endif %}
+        {% if field.description %}{{field.description}}{% endif %}
+        </div>
+        {{form_field_widget(form, field, render_kw)}}
+        {% for error in field.errors %}
+        <div class="mt-1 text-sm leading-6 text-error-500">{{error}}</div>
+        {% endfor %}
+    </div>
+
+{% endmacro %}
+
+{# S P E C I F I C   W I D G E T S   I M P L E M E N T A T I O N #}
+{% macro _default_widget(form, field, render_kw) %}
+    {% set field_id = "{}--{}".format(form.cform.exec_name.replace("/","-"), field.name) %}
+    {% set styling = render_kw.get("_styling", []) %}
+
+    {% set is_not_disabled = render_kw.get("disabled", false) == false and not form.is_disabled %}
+    {% set instant_validate = ((form.__instant_validate__ and render_kw.get('__instant_validate__', none) in (none, true)) or render_kw.get('_instant_validate', none) == true) and "validate" in form.cform._config.component_actions  %}
+    {% set instant_submit = ((form.__instant_submit__ and render_kw.get('__instant_submit__', none) in (none, true)) or render_kw.get('__instant_submit__', none) == true ) and "submit" in form.cform._config.component_actions %}
+    {% set render_kw = form.resolve_kw(
+        render_kw,
+        {
+            "id":field_id,
+            "class":" ".join(
+                [
+                    "form-input", 
+                    "input--error" if field.errors else ""
+                ]
+            ),
+            "jmb-on:change.defer": (
+                "form.{fname} = $self.value;"  
+                + ("modified_fields.indexOf('{fname}') === -1 && modified_fields.push('{fname}');" if "modified_fields" in form.cform.state else "")
+            ).format(fname=field.name) if is_not_disabled and not instant_validate and not instant_submit else none,
+            "jmb-on:change": (
+                "form.{fname} = $self.value;"  
+                + ("modified_fields.indexOf('{fname}') === -1 && modified_fields.push('{fname}');" if "modified_fields" in form.cform.state else "")
+                + ("validate();" if instant_validate  else "")
+                + ("submit();" if instant_submit else "")
+            ).format(fname=field.name) if is_not_disabled and (instant_validate or instant_submit) else none,
+            "jmb-on:keydown.enter": "$self.blur();$self.focus();submit()" if is_not_disabled and "submit" in form.cform._config.component_actions else none,
+        }
+    )%}
+    {{field(**form.attr_kw(render_kw))}}
+{% endmacro %}

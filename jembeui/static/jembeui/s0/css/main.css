@@ -476,29 +476,44 @@ Ensure the default browser behavior of the `hidden` attribute.
   min-height: 1.5em;
 }
 
-[type='text'], [type='email'], [type='url'], [type='password'], [type='number'], [type='date'], [type='datetime-local'], [type='month'], [type='search'], [type='tel'], [type='time'], [type='week'], [multiple], textarea, select {
+.form-input, .form-textarea, .form-select, .form-multiselect {
   box-sizing: border-box;
+  border-radius: 0.125rem;
   border-width: 1px;
   --tw-border-opacity: 1;
   border-color: rgb(212 212 212 / var(--tw-border-opacity));
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
   outline: 2px solid transparent;
   outline-offset: 2px;
 }
 
-[type='text']:hover, [type='email']:hover, [type='url']:hover, [type='password']:hover, [type='number']:hover, [type='date']:hover, [type='datetime-local']:hover, [type='month']:hover, [type='search']:hover, [type='tel']:hover, [type='time']:hover, [type='week']:hover, [multiple]:hover, textarea:hover, select:hover {
+.form-input:hover, .form-textarea:hover, .form-select:hover, .form-multiselect:hover {
   --tw-border-opacity: 1;
   border-color: rgb(163 163 163 / var(--tw-border-opacity));
 }
 
-[type='text']:focus, [type='email']:focus, [type='url']:focus, [type='password']:focus, [type='number']:focus, [type='date']:focus, [type='datetime-local']:focus, [type='month']:focus, [type='search']:focus, [type='tel']:focus, [type='time']:focus, [type='week']:focus, [multiple]:focus, textarea:focus, select:focus {
+.form-input:focus, .form-textarea:focus, .form-select:focus, .form-multiselect:focus {
   border-color: rgb(16 185 129 / 0.8);
-  --tw-shadow: 0 0 0 1px rgb(0 0 0 / 0.8) inset, 0 0 0 1px rgb(0 0 0 / 0.8), 0 0 0 4px rgb(0 0 0 / 0.3);
+  --tw-shadow: 0 0 0 1px rgb(0 0 0 / 0.7) inset, 0 0 0 1px rgb(0 0 0 / 0.7), 0 0 0 4px rgb(0 0 0 / 0.3);
   --tw-shadow-colored: inset 0 0 0 1px var(--tw-shadow-color), 0 0 0 1px var(--tw-shadow-color), 0 0 0 4px var(--tw-shadow-color);
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
   --tw-shadow-color: rgb(16 185 129 / 0.3);
   --tw-shadow: var(--tw-shadow-colored);
   outline: 2px solid transparent;
   outline-offset: 2px;
+}
+
+.input--error {
+  --tw-border-opacity: 1;
+  border-color: rgb(220 38 38 / var(--tw-border-opacity));
+  --tw-shadow: 0 0 0 1px rgb(0 0 0 / 0.7) inset, 0 0 0 1px rgb(0 0 0 / 0.7), 0 0 0 4px rgb(0 0 0 / 0.3);
+  --tw-shadow-colored: inset 0 0 0 1px var(--tw-shadow-color), 0 0 0 1px var(--tw-shadow-color), 0 0 0 4px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+  --tw-shadow-color: rgb(220 38 38 / 0.3);
+  --tw-shadow: var(--tw-shadow-colored);
 }
 
 *, ::before, ::after {
@@ -601,7 +616,7 @@ Ensure the default browser behavior of the `hidden` attribute.
 }
 
 .btn:focus-visible {
-  --tw-shadow: 0 0 0 1px rgb(0 0 0 / 0.8) inset, 0 0 0 1px rgb(0 0 0 / 0.8), 0 0 0 4px rgb(0 0 0 / 0.3);
+  --tw-shadow: 0 0 0 1px rgb(0 0 0 / 0.7) inset, 0 0 0 1px rgb(0 0 0 / 0.7), 0 0 0 4px rgb(0 0 0 / 0.3);
   --tw-shadow-colored: inset 0 0 0 1px var(--tw-shadow-color), 0 0 0 1px var(--tw-shadow-color), 0 0 0 4px var(--tw-shadow-color);
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
   --tw-shadow-color: rgb(16 185 129 / 0.3);
@@ -638,7 +653,7 @@ Ensure the default browser behavior of the `hidden` attribute.
 }
 
 .btn-short:focus-visible {
-  --tw-shadow: 0 0 0 1px rgb(0 0 0 / 0.8) inset, 0 0 0 1px rgb(0 0 0 / 0.8), 0 0 0 4px rgb(0 0 0 / 0.3);
+  --tw-shadow: 0 0 0 1px rgb(0 0 0 / 0.7) inset, 0 0 0 1px rgb(0 0 0 / 0.7), 0 0 0 4px rgb(0 0 0 / 0.3);
   --tw-shadow-colored: inset 0 0 0 1px var(--tw-shadow-color), 0 0 0 1px var(--tw-shadow-color), 0 0 0 4px var(--tw-shadow-color);
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
   --tw-shadow-color: rgb(16 185 129 / 0.3);
@@ -678,7 +693,7 @@ Ensure the default browser behavior of the `hidden` attribute.
 }
 
 .btn-micro:focus-visible {
-  --tw-shadow: 0 0 0 1px rgb(0 0 0 / 0.8) inset, 0 0 0 1px rgb(0 0 0 / 0.8), 0 0 0 4px rgb(0 0 0 / 0.3);
+  --tw-shadow: 0 0 0 1px rgb(0 0 0 / 0.7) inset, 0 0 0 1px rgb(0 0 0 / 0.7), 0 0 0 4px rgb(0 0 0 / 0.3);
   --tw-shadow-colored: inset 0 0 0 1px var(--tw-shadow-color), 0 0 0 1px var(--tw-shadow-color), 0 0 0 4px var(--tw-shadow-color);
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
   --tw-shadow-color: rgb(16 185 129 / 0.3);
@@ -712,7 +727,7 @@ Ensure the default browser behavior of the `hidden` attribute.
 }
 
 .btn-ghost:focus-visible {
-  --tw-shadow: 0 0 0 1px rgb(0 0 0 / 0.8) inset, 0 0 0 1px rgb(0 0 0 / 0.8), 0 0 0 4px rgb(0 0 0 / 0.3);
+  --tw-shadow: 0 0 0 1px rgb(0 0 0 / 0.7) inset, 0 0 0 1px rgb(0 0 0 / 0.7), 0 0 0 4px rgb(0 0 0 / 0.3);
   --tw-shadow-colored: inset 0 0 0 1px var(--tw-shadow-color), 0 0 0 1px var(--tw-shadow-color), 0 0 0 4px var(--tw-shadow-color);
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
   --tw-shadow-color: rgb(16 185 129 / 0.3);
@@ -745,7 +760,7 @@ Ensure the default browser behavior of the `hidden` attribute.
 }
 
 .btn-ghost-micro:focus-visible {
-  --tw-shadow: 0 0 0 1px rgb(0 0 0 / 0.8) inset, 0 0 0 1px rgb(0 0 0 / 0.8), 0 0 0 4px rgb(0 0 0 / 0.3);
+  --tw-shadow: 0 0 0 1px rgb(0 0 0 / 0.7) inset, 0 0 0 1px rgb(0 0 0 / 0.7), 0 0 0 4px rgb(0 0 0 / 0.3);
   --tw-shadow-colored: inset 0 0 0 1px var(--tw-shadow-color), 0 0 0 1px var(--tw-shadow-color), 0 0 0 4px var(--tw-shadow-color);
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
   --tw-shadow-color: rgb(16 185 129 / 0.3);
@@ -845,7 +860,7 @@ Ensure the default browser behavior of the `hidden` attribute.
 }
 
 .btn--danger:focus-visible {
-  --tw-shadow: 0 0 0 1px rgb(0 0 0 / 0.8) inset, 0 0 0 1px rgb(0 0 0 / 0.8), 0 0 0 4px rgb(0 0 0 / 0.3);
+  --tw-shadow: 0 0 0 1px rgb(0 0 0 / 0.7) inset, 0 0 0 1px rgb(0 0 0 / 0.7), 0 0 0 4px rgb(0 0 0 / 0.3);
   --tw-shadow-colored: inset 0 0 0 1px var(--tw-shadow-color), 0 0 0 1px var(--tw-shadow-color), 0 0 0 4px var(--tw-shadow-color);
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
   --tw-shadow-color: rgb(16 185 129 / 0.3);
@@ -890,7 +905,7 @@ Ensure the default browser behavior of the `hidden` attribute.
 }
 
 .href:focus-visible {
-  --tw-shadow: 0 0 0 1px rgb(0 0 0 / 0.8) inset, 0 0 0 1px rgb(0 0 0 / 0.8), 0 0 0 4px rgb(0 0 0 / 0.3);
+  --tw-shadow: 0 0 0 1px rgb(0 0 0 / 0.7) inset, 0 0 0 1px rgb(0 0 0 / 0.7), 0 0 0 4px rgb(0 0 0 / 0.3);
   --tw-shadow-colored: inset 0 0 0 1px var(--tw-shadow-color), 0 0 0 1px var(--tw-shadow-color), 0 0 0 4px var(--tw-shadow-color);
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
   --tw-shadow-color: rgb(16 185 129 / 0.3);
@@ -1022,6 +1037,10 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .mb-1 {
   margin-bottom: 0.25rem;
+}
+
+.mt-1 {
+  margin-top: 0.25rem;
 }
 
 .box-border {
@@ -1440,6 +1459,10 @@ Ensure the default browser behavior of the `hidden` attribute.
   background-color: rgb(22 163 74 / var(--tw-bg-opacity));
 }
 
+.bg-transparent {
+  background-color: transparent;
+}
+
 .bg-opacity-80 {
   --tw-bg-opacity: 0.8;
 }
@@ -1637,6 +1660,15 @@ Ensure the default browser behavior of the `hidden` attribute.
   color: rgb(255 255 255 / var(--tw-text-opacity));
 }
 
+.text-error-500 {
+  --tw-text-opacity: 1;
+  color: rgb(239 68 68 / var(--tw-text-opacity));
+}
+
+.text-grey-900\/50 {
+  color: rgb(23 23 23 / 0.5);
+}
+
 .opacity-95 {
   opacity: 0.95;
 }
@@ -1674,26 +1706,13 @@ Ensure the default browser behavior of the `hidden` attribute.
   background-color: rgb(229 229 229 / var(--tw-bg-opacity));
 }
 
-.hover\:bg-primary-100\/70:hover {
-  background-color: rgb(209 250 229 / 0.7);
+.hover\:bg-primary-100\/60:hover {
+  background-color: rgb(209 250 229 / 0.6);
 }
 
 .hover\:bg-grey-300:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(212 212 212 / var(--tw-bg-opacity));
-}
-
-.hover\:bg-secondary-100\/70:hover {
-  background-color: rgb(207 250 254 / 0.7);
-}
-
-.hover\:bg-tertiary-100:hover {
-  --tw-bg-opacity: 1;
-  background-color: rgb(250 232 255 / var(--tw-bg-opacity));
-}
-
-.hover\:bg-primary-100\/60:hover {
-  background-color: rgb(209 250 229 / 0.6);
 }
 
 .hover\:bg-opacity-70:hover {
@@ -1711,7 +1730,7 @@ Ensure the default browser behavior of the `hidden` attribute.
 }
 
 .focus-visible\:shadow-focus:focus-visible {
-  --tw-shadow: 0 0 0 1px rgb(0 0 0 / 0.8) inset, 0 0 0 1px rgb(0 0 0 / 0.8), 0 0 0 4px rgb(0 0 0 / 0.3);
+  --tw-shadow: 0 0 0 1px rgb(0 0 0 / 0.7) inset, 0 0 0 1px rgb(0 0 0 / 0.7), 0 0 0 4px rgb(0 0 0 / 0.3);
   --tw-shadow-colored: inset 0 0 0 1px var(--tw-shadow-color), 0 0 0 1px var(--tw-shadow-color), 0 0 0 4px var(--tw-shadow-color);
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
@@ -1800,6 +1819,10 @@ Ensure the default browser behavior of the `hidden` attribute.
     display: flex;
   }
 
+  .sm\:grid {
+    display: grid;
+  }
+
   .sm\:hidden {
     display: none;
   }
@@ -1814,6 +1837,10 @@ Ensure the default browser behavior of the `hidden` attribute.
 
   .sm\:grid-cols-\[minmax\(100px\2c _25\%\)_minmax\(0\2c 1fr\)\] {
     grid-template-columns: minmax(100px, 25%) minmax(0,1fr);
+  }
+
+  .sm\:grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .sm\:grid-rows-\[_auto_1fr\] {

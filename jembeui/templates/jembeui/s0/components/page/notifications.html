@@ -1,6 +1,6 @@
 <div class="pointer-events-auto">
 {% for noteId, note in notifications.items() %}
-    <div class="z-50 relative w-auto gap-2 rounded min-h-[2rem] leading-5 flex items-center mb-1 px-4 shadow
+    <div class="z-50 relative w-auto gap-2 rounded min-h-[2rem] leading-6 flex items-center mb-1 px-4 py-2 shadow
         {%- if note.level == 'info' %}
         bg-grey-300 text-grey-900
         {%- elif note.level == 'success' %}

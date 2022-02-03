@@ -21,7 +21,7 @@ __all__ = ("CUpdateRecord",)
 
 class CUpdateRecord(CForm):
     class Config(CForm.Config):
-        default_template_exp = "jembeui/{style}/components/crud/update.html"
+        # default_template_exp = "jembeui/{style}/components/crud/update.html"
 
         def __init__(
             self,
@@ -49,7 +49,7 @@ class CUpdateRecord(CForm):
             if menu is None:
                 menu = Menu(
                     [
-                        ActionLink("submit()", "Save", styling=dict(primary=True)),
+                        ActionLink("submit()", "Save", styling=("primary",)),
                         ActionLink("cancel()", "Cancel"),
                     ]
                 )

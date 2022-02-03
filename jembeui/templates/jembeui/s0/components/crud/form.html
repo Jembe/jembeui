@@ -1,4 +1,5 @@
+{% from 'jembeui/s0/macros.html' import display_menu_as_buttons %}
 <div>
-    <div>{{menu.as_html('buttons')}}</div>
+    <div>{{display_menu_as_buttons(menu)}}</div>
     <div>{{form.as_html()}}</div>
 </div>

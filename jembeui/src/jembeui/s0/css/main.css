@@ -6,22 +6,14 @@
     @apply hidden;
 }
 @layer base{
-    [type='text'],
-    [type='email'],
-    [type='url'],
-    [type='password'],
-    [type='number'],
-    [type='date'],
-    [type='datetime-local'],
-    [type='month'],
-    [type='search'],
-    [type='tel'],
-    [type='time'],
-    [type='week'],
-    [multiple],
-    textarea,
-    select {
-        @apply box-border border outline-none border-grey-300 hover:border-grey-400 focus:border-primary-500/80 focus:shadow-focus focus:shadow-primary-500/30 focus:outline-none;
+    .form-input, 
+    .form-textarea, 
+    .form-select, 
+    .form-multiselect {
+        @apply box-border px-2 py-1 border rounded-sm outline-none border-grey-300 hover:border-grey-400 focus:border-primary-500/80 focus:shadow-focus focus:shadow-primary-500/30 focus:outline-none;
+    }
+    .input--error {
+        @apply border-error-600 shadow-focus shadow-error-600/30
     }
 }
 

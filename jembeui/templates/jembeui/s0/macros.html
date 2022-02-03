@@ -315,9 +315,9 @@
 
 
 {# DISPLAY MENU AS BUTTONS #}
-{% macro display_menu_as_buttons(menu, aligh_right=false, buttons_styling=())%}
+{% macro display_menu_as_buttons(menu, styling=(), buttons_styling=())%}
     {% if menu.is_accessible %}
-        <div jmb-scope="{opened:null}" class="flex items-center gap-1">
+        <div jmb-scope="{opened:null}" class="flex items-center gap-1 {% if 'align-right' in styling %} flex-row-reverse{% endif %}">
             {% for mi in menu.items recursive %}
                 {% if mi.is_accessible %}
                     {% if mi.is_menu %}
@@ -383,20 +383,20 @@
 
 
 {#  DISPLAY MODAL #}
-{% macro display_modal(component, title=none, menu=none, closable=true, size="base", close_button_title=none)%}
+{% macro display_modal(component, title=none, menu=none, closable=true, styling=(), close_button_title=none)%}
     {# size in small, base, wide, fullscreen #}
     {% set display_header = title is not none or closable %}
     {% set display_footer = menu is not none or (closable and close_button_title is not none)%}
 
-    <div class="fixed inset-0 z-50 bg-opacity-80 bg-grey-900">
+    <div class="fixed inset-0 z-40 bg-opacity-80 bg-grey-900">
         <div class="min-w-[280px] m-auto mt-[5vh]
-        {%- if size == 'small' %}
+        {%- if 'small' in styling %}
             max-w-[80%] w-[420px]
-        {%- elif size == 'base' %}
-            max-w-[80%] w-[650px]
-        {%- elif size == 'wide' %}
+        {%- elif 'wide' in styling %}
             max-w-[80%] w-4/5
-        {%- elif size == 'fullscreen' %}
+        {%- elif 'fullscreen' in styling %}
+        {%- else%}
+            max-w-[80%] w-[650px]
         {%- endif %}">
             {# header #}
             {% if display_header %}
@@ -420,7 +420,7 @@
                     {% if menu is string() %}
                     {{menu}}
                     {% else %}
-                    {{display_menu_as_buttons(menu, aligh_right=true)}}
+                    {{display_menu_as_buttons(menu, ("align-right"))}}
                     {% endif %}
                 {% elif menu is none and closable and close_button_title %}
                     <div class="flex justify-end">

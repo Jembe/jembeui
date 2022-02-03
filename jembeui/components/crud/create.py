@@ -21,7 +21,7 @@ __all__ = ("CCreateRecord",)
 
 class CCreateRecord(CForm):
     class Config(CForm.Config):
-        default_template_exp = "jembeui/{style}/components/crud/create.html"
+        # default_template_exp = "jembeui/{style}/components/crud/create.html"
 
         def __init__(
             self,
@@ -49,7 +49,7 @@ class CCreateRecord(CForm):
             if menu is None:
                 menu = Menu(
                     [
-                        ActionLink("submit()", "Save", styling=dict(primary=True)),
+                        ActionLink("submit()", "Save", styling=("primary",)),
                         ActionLink("cancel()", "Cancel"),
                     ]
                 )

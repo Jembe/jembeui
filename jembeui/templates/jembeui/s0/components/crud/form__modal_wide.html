@@ -1,4 +1,4 @@
 {% from 'jembeui/s0/macros.html' import display_modal %}
-{% call display_modal(component, title, menu) %}
+{% call display_modal(component, title, menu, styling=("wide",)) %}
     {{form.as_html()}}
 {% endcall %}

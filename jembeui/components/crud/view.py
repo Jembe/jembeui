@@ -22,7 +22,7 @@ __all__ = ("CViewRecord",)
 
 class CViewRecord(CFormBase):
     class Config(CFormBase.Config):
-        default_template_exp = "jembeui/{style}/components/crud/view.html"
+        # default_template_exp = "jembeui/{style}/components/crud/view.html"
 
         def __init__(
             self,
