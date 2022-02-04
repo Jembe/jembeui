@@ -43,7 +43,7 @@
 
 {% macro display_link_as_href(link, styling=(), attrs=none) %}
     {% if link.is_accessible %}
-        {% if "as_button" in link.styling %}
+        {% if "as-button" in link.styling %}
             {{display_link_as_button(link)}}
         {% endif %}
         {% set styling = styling if styling else link.styling %}
@@ -133,7 +133,7 @@
 {# DISPLAY LINK AS BUTTON #}
 {% macro display_link_as_button(link, styling=(), attrs=none) %}
     {% if link.is_accessible %}
-        {% if "as_href" in link.styling %}
+        {% if "as-href" in link.styling %}
             {{display_link_as_href(link)}}
         {% endif %}
         {% set styling = styling if styling else link.styling %}

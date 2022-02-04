@@ -7,13 +7,13 @@
     display_table,
     display_icon
 %}
-<div class="py-4">
+<div class="my-4">
 {%- block header %}
     {{display_menu_as_buttons(menu)}}
 {%- endblock header %}
 
 {%- block toolbar %}
-    <div class="flex flex-wrap items-center justify-end gap-1 pt-4">
+    <div class="flex flex-wrap items-center justify-end gap-1 mt-4">
         {{display_list_clear_filters_button(_config.search_filter, jui_choice_filters_config)}}
         {{display_list_search_input(search, _config.search_filter)}}
         {% if  _config.search_filter %}

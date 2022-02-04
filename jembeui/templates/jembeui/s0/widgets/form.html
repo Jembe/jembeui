@@ -1,12 +1,14 @@
 {% from 'jembeui/s0/macros__form.html' import form_field %}
-<div class="form">
+<div>
 {% set top = namespace(grab_focus = _config.grab_focus_on_display, prev_field_ends_block=false, open_divs = 0) %}
 {% for field in form  %}
-    {% set field_is_inline=form.RENDER_KW[field.name].get("_field", {}).get("_inline", False) %}
-    {% set block=form.RENDER_KW[field.name].get("_block", {}) %}
-    {% set field_starts_block=block.get("_start", false) %}
-    {% set field_starts_inline_block =block.get("_inline", false) %}
-    {% set field_ends_block = block.get("_end", false) %}
+    {% set render_kw = form.RENDER_KW[field.name] %}
+    {% set styling = render_kw.get("_styling", []) %}
+    {% set field_is_inline = "inline" in styling %}
+    {% set field_starts_block = "block-start" in styling %}
+    {% set field_ends_block = "block-end" in styling %}
+
+
 
     {% set start_new_field_row = not field_is_inline or loop.first or field_starts_block %}
     {% set start_new_block_row =  field_starts_block  and not field_starts_inline_block %}
@@ -35,26 +37,24 @@
     {# start block row #}
     {% if start_new_block_row %}
         {% set top.open_divs = top.open_divs + 1 %}
-    <div class="form__row">
+    <div class="flex flex-row items-stretch gap-2">
     {% endif %}
     {# start block #}
     {% if start_new_block%}
         {% set top.open_divs = top.open_divs + 1 %}
-    <div {{form.attr_kw(form.resolve_kw(block,{'class':'form__block'}))|xmlattr}}>
+    <div {{form.attr_kw(form.resolve_kw(render_kw.get('_block', {}),{'class':'grow basis-0'}))|xmlattr}}>
     {% endif %}
     {# start field row #}
     {% if start_new_field_row%}
         {% set top.open_divs = top.open_divs + 1 %}
-    <div class="form__row">
+    <div class="flex flex-row items-stretch gap-2">
     {% endif %}
 
     {# field #}
     {% if not form.is_disabled and top.grab_focus and (field.render_kw|default({}, true)).get("disabled", none) is none %}
         {% set top.grab_focus = false %}
-        {# {{form.field_as_html(field, **{"jmb-on:ready.once":"$self.focus()"})}} #}
         {{form_field(form, field, {"jmb-on:ready.once":"$self.focus()"})}}
     {% else %}
-        {# {{form.field_as_html(field)}} #}
         {{form_field(form, field)}}
     {% endif %}
 

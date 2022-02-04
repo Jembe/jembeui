@@ -26,6 +26,9 @@ module.exports = {
             boxShadow: {
                 'focus': '0 0 0 1px rgb(0 0 0 / 0.7) inset, 0 0 0 1px rgb(0 0 0 / 0.7), 0 0 0 4px rgb(0 0 0 / 0.3)',
             },
+            ringColor: {
+                DEFAULT: colors.emerald[500],
+            },
             animation: {
                 'progress': 'running-progress 2s cubic-bezier(0.4, 0, 0.2, 1) infinite'
             },
