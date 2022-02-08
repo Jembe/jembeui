@@ -1,3 +1,4 @@
+from math import ceil
 from typing import Optional, Tuple
 from jembe import File
 from .file import FileField
@@ -49,6 +50,8 @@ class ImageField(FileField):
 
     def thumbnail(self, size: Optional[Tuple[int, int]] = None) -> Optional["File"]:
         thumbnail_size = size if size else self.thumbnail_size
+        # get litle bit larger thumbnail to make it more flexible when displaying
+        thumbnail_size = (ceil(thumbnail_size[0] * 1.5), ceil(thumbnail_size[1] * 1.5))
         if self.data:
             return create_thumbnail(self.data, thumbnail_size)
         return None

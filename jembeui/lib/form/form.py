@@ -85,7 +85,15 @@ class FormBase(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
         # otherwise changes to render_kw will be permanent
         for field in self:
             setattr(
-                field, "render_kw", field.render_kw.copy() if field.render_kw else {}
+                field,
+                "render_kw",
+                {
+                    k: v
+                    for k, v in field.render_kw.items()
+                    if not k.endswith("+") and not k.startswith("_")
+                }
+                if field.render_kw
+                else {},
             )
 
     @classmethod

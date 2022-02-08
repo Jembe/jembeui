@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, List, Dict, Optional, Tuple
+from typing import TYPE_CHECKING, List, Dict, Tuple
 import re
 from PIL import Image, ImageOps
 from flask import current_app
