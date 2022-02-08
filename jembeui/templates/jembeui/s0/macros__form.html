@@ -2,7 +2,7 @@
 
 {% macro form_field(form, field, render_kw = none) %}
     {% set render_kw = {} if render_kw is none else render_kw %}
-    {% set field_id = "{}--{}".format(form.cform.exec_name.replace("/","-"), field.name) %}
+    {% set field_id = "{}--{}".format(form.cform.exec_name.replace("/","-").replace(".","-_-"), field.name) %}
     {% set is_not_disabled = render_kw.get("disabled", false) == false and not form.is_disabled %}
 
     {% set fclass = field.__class__.__name__ %}
@@ -23,7 +23,7 @@
     {% set render_kw = {} if render_kw is none else render_kw %}
     {% set render_kw = form.resolve_kw(form.RENDER_KW[field.name], render_kw) %}
 
-    {% set field_id = "{}--{}".format(form.cform.exec_name.replace("/","-"), field.name) %}
+    {% set field_id = "{}--{}".format(form.cform.exec_name.replace("/","-").replace(".","-_-"), field.name) %}
     {% set styling = render_kw.get("_styling", []) %}
     {% set is_not_disabled = render_kw.get("disabled", false) == false and not form.is_disabled %}
     {% set instant_validate = ((form.__instant_validate__ and render_kw.get('__instant_validate__', none) in (none, true)) or render_kw.get('_instant_validate', none) == true) and "validate" in form.cform._config.component_actions  %}
