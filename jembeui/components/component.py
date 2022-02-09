@@ -99,6 +99,15 @@ class Component(jembe.Component):
 
         return self._config.title(self)
 
+    @property
+    def jui_style(self) -> str:
+        """Adds current JembeUI style to template context
+
+        Returns:
+            str: JembeUI style configured by JEMBEUI_STYLE parameter in config.py
+        """
+        return settings.default_style
+
     # JembeUI helper methods
     def jui_set_page_title(self, title: Optional[str]):
         self.emit("setPageTitle", title=title)

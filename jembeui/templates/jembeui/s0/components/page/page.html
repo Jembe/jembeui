@@ -6,14 +6,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {{component("__title")}}
     {# seo tag + description #}
+    {%- block page_head_css %}
     <link rel="stylesheet" href="{{url_for('jembeui.static', filename='jembeui/s0/css/main.css')}}">
+    {%- endblock page_head_css %}
+    {%- block page_head_font %}
     <link rel="stylesheet" href="{{url_for('jembeui.static', filename='jembeui/s0/css/fira-sans.css')}}">
+    {%- endblock page_head_font %}
     <link rel="stylesheet" href="{{url_for('jembeui.static', filename='jembeui/s0/css/datepicker.css')}}">
-    {% if _config.enable_image_edit_support -%}
+    {%- if _config.enable_image_edit_support -%}
     <link rel="stylesheet" href="{{url_for('jembeui.static', filename='jembeui/s0/tui/tui-color-picker.min.css')}}">
     <link rel="stylesheet" href="{{url_for('jembeui.static', filename='jembeui/s0/tui/tui-image-editor.min.css')}}">
     {%- endif %}
-    {% block page_head %}{% endblock page_head %}
+    {%- block page_head %}
+    {%- endblock page_head %}
 </head>
 
 <body class="m-0 box-border bg-grey-100 text-grey-900 [font-kerning:normal] ">
