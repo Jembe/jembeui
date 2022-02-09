@@ -1,5 +1,8 @@
 {% from 'jembeui/s0/macros__form.html' import form_field %}
-<div>
+{% set form_styling = form.__styling__|default([], true) %}
+{% set form_is_wfull = "w-full" in form_styling %}
+
+<div class="{% if not form_is_wfull %}max-w-3xl{% endif %}">
 {% set top = namespace(grab_focus = _config.grab_focus_on_display, prev_field_ends_block=false, open_divs = 0) %}
 {% for field in form  %}
     {% set render_kw = form.RENDER_KW[field.name] %}

@@ -46,6 +46,7 @@
 
 {# S P E C I F I C   F I E L D S   I M P L E M E N T A T I O N #}
 {% macro _default_field(form, field, render_kw, field_id, is_not_disabled) %}
+    {# TODO add styling "short" without grow class #}
     <div {{form.attr_kw(form.resolve_kw(render_kw._field|default({},true), {"class":"mb-2 grow basis-0 flex flex-col"}))|xmlattr}}>
         <div class="flex items-center justify-between">
             <label for="{{field_id}}" class="flex flex-row items-center justify-between text-sm">{{field.label.text}}</label>

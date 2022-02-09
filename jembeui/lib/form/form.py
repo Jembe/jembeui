@@ -42,12 +42,8 @@ class FormBase(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
     # full path name of template
     __template__: Union[str, Sequence[str]] = "jembeui/{style}/widgets/form.html"
     # __template__ = Form.template_variant("inline")
+    __styling__: Sequence[str] = ()
 
-    # TEMPLATE_VARIANTS: dict
-    # TEMPLATE_VARIANTS_CACHE: dict
-    # DEFAULT_TEMPLATE: Union[str, List[str]]
-    # FIELD_TEMPLATES_CACHE: dict
-    # FIELD_TEMPLATES_VARIANTS_CACHE: dict
 
     RENDER_KW: Dict[str, Dict[str, Any]]
 
