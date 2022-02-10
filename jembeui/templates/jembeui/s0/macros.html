@@ -484,10 +484,10 @@
     <div jmb-scope="{opened:false}" jmb-on:click.away="$scope().opened = false;" class="relative">
         {% set ns = namespace(other_selected = false) %}
         <div jmb-show="$scope().opened" jmb-cloak
-             class="absolute top-7 min-w-[70px] right-0 shadow rounded-sm overflow-hidden bg-grey-50">
+             class="absolute z-10 top-7 min-w-[70px] right-0 shadow rounded-sm overflow-hidden bg-grey-50">
         {% for filter_name, choice_filter in filters_config.items() if choice_filter.is_grouped  %}
         {% for choice in choice_filter.choices  %}
-        <label class="btn-micro flex justify-start items-center rounded-none
+        <label class="btn-micro flex justify-start items-center rounded-none whitespace-nowrap
             {% if choice_filters and filter_name in choice_filters and choice.value_str in choice_filters[filter_name] %}
             btn--on
             {% set ns.other_selected = true %}
@@ -527,7 +527,7 @@
     <div class="relative" jmb-scope="{opened:false}" jmb-on:click.away="$scope().opened = false;">
         {% set ns = namespace(ordered = false) %}
         <div jmb-show="$scope().opened" jmb-cloak
-             class="absolute top-7 min-w-[70px] right-0 shadow rounded-sm overflow-hidden bg-grey-50">
+             class="absolute z-10 top-7 min-w-[70px] right-0 shadow rounded-sm overflow-hidden bg-grey-50">
         {% for order_name, order_title in order_by_config.items()  %}
         <label class="btn-micro flex justify-between items-center rounded-none whitespace-nowrap
             {% if order_by == order_name  or order_by == '-' + order_name %}
@@ -585,8 +585,8 @@
 
 
 {# TABLE #}
-{% macro display_list__table(records, fields_config, field_values,order_by, order_by_config, record_menu_config=none, get_record_menu=none) %}
-    {% if not fields_config and not records %}
+{% macro display_list__table(records, fields_config, field_values, order_by, order_by_config, record_menu_config, get_record_menu, search, choice_filters, total_records) %}
+    {% if  not records  and total_records == 0 and not search and not choice_filters %}
     <div class="text-sm text-center text-grey-500">No data found</div>  
     {% else %}
     <table class="w-full border border-t-0 border-grey-400/50">
@@ -655,7 +655,10 @@
         ctx.state.order_by, 
         ctx._config.order_by, 
         ctx._config.record_menu, 
-        ctx.get_record_menu
+        ctx.get_record_menu,
+        ctx.state.search,
+        ctx.state.choice_filters,
+        ctx.total_records
     )}}
 {% endmacro %}
 

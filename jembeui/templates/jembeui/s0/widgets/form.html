@@ -1,8 +1,19 @@
 {% from 'jembeui/s0/macros__form.html' import form_field %}
 {% set form_styling = form.__styling__|default([], true) %}
-{% set form_is_wfull = "w-full" in form_styling %}
+{% set fields_styling = form.__fields_styling__|default((), true) %}
 
-<div class="{% if not form_is_wfull %}max-w-3xl{% endif %}">
+<div class="{%- if 'w-full' in form_styling %}
+            {%- elif 'w-sm' in form_styling %}
+            max-w-screen-sm
+            {%- elif 'w-md' in form_styling %}
+            max-w-screen-md
+            {%- elif 'w-lg' in form_styling %}
+            max-w-screen-lg
+            {%- elif 'w-xl' in form_styling %}
+            max-w-screen-lg
+            {%- else %}
+            inline-block
+            {%- endif %}">
 {% set top = namespace(grab_focus = _config.grab_focus_on_display, prev_field_ends_block=false, open_divs = 0) %}
 {% for field in form  %}
     {% set render_kw = form.RENDER_KW[field.name] %}
@@ -10,6 +21,7 @@
     {% set field_is_inline = "inline" in styling %}
     {% set field_starts_block = "block-start" in styling %}
     {% set field_ends_block = "block-end" in styling %}
+    {#  TODO filed_starts_inline_block = fields_starts_block and field_is_inline #}
 
 
 
@@ -40,25 +52,26 @@
     {# start block row #}
     {% if start_new_block_row %}
         {% set top.open_divs = top.open_divs + 1 %}
-    <div class="flex flex-row items-stretch gap-2">
+    <div class="flex flex-row items-stretch gap-4">
     {% endif %}
     {# start block #}
     {% if start_new_block%}
         {% set top.open_divs = top.open_divs + 1 %}
-    <div {{form.attr_kw(form.resolve_kw(render_kw.get('_block', {}),{'class':'grow basis-0'}))|xmlattr}}>
+        {% set default_block_class = "" if field_is_inline else "grow basis-0" %}
+    <div {{form.attr_kw(form.resolve_kw(render_kw.get('_block', {}),{'class':default_block_class}))|xmlattr}}>
     {% endif %}
     {# start field row #}
     {% if start_new_field_row%}
         {% set top.open_divs = top.open_divs + 1 %}
-    <div class="flex flex-row items-stretch gap-2">
+    <div class="flex flex-row items-stretch gap-4">
     {% endif %}
 
     {# field #}
     {% if not form.is_disabled and top.grab_focus and (field.render_kw|default({}, true)).get("disabled", none) is none %}
         {% set top.grab_focus = false %}
-        {{form_field(form, field, {"jmb-on:ready.once":"$self.focus()"})}}
+        {{form_field(form, field, {"jmb-on:ready.once+":"$self.focus();", "_styling+": fields_styling, "_field":{"class+": " mb-2"}})}}
     {% else %}
-        {{form_field(form, field)}}
+        {{form_field(form, field, {"_styling+": fields_styling, "_field":{"class+": " mb-2"}})}}
     {% endif %}
 
     {% set top.prev_field_ends_block = field_ends_block %}

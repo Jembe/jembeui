@@ -37,7 +37,7 @@
         <div class="flex-grow grid grid-cols-1 grid-rows-[auto_auto_auto_1fr] sm:grid-cols-[minmax(100px,_25%)_minmax(0,1fr)] sm:grid-rows-[_auto_1fr] "
             jmb-bind:class="{'grid-rows-[auto_1fr]': ! $local.mainMenuOpen}">
             {# Title and open menu button #}
-            <div class="sticky z-40 flex items-center gap-2 pl-1 border-b top-1 border-b-grey-300 sm:pr-4 bg-grey-100 opacity-95">
+            <div class="sticky top-0 z-40 flex items-center gap-2 pt-1 pl-1 border-b border-b-grey-300 sm:pr-4 bg-grey-100 opacity-95">
                 {# Open close main menu #}
                 {% if "__main_menu" in _config.components and not component("__main_menu").component_instance.is_empty() %}
                 <button class="btn-ghost w-7 h-7" type="button" 
@@ -65,7 +65,7 @@
             {% endif %} 
 
             {# System menu #}
-            <div class="sm:z-40 sm:row-start-1 sm:col-start-2 sm:block sm:border-b sm:border-b-grey-300 bg-grey-100 sm:opacity-95 sm:sticky sm:top-1"
+            <div class="sm:z-40 sm:row-start-1 sm:col-start-2 sm:block sm:border-b sm:border-b-grey-300 bg-grey-100 sm:opacity-95 sm:sticky sm:top-0 sm:pt-1"
                 jmb-bind:class="{'hidden': ! $local.mainMenuOpen}">
             {% block system_menu -%}
                 {% if "__system_menu" in _config.components %}

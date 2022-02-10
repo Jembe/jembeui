@@ -10,11 +10,11 @@
     .form-textarea, 
     .form-select, 
     .form-multiselect {
-        @apply box-border px-2 py-1 border rounded-sm outline-none border-grey-300 hover:border-grey-400 focus:border-primary-500/80 focus:shadow-focus focus:shadow-primary-500/30 focus:outline-none focus:ring-primary-500/30 disabled:bg-grey-50 disabled:hover:border-grey-200 disabled:border-grey-200;
+        @apply box-border px-2 py-1 border rounded-sm outline-none border-grey-300 hover:border-grey-400 focus:border-primary-500/80 focus:shadow-focus focus:shadow-primary-500/30 focus:outline-none focus:ring-primary-500/30 disabled:bg-grey-50 disabled:hover:border-grey-100 disabled:border-grey-100;
     }
     .form-checkbox,
     .form-radio {
-        @apply w-5 h-5 mx-1 rounded-sm cursor-pointer text-primary-500 focus:shadow-focus focus:shadow-primary-500/30 focus:outline-none focus:ring-primary-500/30 disabled:cursor-default disabled:opacity-70;
+        @apply w-5 h-5 mx-1 rounded-sm cursor-pointer text-primary-500 focus:shadow-focus focus:shadow-primary-500/30 focus:outline-none focus:ring-primary-500/30 disabled:cursor-default disabled:bg-grey-400;
     }
     .form-checkbox:checked {
         @apply stroke-white bg-[url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciICB2aWV3Qm94PSIwIDAgNTEyIDUxMiI+PHRpdGxlPkNoZWNrbWFyazwvdGl0bGU+PHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmZmZmIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIHN0cm9rZS13aWR0aD0iMzIiIGQ9Ik00MTYgMTI4TDE5MiAzODRsLTk2LTk2Ii8+PC9zdmc+)];

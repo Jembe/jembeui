@@ -44,7 +44,6 @@ class FormBase(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
     # __template__ = Form.template_variant("inline")
     __styling__: Sequence[str] = ()
 
-
     RENDER_KW: Dict[str, Dict[str, Any]]
 
     def __init__(
@@ -291,7 +290,7 @@ class FormBase(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
                             result[kn] = self.__resolve_kw(
                                 self.__join_kw(result[kn], w)
                             )
-                        elif isinstance(w, list):
+                        elif isinstance(w, (list, tuple)):
                             result[kn] = [*result[kn], *w]
                         else:  # str
                             result[kn] = " ".join((result[kn], w))
@@ -307,9 +306,16 @@ class FormBase(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
                         result[k] = w
         return result
 
-    def resolve_kw(self, render_kw: dict, defaults_kw: Optional[dict] = None) -> dict:
-        if defaults_kw:
-            return self.__resolve_kw(self.__join_kw(render_kw, defaults_kw, True))
+    def resolve_kw(
+        self,
+        render_kw: dict,
+        additional_kw: Optional[dict] = None,
+        additional_as_default: bool = True,
+    ) -> dict:
+        if additional_kw:
+            return self.__resolve_kw(
+                self.__join_kw(render_kw, additional_kw, additional_as_default)
+            )
         else:
             return self.__resolve_kw(render_kw)
 

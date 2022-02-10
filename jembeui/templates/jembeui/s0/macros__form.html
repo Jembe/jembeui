@@ -2,26 +2,7 @@
 
 {% macro form_field(form, field, render_kw = none) %}
     {% set render_kw = {} if render_kw is none else render_kw %}
-    {% set field_id = "{}--{}".format(form.cform.exec_name.replace("/","-").replace(".","-_-"), field.name) %}
-    {% set is_not_disabled = render_kw.get("disabled", false) == false and not form.is_disabled %}
-
-    {% set fclass = field.__class__.__name__ %}
-    {% if fclass == "BooleanField" %}
-        {{_boolean_field(form, field, render_kw, field_id, is_not_disabled)}}
-    {# {% elif fclass == "DateField" %}
-    {% elif fclass == "DateTimeField" %}
-    {% elif fclass == "SelectMultipleField" %}
-    {% elif fclass == "FileField" %} #}
-    {% elif fclass == "ImageField" %}
-        {{_default_field(form, field, render_kw, field_id, is_not_disabled)}}
-    {% else %}
-        {{_default_field(form, field, render_kw, field_id, is_not_disabled)}}
-    {% endif %}
-{% endmacro %}
-
-{% macro form_field_widget(form, field, render_kw = none) %}
-    {% set render_kw = {} if render_kw is none else render_kw %}
-    {% set render_kw = form.resolve_kw(form.RENDER_KW[field.name], render_kw) %}
+    {% set render_kw = form.resolve_kw(form.RENDER_KW[field.name], render_kw, false) %}
 
     {% set field_id = "{}--{}".format(form.cform.exec_name.replace("/","-").replace(".","-_-"), field.name) %}
     {% set styling = render_kw.get("_styling", []) %}
@@ -29,6 +10,52 @@
     {% set instant_validate = ((form.__instant_validate__ and render_kw.get('__instant_validate__', none) in (none, true)) or render_kw.get('_instant_validate', none) == true) and "validate" in form.cform._config.component_actions  %}
     {% set instant_submit = ((form.__instant_submit__ and render_kw.get('__instant_submit__', none) in (none, true)) or render_kw.get('__instant_submit__', none) == true ) and "submit" in form.cform._config.component_actions %}
 
+    {% set fclass = field.__class__.__name__ %}
+    {% if fclass == "BooleanField" %}
+        {{_boolean_field(form, field, render_kw, field_id, is_not_disabled, styling, instant_validate, instant_submit)}}
+    {# {% elif fclass == "DateField" %}
+    {% elif fclass == "DateTimeField" %}
+    {% elif fclass == "SelectMultipleField" %}
+    {% elif fclass == "FileField" %} #}
+    {% elif fclass == "ImageField" %}
+        {{_default_field(form, field, render_kw, field_id, is_not_disabled, styling, instant_validate, instant_submit)}}
+    {% else %}
+        {{_default_field(form, field, render_kw, field_id, is_not_disabled, styling, instant_validate, instant_submit)}}
+    {% endif %}
+{% endmacro %}
+
+{% macro form_field_widget(form, field, render_kw = none) %}
+    {% set render_kw = {} if render_kw is none else render_kw %}
+    {% set render_kw = form.resolve_kw(form.RENDER_KW[field.name], render_kw, false) %}
+
+    {% set field_id = "{}--{}".format(form.cform.exec_name.replace("/","-").replace(".","-_-"), field.name) %}
+    {% set styling = render_kw.get("_styling", []) %}
+    {% set is_not_disabled = render_kw.get("disabled", false) == false and not form.is_disabled %}
+    {% set instant_validate = ((form.__instant_validate__ and render_kw.get('__instant_validate__', none) in (none, true)) or render_kw.get('_instant_validate', none) == true) and "validate" in form.cform._config.component_actions  %}
+    {% set instant_submit = ((form.__instant_submit__ and render_kw.get('__instant_submit__', none) in (none, true)) or render_kw.get('__instant_submit__', none) == true ) and "submit" in form.cform._config.component_actions %}
+
+    {{_form_field_widget(form, field, render_kw, field_id, is_not_disabled, styling, instant_validate, instant_submit)}}
+{% endmacro %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{# P R I V A T E    M A C R O S #}
+
+{# Callaed internaly asume that render_kw is resolved #}
+{% macro _form_field_widget(form, field, render_kw, field_id, is_not_disabled, styling, instant_validate, instant_submit) %}
     {% set fclass = field.__class__.__name__ %}
     {% if fclass == "BooleanField" %}
         {{_boolean_widget(form, field, render_kw, field_id, is_not_disabled, styling, instant_validate, instant_submit)}}
@@ -44,30 +71,41 @@
 {% endmacro %}
 
 
-{# S P E C I F I C   F I E L D S   I M P L E M E N T A T I O N #}
-{% macro _default_field(form, field, render_kw, field_id, is_not_disabled) %}
-    {# TODO add styling "short" without grow class #}
-    <div {{form.attr_kw(form.resolve_kw(render_kw._field|default({},true), {"class":"mb-2 grow basis-0 flex flex-col"}))|xmlattr}}>
-        <div class="flex items-center justify-between">
-            <label for="{{field_id}}" class="flex flex-row items-center justify-between text-sm">{{field.label.text}}</label>
-            <div class="text-sm font-light text-grey-600">
+
+
+
+
+
+
+
+
+
+
+{# S P E C I F I C   F I E L D S   I M P L E M E N T A T I O N S #}
+{% macro _default_field(form, field, render_kw, field_id, is_not_disabled, styling, instant_validate, instant_submit) %}
+    {% set default_class = "flex flex-col grow basis-0" if "w-full" in styling else "flex flex-col" %}
+    <div {{form.attr_kw(form.resolve_kw(render_kw._field|default({},true), {"class+":default_class}, false))|xmlattr}}>
+        <div class="flex items-center justify-between mb-1">
+            <label for="{{field_id}}" class="flex flex-row items-center justify-between text-xs">{{field.label.text}}</label>
+            <div class="text-xs font-light text-grey-600">
             {% if is_not_disabled and not field.flags.required %}optional{% endif %}
             {% if field.description %}{{field.description}}{% endif %}
             </div>
         </div>
-        {{form_field_widget(form, field, render_kw)}}
+        {{_form_field_widget(form, field, render_kw, field_id, is_not_disabled, styling, instant_validate, instant_submit)}}
         {% for error in field.errors %}
         <div class="mt-1 text-sm leading-6 text-error-500">{{error}}</div>
         {% endfor %}
     </div>
 {% endmacro %}
 
-{% macro _boolean_field(form, field, render_kw, field_id, is_not_disabled) %}
-    <div {{form.attr_kw(form.resolve_kw(render_kw._field|default({},true), {"class":"mb-2 grow basis-0 flex flex-col"}))|xmlattr}}>
+{% macro _boolean_field(form, field, render_kw, field_id, is_not_disabled, styling, instant_validate, instant_submit) %}
+    {% set default_class = "flex flex-col mt-2" if "w-full" not in styling else "flex flex-col grow basis-0 mt-2" %}
+    <div {{form.attr_kw(form.resolve_kw(render_kw._field|default({},true), {"class+":default_class}, false))|xmlattr}}>
         <div class="flex flex-row items-center">
-            {{form_field_widget(form, field, render_kw)}}
+            {{_form_field_widget(form, field, render_kw, field_id, is_not_disabled, styling, instant_validate, instant_submit)}}
             <label for="{{field_id}}" class="w-full ml-1 text-sm {% if is_not_disabled %} cursor-pointer {% endif %} basis-0 grow">{{field.label.text}}</label>
-            <div class="text-sm font-light text-grey-600">
+            <div class="text-xs font-light text-grey-600">
                 {# {% if is_not_disabled and not field.flags.required %}optional{% endif %} #}
                 {% if field.description %}{{field.description}}{% endif %}
             </div>
@@ -162,13 +200,13 @@
          jmb-on:focusin.document="if ($scope().showControls && !$self.contains(document.activeElement)){$scope().showControls=false}" 
          class="relative">
         {# thumbnail #}
-        <button class="flex items-center justify-center w-full overflow-hidden bg-white rounded-lg cursor-pointer focus-visible:shadow-focus focus-visible:outline-none focus-visible:shadow-primary-500/30 focus-visible:ring-primary-500/30"
+        <button class="z-0 flex items-center justify-center w-full overflow-hidden bg-white rounded-lg cursor-pointer focus-visible:shadow-focus focus-visible:outline-none focus-visible:shadow-primary-500/30 focus-visible:ring-primary-500/30"
                 {%- if field.data or is_not_disabled %}
                 jmb-on:focus="$scope().showControls = true"
                 {%- else %}
                 disabled
                 {%- endif %}
-                style="height: {{field.thumbnail_size[1]}}px;">
+                style="height: {{field.thumbnail_size[1]}}px;min-width: {{field.thumbnail_size[0]*1.5}}px;">
             {% if field.data %}
             <img src="{{field.thumbnail().url}}" alt="{{field.data.basename}} thumbnail" class="object-contain w-full h-full">
             {% elif is_not_disabled %}
