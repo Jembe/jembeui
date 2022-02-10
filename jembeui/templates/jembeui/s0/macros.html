@@ -51,7 +51,7 @@
             title=link.title,
             url=link.url,
             jrl=link.jrl,
-            icon_name=link.icon_name,
+            icon_name=link.icon,
             icon_html=link.icon_html,
             styling=styling,
             attrs=attrs
@@ -79,7 +79,7 @@
             btn
         {%- endif %}
         {%- if not is_ghost and has_icon %}
-        flex items-center
+        flex items-center gap-1
         {%- endif %}
         {%- if 'primary' in styling %}
             btn--primary
@@ -114,7 +114,7 @@
             {{display_icon(icon_name, icon_html, class="p-1")}} 
         {%- elif has_icon %}
             {%- set icon_is_last = "icon-last" in styling %}
-            {%- set icon_class = "w-8 h-8 p-1" if "micro" not in styling else "w-5 h-5 p-1" %}
+            {%- set icon_class = "w-8 h-8 p-1" if "micro" not in styling else "w-5 h-5" %}
             {%- if has_icon and not icon_is_last %}
                 {{display_icon(icon_name, icon_html, class=icon_class)}} 
             {%- endif -%}
@@ -140,7 +140,7 @@
         {{display_button(
             title=link.title,
             jrl=link.jrl,
-            icon_name=link.icon_name,
+            icon_name=link.icon,
             icon_html=link.icon_html,
             styling=styling,
             attrs=attrs
@@ -440,7 +440,7 @@
 
 
 {# LIST CLEAR FILTERS BUTTON #}
-{% macro display_list_clear_filters_button(search_filter, choice_filters) %}
+{% macro display_list__clear_filters_button(search_filter, choice_filters) %}
     {% if search_filter is not none or choice_filters %}
     <button jmb-on:click.prevent="{% if search_filter %}search='';{% endif %}{% if choice_filters %}choice_filters={};{% endif %}order_by=null;" class="btn-ghost-micro" type="button">
         {{display_icon('trash-outline')}}
@@ -449,7 +449,7 @@
 {% endmacro %}
 
 {# LIST SEARCH INPUT #}
-{% macro display_list_search_input(search, search_filter) %}
+{% macro display_list__search_input(search, search_filter) %}
     {% if search_filter is not none %}
         <input jmb-on:input="page=0;search=$self.value;" value="{{search}}" type="search" placeholder="Search..." class="form-input toolbar-input" >
     {% endif %}
@@ -457,7 +457,7 @@
 
 
 {# LIST CHOICE FILTERS #}
-{% macro display_list_choice_filters(choice_filters, filters_config, apply_filter, remove_filter) %}
+{% macro display_list__choice_filters(choice_filters, filters_config) %}
 {%- if filters_config %}
     {%- for filter_name, choice_filter in filters_config.items() if not choice_filter.is_grouped  %}
     {%- for choice in choice_filter.choices  %}
@@ -522,7 +522,7 @@
 
 
 {# LIST ORDER BY IN TOOLBAR #}
-{% macro display_list_order_by(order_by, order_by_config) %}
+{% macro display_list__order_by(order_by, order_by_config) %}
     {% if order_by_config %}
     <div class="relative" jmb-scope="{opened:false}" jmb-on:click.away="$scope().opened = false;">
         {% set ns = namespace(ordered = false) %}
@@ -563,7 +563,7 @@
 
 
 {# LIST PAGINATION #}
-{% macro display_list_pagination(page, total_pages, total_records) %}
+{% macro display_list__pagination(page, total_pages, total_records) %}
     <nav class="flex items-center gap-1 flex-nowrap">
         {{display_button(
             jrl="page=page-1",
@@ -585,7 +585,7 @@
 
 
 {# TABLE #}
-{% macro display_table(records, fields_config, field_values,order_by, order_by_config, record_menu_config=none, get_record_menu=none) %}
+{% macro display_list__table(records, fields_config, field_values,order_by, order_by_config, record_menu_config=none, get_record_menu=none) %}
     {% if not fields_config and not records %}
     <div class="text-sm text-center text-grey-500">No data found</div>  
     {% else %}
@@ -644,4 +644,34 @@
         </tbody>
     </table>
     {% endif %}
+{% endmacro %}
+
+
+{% macro display_list_records_as_table(ctx) %}
+    {{display_list__table(
+        ctx.records, 
+        ctx._config.fields, 
+        ctx.field_values, 
+        ctx.state.order_by, 
+        ctx._config.order_by, 
+        ctx._config.record_menu, 
+        ctx.get_record_menu
+    )}}
+{% endmacro %}
+
+{% macro display_list_toolbar(ctx, display_order_by=true) %}
+    <div class="flex flex-wrap items-center justify-end gap-1">
+        {{display_list__clear_filters_button(ctx._config.search_filter, ctx.jui_choice_filters_config)}}
+        {{display_list__search_input(ctx.search, ctx._config.search_filter)}}
+        {% if ctx._config.search_filter %}
+        <div class="h-0 basis-full sm:hidden"></div>
+        {% endif %}
+        {{display_list__choice_filters(ctx.state.choice_filters, ctx.jui_choice_filters_config)}}
+        {% if display_order_by %}
+        {{display_list__order_by(ctx.state.order_by, ctx._config.order_by)}}
+        {% endif %}
+        {% if ctx.total_records > 0 or (ctx.state.search or ctx.state.choice_filters) %}
+        {{display_list__pagination(ctx.state.page, ctx.total_pages, ctx.total_records)}}
+        {% endif %}
+    </div>
 {% endmacro %}
