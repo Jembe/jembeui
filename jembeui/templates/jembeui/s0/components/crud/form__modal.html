@@ -1,5 +1,5 @@
 {% from 'jembeui/s0/macros.html' import display_modal %}
-{% call display_modal(component, title, menu) %}
+{% call display_modal(component, title, menu, styling=_juits_modal_styling|default((""), true)) %}
     {%- block content %}
     {{form.as_html()}}
     {%- endblock content %}

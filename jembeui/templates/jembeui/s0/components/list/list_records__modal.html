@@ -1,15 +1,21 @@
-<div class="modal">
-    <div class="modal__dialog">
-        <div class="modal__dialog__head">
-            <div jmb-ref="title">
-                {%- block title -%}
-                {{title}}
-                {%- endblock title -%}
-            </div>
-            <button jmb-on:click="{%- if component('cancel()').is_accessible %}cancel(){% else %}$jmb.emit('cancel'){% endif -%}" type="button" title="Close">X</button>
+{% from 'jembeui/s0/macros.html' import 
+    display_modal, 
+    display_menu_as_buttons, 
+    display_list_toolbar, 
+    display_list_records_as_table 
+%}
+{% call display_modal(component, title, styling=_juits_modal_styling|default((""), true)) %}
+    <div class="flex items-center justify-between">
+    {%- block toolbar %}
+        <div>
+            {{display_menu_as_buttons(menu)}}
         </div>
-        <div class="modal__dialog__content">
-            {% include "jembeui/s0/components/list/list_records.html" %}
-        </div>
+        {{display_list_toolbar(_context, display_order_by=false)}}
+    {%- endblock toolbar %}
     </div>
-</div>
+    <div class="mt-2">
+    {%- block content %}
+        {{display_list_records_as_table(_context)}}
+    {%- endblock content %}
+    </div>
+{% endcall %}

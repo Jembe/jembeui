@@ -2,14 +2,16 @@
 {% set form_styling = form.__styling__|default([], true) %}
 {% set fields_styling = form.__fields_styling__|default((), true) %}
 
-<div class="{%- if 'w-full' in form_styling %}
-            {%- elif 'w-sm' in form_styling %}
+<div class="{%- if 'full' in form_styling %}
+            {%- elif 'xs' in form_styling %}
+            max-w-[420px]
+            {%- elif 'sm' in form_styling %}
             max-w-screen-sm
-            {%- elif 'w-md' in form_styling %}
+            {%- elif 'md' in form_styling %}
             max-w-screen-md
-            {%- elif 'w-lg' in form_styling %}
+            {%- elif 'lg' in form_styling %}
             max-w-screen-lg
-            {%- elif 'w-xl' in form_styling %}
+            {%- elif 'xl' in form_styling %}
             max-w-screen-lg
             {%- else %}
             inline-block

@@ -19,6 +19,9 @@
     .form-checkbox:checked {
         @apply stroke-white bg-[url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciICB2aWV3Qm94PSIwIDAgNTEyIDUxMiI+PHRpdGxlPkNoZWNrbWFyazwvdGl0bGU+PHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmZmZmIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIHN0cm9rZS13aWR0aD0iMzIiIGQ9Ik00MTYgMTI4TDE5MiAzODRsLTk2LTk2Ii8+PC9zdmc+)];
     }
+    .form-select {
+        @apply stroke-grey-300 bg-[url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBzdHJva2Utd2lkdGg9IjQ4IiBkPSJNMTEyIDE4NGwxNDQgMTQ0IDE0NC0xNDQiLz48L3N2Zz4K)];
+    }
     .input--error {
         @apply border-error-600 shadow-focus shadow-error-600/30
     }

@@ -1,6 +1,0 @@
-{% from 'jembeui/s0/macros.html' import display_modal %}
-{% call display_modal(component, title, menu, styling=("small",)) %}
-    {%- block content %}
-    {{form.as_html()}}
-    {%- endblock content %}
-{% endcall %}

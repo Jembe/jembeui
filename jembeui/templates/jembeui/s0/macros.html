@@ -389,14 +389,21 @@
     {% set display_footer = menu is not none or (closable and close_button_title is not none)%}
 
     <div class="fixed inset-0 z-40 bg-opacity-80 bg-grey-900">
-        <div class="min-w-[280px] m-auto mt-[5vh]
-        {%- if 'small' in styling %}
-            max-w-[80%] w-[420px]
-        {%- elif 'wide' in styling %}
-            max-w-[80%] w-4/5
-        {%- elif 'fullscreen' in styling %}
+        <div class=" m-auto
+        {%- if 'xs' in styling %}
+            min-w-[280px] max-w-[80%] w-[360px] mt-[5vh]
+        {%- elif 'sm' in styling %}
+            min-w-[280px] max-w-[80%] w-[420px] mt-[5vh]
+        {%- elif 'md' in styling %}
+            min-w-[280px] max-w-[80%] w-[768px] mt-[5vh]
+        {%- elif 'lg' in styling %}
+            min-w-[280px] max-w-[90%] w-[1024px] mt-[5vh]
+        {%- elif 'xl' in styling %}
+            min-w-[280px] max-w-[80%] w-4/5 mt-[5vh]
+        {%- elif 'full' in styling %}
+            min-w-full min-h-screen h-full flex flex-col
         {%- else%}
-            max-w-[80%] w-[650px]
+            min-w-[280px] max-w-[80%] w-[640px] mt-[5vh]
         {%- endif %}">
             {# header #}
             {% if display_header %}
@@ -410,7 +417,10 @@
             </div>
             {% endif %}
             {# content #}
-            <div class="p-4 bg-grey-50 {% if not display_header %}rounded-t-sm{% endif %} {% if not display_footer %}rounded-b-sm{% endif %}">
+            <div class="p-4 bg-grey-50 
+                        {%- if not display_header %} rounded-t-sm{% endif -%} 
+                        {%- if not display_footer %} rounded-b-sm{% endif -%} 
+                        {%- if 'full' in styling %} grow overflow-auto{% endif -%}">
                 {{caller()}}
             </div>
             {# footer #}

@@ -476,6 +476,16 @@ Ensure the default browser behavior of the `hidden` attribute.
   min-height: 1.5em;
 }
 
+.form-select {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+  -webkit-print-color-adjust: exact;
+          color-adjust: exact;
+}
+
 .form-checkbox,.form-radio {
   -webkit-appearance: none;
      -moz-appearance: none;
@@ -621,6 +631,11 @@ Ensure the default browser behavior of the `hidden` attribute.
 .form-checkbox:checked {
   background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciICB2aWV3Qm94PSIwIDAgNTEyIDUxMiI+PHRpdGxlPkNoZWNrbWFyazwvdGl0bGU+PHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmZmZmIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIHN0cm9rZS13aWR0aD0iMzIiIGQ9Ik00MTYgMTI4TDE5MiAzODRsLTk2LTk2Ii8+PC9zdmc+);
   stroke: #fff;
+}
+
+.form-select {
+  background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBzdHJva2Utd2lkdGg9IjQ4IiBkPSJNMTEyIDE4NGwxNDQgMTQ0IDE0NC0xNDQiLz48L3N2Zz4K);
+  stroke: #d4d4d4;
 }
 
 .input--error {
@@ -1503,10 +1518,6 @@ Ensure the default browser behavior of the `hidden` attribute.
   top: 3.5rem;
 }
 
-.top-1 {
-  top: 0.25rem;
-}
-
 .z-50 {
   z-index: 50;
 }
@@ -1543,6 +1554,11 @@ Ensure the default browser behavior of the `hidden` attribute.
 .my-4 {
   margin-top: 1rem;
   margin-bottom: 1rem;
+}
+
+.my-8 {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
 }
 
 .-mt-2 {
@@ -1673,6 +1689,10 @@ Ensure the default browser behavior of the `hidden` attribute.
   min-height: 100vh;
 }
 
+.min-h-screen {
+  min-height: 100vh;
+}
+
 .w-6 {
   width: 1.5rem;
 }
@@ -1689,20 +1709,32 @@ Ensure the default browser behavior of the `hidden` attribute.
   width: 1rem;
 }
 
+.w-\[360px\] {
+  width: 360px;
+}
+
 .w-\[420px\] {
   width: 420px;
+}
+
+.w-\[768px\] {
+  width: 768px;
+}
+
+.w-\[1024px\] {
+  width: 1024px;
 }
 
 .w-4\/5 {
   width: 80%;
 }
 
-.w-\[650px\] {
-  width: 650px;
-}
-
 .w-full {
   width: 100%;
+}
+
+.w-\[640px\] {
+  width: 640px;
 }
 
 .w-screen {
@@ -1733,8 +1765,20 @@ Ensure the default browser behavior of the `hidden` attribute.
   min-width: 70px;
 }
 
+.min-w-full {
+  min-width: 100%;
+}
+
 .max-w-\[80\%\] {
   max-width: 80%;
+}
+
+.max-w-\[90\%\] {
+  max-width: 90%;
+}
+
+.max-w-\[420px\] {
+  max-width: 420px;
 }
 
 .max-w-screen-sm {
@@ -1903,6 +1947,10 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .self-start {
   align-self: flex-start;
+}
+
+.overflow-auto {
+  overflow: auto;
 }
 
 .overflow-hidden {
@@ -2128,20 +2176,24 @@ Ensure the default browser behavior of the `hidden` attribute.
   padding-left: 0.5rem;
 }
 
-.pb-8 {
-  padding-bottom: 2rem;
+.pb-12 {
+  padding-bottom: 3rem;
 }
 
 .pt-14 {
   padding-top: 3.5rem;
 }
 
+.pt-1 {
+  padding-top: 0.25rem;
+}
+
 .pl-1 {
   padding-left: 0.25rem;
 }
 
-.pt-1 {
-  padding-top: 0.25rem;
+.pb-4 {
+  padding-bottom: 1rem;
 }
 
 .text-center {
@@ -2426,10 +2478,6 @@ Ensure the default browser behavior of the `hidden` attribute.
 
   .sm\:top-11 {
     top: 2.75rem;
-  }
-
-  .sm\:top-1 {
-    top: 0.25rem;
   }
 
   .sm\:top-0 {
