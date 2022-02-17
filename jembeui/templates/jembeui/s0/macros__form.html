@@ -239,10 +239,10 @@
                 {%- else %}
                 disabled
                 {%- endif %}
-                style="height: {{field.thumbnail_size[1]}}px;
+                style="height: {{field.thumbnail_size[1]}}px; min-width: {{field.thumbnail_size[1]}}px;
                       {%- if not field.data %}width: {{field.thumbnail_size[0]*1.5}}px;{% endif %}">
             {% if field.data %}
-            <img src="{{field.thumbnail().url}}" alt="{{field.data.basename}} thumbnail" class="object-contain w-full h-full">
+            <img src="{{field.thumbnail().url}}" alt="{{field.data.basename}} thumbnail" class="object-cover w-full h-full">
             {% endif %}
         </button>
         {# enlarged view #}

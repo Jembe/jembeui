@@ -18,7 +18,9 @@
     {% set has_icon = icon_name  or icon_html %}
     {% set attrs = attrs if attrs else {} %}
     <a  href="{{url if url else '#'}}"{% if jrl %} jmb-on:click.prevent="{{jrl}}"{% endif %} 
+        {%- if 'class' not in attrs %}
         class="href"
+        {%- endif %}
         {%- if attrs %}
             {%- for k,v in attrs.items() %}
                 {{k}}="{{v}}"
@@ -42,11 +44,11 @@
 
 
 {% macro display_link_as_href(link, styling=(), attrs=none) %}
-    {% if link.is_accessible %}
-        {% if "as-button" in link.styling %}
+    {%- if link.is_accessible %}
+        {%- if "as-button" in link.styling %}
             {{display_link_as_button(link)}}
-        {% endif %}
-        {% set styling = styling if styling else link.styling %}
+        {%- else %}
+        {%- set styling = styling if styling else link.styling %}
         {{display_link(
             title=link.title,
             url=link.url,
@@ -56,7 +58,8 @@
             styling=styling,
             attrs=attrs
         )}}
-    {% endif %}
+        {%- endif %}
+    {%- endif %}
 {% endmacro %}
 
 {# DISPLAY BUTTON #}
@@ -132,11 +135,11 @@
 
 {# DISPLAY LINK AS BUTTON #}
 {% macro display_link_as_button(link, styling=(), attrs=none) %}
-    {% if link.is_accessible %}
-        {% if "as-href" in link.styling %}
+    {%- if link.is_accessible %}
+        {%- if "as-href" in link.styling %}
             {{display_link_as_href(link)}}
-        {% endif %}
-        {% set styling = styling if styling else link.styling %}
+        {%- else %}
+        {%- set styling = styling if styling else link.styling %}
         {{display_button(
             title=link.title,
             jrl=link.jrl,
@@ -145,7 +148,8 @@
             styling=styling,
             attrs=attrs
         )}}
-    {% endif %}
+        {%- endif %}
+    {%- endif %}
 {% endmacro %}
 
 
@@ -278,9 +282,10 @@
             {% if mi.is_accessible %}
                 {% if mi.is_menu %}
                     {% if loop.depth == 1 %}
-                        <div class="my-4">
+                        <div class="mt-4">
                             <button type="button"
-                                class="block mb-2 text-sm font-light tracking-wider uppercase focus-visible:outline-none text-grey-600 ">
+                                class="block mb-2 text-sm font-light tracking-wider uppercase focus-visible:outline-none text-grey-600 "
+                                {%- if mi.description %}title="{{mi.description}}"{% endif %}>
                                 {{mi.title}}
                             </button>
                             <div class="flex flex-col gap-2 pl-4 ">
@@ -296,17 +301,25 @@
                         </div>
                     {% endif %}
                 {% else %}
-                    <a href="{{mi.url}}" {% if mi.jrl %}jmb-on:click.prevent="{{mi.jrl}}"{% endif %} 
-                        jmb-bind:class="{
-                        'font-semibold': 
-                            (   
-                                {{mi.active_for_exec_names|tojson|forceescape}}.some(function(en){return $jmb.componentsOnPage().includes(en)})
-                                || {{mi.active_for_pathnames|tojson|forceescape}}.some(function(pn){return window.location.pathname === pn})
-                            ) 
-                        }"
-                        class="block text-grey-600 hover:underline focus-visible:outline-none focus-visible:underline">
-                        {{mi.title}} 
-                    </a>
+                    {% if "as-button" in mi.styling %}
+                    <div> 
+                    {% endif %}
+                    {{display_link_as_href(
+                        mi,
+                        attrs={
+                            "jmb-bind:class": "{{
+                                'font-semibold': 
+                                    (   
+                                        {}.some(function(en){{return $jmb.componentsOnPage().includes(en)}})
+                                        || {}.some(function(pn){{return window.location.pathname === pn}})
+                                    ) 
+                                }}".format(mi.active_for_exec_names|tojson, mi.active_for_pathnames|tojson)|forceescape,
+                            "class":"block text-grey-600 hover:underline focus-visible:outline-none focus-visible:underline"
+                        }
+                    )}}
+                    {% if "as-button" in mi.styling %}
+                    </div> 
+                    {% endif %}
                 {% endif %}
             {% endif %}
         {% endfor %}
