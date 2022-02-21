@@ -18,9 +18,7 @@ if TYPE_CHECKING:
     import jembeui
 
 
-__all__ = (
-    "CBreadcrumb",
-)
+__all__ = ("CBreadcrumb",)
 
 
 class CBreadcrumb(Component):
@@ -53,11 +51,17 @@ class CBreadcrumb(Component):
             self.breadcrumbs_flat: Dict[str, Breadcrumb] = self._flatten_breadcrumbs(
                 breadcrumbs
             )
-            self.breadcrumbs_mapping: Dict[str, Breadcrumb] = {
-                b.component_full_name: b
-                for b in self.breadcrumbs_flat.values()
-                if b.component_full_name is not None  # b.is_link
-            }
+
+            self.breadcrumbs_mapping: Dict[str, List[Breadcrumb]] = dict()
+            for b in self.breadcrumbs_flat.values():
+                if (
+                    b.component_full_name is not None
+                ):  # b.is_link or changes title with component
+                    if b.component_full_name not in self.breadcrumbs_mapping:
+                        self.breadcrumbs_mapping[b.component_full_name] = [b]
+                    else:
+                        self.breadcrumbs_mapping[b.component_full_name].append(b)
+
             super().__init__(
                 title=title,
                 template=template,
@@ -109,110 +113,112 @@ class CBreadcrumb(Component):
             # component that has been displayed does not have associated breadcrumb
             return
 
-        new_bitem = self._config.breadcrumbs_mapping[
-            event.source_full_name
-        ].get_breadcrumb_item(self, event.source)
-        new_bitem.fresh = True
-        bitems_new: List[BreadcrumbItem] = []
+        for bc in self._config.breadcrumbs_mapping[event.source_full_name]:
+            new_bitem = bc.get_breadcrumb_item(self, event.source)
+            # print(new_bitem)
+            # import pdb; pdb.set_trace()
+            new_bitem.fresh = True
+            bitems_new: List[BreadcrumbItem] = []
 
-        if len(self.state.bitems) == 0:
-            bitems_new = [new_bitem]
-        elif self._config.is_parent_breadcrumbitem(new_bitem, self.state.bitems[0]):
-            # first item in bitems is child of new_bitem
-            bitems_new = [new_bitem]
-            bitems_new.extend(
-                [
-                    bi
-                    for bi in self.state.bitems
-                    if self._config.breadcrumbs_flat[bi.id].is_link
-                ]
-            )
-        elif self._config.is_parent_breadcrumbitem(self.state.bitems[-1], new_bitem):
-            # last item in bitems is parent of new_bitem
-            bitems_new.extend(
-                [
-                    bi
-                    for bi in self.state.bitems
-                    if self._config.breadcrumbs_flat[bi.id].is_link
-                ]
-            )
-            bitems_new.append(new_bitem)
-        else:
-            # find index of same item in bitems
-            same_index: Optional[int] = None
-            parent_index: Optional[int] = None
-            last_fresh_index: Optional[int] = None
-            for index, bi in enumerate(self.state.bitems):
-                if bi.id == new_bitem.id:
-                    same_index = index
-                elif self._config.is_parent_breadcrumbitem(bi, new_bitem):
-                    parent_index = index
-                if bi.fresh:
-                    last_fresh_index = index
-
-            if same_index is not None:
-                # replace same element and add all elements after it which
-                # are fresh or behind the fresh ones
+            if len(self.state.bitems) == 0:
+                bitems_new = [new_bitem]
+            elif self._config.is_parent_breadcrumbitem(new_bitem, self.state.bitems[0]):
+                # first item in bitems is child of new_bitem
+                bitems_new = [new_bitem]
                 bitems_new.extend(
                     [
                         bi
-                        for bi in self.state.bitems[:same_index]
-                        if self._config.breadcrumbs_flat[bi.id].is_link
+                        for bi in self.state.bitems
+                        if self._config.breadcrumbs_flat[bi.id].component_full_name is not None
                     ]
                 )
-                bitems_new.append(new_bitem)
-                if last_fresh_index is not None:
-                    bitems_new.extend(
-                        [
-                            bi
-                            for bi in self.state.bitems[
-                                same_index + 1 : last_fresh_index + 1
-                            ]
-                            if self._config.breadcrumbs_flat[bi.id].is_link
-                        ]
-                    )
-            elif parent_index is not None:
-                # add new bitem after its parent and dich all other that
-                # was prevously after the parent
+            elif self._config.is_parent_breadcrumbitem(self.state.bitems[-1], new_bitem):
+                # last item in bitems is parent of new_bitem
                 bitems_new.extend(
                     [
                         bi
-                        for bi in self.state.bitems[: parent_index + 1]
-                        if self._config.breadcrumbs_flat[bi.id].is_link
+                        for bi in self.state.bitems
+                        if self._config.breadcrumbs_flat[bi.id].component_full_name is not None
                     ]
                 )
                 bitems_new.append(new_bitem)
             else:
-                # new bitem is out of existing breadcrumb context/tree
-                if last_fresh_index is not None:
-                    # dich new one if there are fresh ones in existing breadcrumb
-                    bitems_new = [
-                        bi
-                        for bi in self.state.bitems
-                        if self._config.breadcrumbs_flat[bi.id].is_link
-                    ]
-                else:
-                    # start new breadcrumb if old one does not have fresh ones
-                    bitems_new = [new_bitem]
+                # find index of same item in bitems
+                same_index: Optional[int] = None
+                parent_index: Optional[int] = None
+                last_fresh_index: Optional[int] = None
+                for index, bi in enumerate(self.state.bitems):
+                    if bi.id == new_bitem.id:
+                        same_index = index
+                    elif self._config.is_parent_breadcrumbitem(bi, new_bitem):
+                        parent_index = index
+                    if bi.fresh:
+                        last_fresh_index = index
 
-        # add non link breadcrumbs (up to max tree consecutive non link)
-        bitems_new_ext: List[BreadcrumbItem] = list()
-        for bitem in bitems_new:
-            bdef = self._config.breadcrumbs_flat[bitem.id]
-            if bdef.parent and not bdef.parent.is_link:
-                # support nesting non link breadcrumb witout recursion
-                # (bad programing but i dont care)
-                non_links = []
-                non_links.append(bdef.parent.get_breadcrumb_item(self))
-                if bdef.parent.parent and not bdef.parent.parent.is_link:
-                    non_links.append(bdef.parent.parent.get_breadcrumb_item(self))
-                    if (
-                        bdef.parent.parent.parent
-                        and not bdef.parent.parent.parent.is_link
-                    ):
-                        non_links.append(
-                            bdef.parent.parent.parent.get_breadcrumb_item(self)
+                if same_index is not None:
+                    # replace same element and add all elements after it which
+                    # are fresh or behind the fresh ones
+                    bitems_new.extend(
+                        [
+                            bi
+                            for bi in self.state.bitems[:same_index]
+                            if self._config.breadcrumbs_flat[bi.id].component_full_name is not None
+                        ]
+                    )
+                    bitems_new.append(new_bitem)
+                    if last_fresh_index is not None:
+                        bitems_new.extend(
+                            [
+                                bi
+                                for bi in self.state.bitems[
+                                    same_index + 1 : last_fresh_index + 1
+                                ]
+                                if self._config.breadcrumbs_flat[bi.id].component_full_name is not None
+                            ]
                         )
-                bitems_new_ext.extend(reversed(non_links))
-            bitems_new_ext.append(bitem)
-        self.state.bitems = tuple(bitems_new_ext)
+                elif parent_index is not None:
+                    # add new bitem after its parent and dich all other that
+                    # was prevously after the parent
+                    bitems_new.extend(
+                        [
+                            bi
+                            for bi in self.state.bitems[: parent_index + 1]
+                            if self._config.breadcrumbs_flat[bi.id].component_full_name is not None
+                        ]
+                    )
+                    bitems_new.append(new_bitem)
+                else:
+                    # new bitem is out of existing breadcrumb context/tree
+                    if last_fresh_index is not None:
+                        # dich new one if there are fresh ones in existing breadcrumb
+                        bitems_new = [
+                            bi
+                            for bi in self.state.bitems
+                            if self._config.breadcrumbs_flat[bi.id].component_full_name is not None
+                        ]
+                    else:
+                        # start new breadcrumb if old one does not have fresh ones
+                        bitems_new = [new_bitem]
+
+            # add non component referenced breadcrumbs (up to max tree consecutive non link)
+            bitems_new_ext: List[BreadcrumbItem] = list()
+            for bitem in bitems_new:
+                bdef = self._config.breadcrumbs_flat[bitem.id]
+                if bdef.parent and bdef.parent.component_full_name is None:
+                    # support nesting non link breadcrumb witout recursion
+                    # (bad programing but i dont care)
+                    non_links = []
+                    non_links.append(bdef.parent.get_breadcrumb_item(self))
+                    if bdef.parent.parent and bdef.parent.parent.component_full_name is None:
+                        non_links.append(bdef.parent.parent.get_breadcrumb_item(self))
+                        if (
+                            bdef.parent.parent.parent
+                            and bdef.parent.parent.parent.component_full_name is None
+                        ):
+                            non_links.append(
+                                bdef.parent.parent.parent.get_breadcrumb_item(self)
+                            )
+                    bitems_new_ext.extend(reversed(non_links))
+                bitems_new_ext.append(bitem)
+
+            self.state.bitems = tuple(bitems_new_ext)

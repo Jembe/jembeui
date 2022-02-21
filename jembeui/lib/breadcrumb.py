@@ -114,7 +114,8 @@ class Breadcrumb:
         component_init_params: Optional[dict] = None,
         title: Union[str, Callable[["jembe.Component"], str]] = "",
         children: Optional[Sequence["jembeui.Breadcrumb"]] = None,
-        is_hidden: bool = False
+        is_hidden: bool = False,
+        is_link: Optional[bool] = None,
     ) -> None:
         """
         When component_full_name and title are None then this breadcrumb should not be displayed
@@ -134,6 +135,7 @@ class Breadcrumb:
         self.id: str = self._calc_id()
 
         self.is_hidden = is_hidden
+        self._is_link = is_link
 
         if children is not None:
             self.children = list(children)
@@ -198,7 +200,7 @@ class Breadcrumb:
         self._update_all_childrens_ids()
 
     def insert_into(self, *children: "jembeui.Breadcrumb") -> "jembeui.Breadcrumb":
-        self.children = self.children +  list(children)
+        self.children = self.children + list(children)
         return self
 
     def _update_all_childrens_ids(self):
@@ -214,7 +216,11 @@ class Breadcrumb:
 
     @property
     def is_link(self) -> bool:
-        return self.component_full_name is not None
+        return (
+            self.component_full_name is not None
+            if self._is_link is None
+            else self._is_link
+        )
 
     def get_breadcrumb_item(
         self,
@@ -296,7 +302,7 @@ class Breadcrumb:
                 else None
             )
             children: "BreadcrumbList" = BreadcrumbList()
-            for mi in menu.items:
+            for mi in menu.items:  # type:ignore
                 children.extend(cls._from_menu_item(mi))
             if parent_bc:
                 parent_bc.children = children
