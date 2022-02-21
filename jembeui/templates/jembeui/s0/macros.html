@@ -404,8 +404,7 @@
     {% set display_header = title is not none or closable %}
     {% set display_footer = menu is not none or (closable and close_button_title is not none)%}
 
-    <div class="fixed inset-0 z-40 bg-opacity-80 bg-grey-900"
-         jmb-on:ready="$dispatch('juiShowModal')">
+    <div class="fixed inset-0 z-40 bg-opacity-80 bg-grey-900" jui-show-modal>
         <div class=" m-auto
         {%- if 'xs' in styling %}
             min-w-[280px] max-w-[80%] w-[360px] mt-[5vh]
