@@ -65,7 +65,8 @@
 {# DISPLAY BUTTON #}
 {% macro display_button(title=none, jrl=none, icon_name=none, icon_html=none, default_icon_name=none, styling=(), attrs=none) %}
     {% set has_icon = icon_name  or icon_html %}
-    {% set is_ghost = (has_icon or default_icon_name) and (not title or "ghost" in styling or "ghost-micro" in "styling") %}
+    {% set is_ghost = (has_icon or default_icon_name) and ("ghost" in styling or "ghost-micro" in "styling") %}
+    {% set is_short = (has_icon or default_icon_name) and not title %}
     {% set attrs = attrs if attrs else {} %}
     <button type="button" class="
         {%- if is_ghost %}
@@ -74,10 +75,10 @@
             {%- else %}
                 btn-ghost
             {%- endif %}
+        {%- elif 'short' in styling or is_short %}
+            btn-short
         {%- elif 'micro' in styling %}
             btn-micro
-        {%- elif 'short' in styling %}
-            btn-short
         {%- else %}
             btn
         {%- endif %}
@@ -121,9 +122,11 @@
             {%- if has_icon and not icon_is_last %}
                 {{display_icon(icon_name, icon_html, class=icon_class)}} 
             {%- endif -%}
+            {%- if title %}
             <div class="grow">
                 {{title|default('',true)}}
             </div>
+            {%- endif %}
             {%- if has_icon and icon_is_last %}
                 {{display_icon(icon_name, icon_html, class=icon_class)}} 
             {%- endif -%}
@@ -186,15 +189,15 @@
             <div jmb-cloak 
                 jmb-show="$scope().opened === '{{menu.id}}'"
                 jmb-on:click.prevent="if($event.target.tagName ==='A'){$scope().opened=null}"
-                class="absolute right-0 z-50 -mt-2">
+                class="absolute right-0 z-50 -mt-1">
                 {# arrow on top of dropdown #}
                 <div class="flex justify-end mr-1">
                     <div class="w-6 overflow-hidden">
-                        <div class="w-4 h-4 origin-bottom-left transform rotate-45 bg-white border border-grey-200"></div>
+                        <div class="w-4 h-4 origin-bottom-left transform rotate-45 bg-white border border-grey-300"></div>
                     </div>
                 </div>
                 {# dropdown #}
-                <div class="px-4 py-4 -mt-[1px] bg-white border rounded-sm shadow border-grey-200 whitespace-nowrap flex flex-col gap-2 min-w-[8rem]">
+                <div class="px-4 py-4 -mt-[1px] bg-white border rounded shadow shadow-grey-400 border-grey-300 whitespace-nowrap flex flex-col gap-2 min-w-[8rem]">
                     {{caller()}}
                 </div>
             </div>

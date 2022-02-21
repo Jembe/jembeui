@@ -35,6 +35,17 @@ const juiTakeScreenshot = async () => {
   return file
 }
 
+function juiGetImagesFromClipboard(pasteEvent) {
+  // consider the first item (can be easily extended for multiple items)
+  var item = pasteEvent.clipboardData.items[0];
+
+  if (item.type.indexOf("image") === 0) {
+    return [item.getAsFile()];
+  }
+  else {
+    return [];
+  }
+}
 
 const juiSaveTuiImage = async (editor) => {
   const image = editor.toDataURL();

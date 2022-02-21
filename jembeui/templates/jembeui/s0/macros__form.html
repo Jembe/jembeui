@@ -108,7 +108,6 @@
     <div {{form.attr_kw(form.resolve_kw(render_kw._field|default({},true), {"class+":default_class}, false))|xmlattr}}>
         <div class="flex flex-row items-center">
             {{_form_field_widget(form, field, render_kw, field_id, is_not_disabled, styling, instant_validate, instant_submit)}}
-            <label for="{{field_id}}" class="w-full ml-1 text-sm {% if is_not_disabled %} cursor-pointer {% endif %} basis-0 grow">{{field.label.text}}</label>
             <div class="text-xs font-light text-grey-600">
                 {# {% if is_not_disabled and not field.flags.required %}optional{% endif %} #}
                 {% if field.description %}{{field.description}}{% endif %}
@@ -204,7 +203,10 @@
             "jmb-on:keydown.enter": "$self.blur();$self.focus();submit()" if is_not_disabled and "submit" in form.cform._config.component_actions else none,
         }
     )%}
-    {{field(**form.attr_kw(render_kw))}}
+    <div class="flex flex-row items-center">
+        {{field(**form.attr_kw(render_kw))}}
+        <label for="{{field_id}}" class="w-full ml-1 text-sm {% if is_not_disabled %} cursor-pointer {% endif %} basis-0 grow">{{field.label.text}}</label>
+    </div>
 {% endmacro %}
 
 
@@ -227,7 +229,10 @@
     )%}
     <div jmb-scope="{showControls: false, showEnlarged: false, enlargedUrl: '', showEdit: false, editor: null}"
          {%- if field.data or is_not_disabled %}
-         jmb-on:mouseenter="$scope().showControls = true"
+         jmb-on:mouseenter="$scope().showControls = true;"
+         {%- endif %}
+         {%- if is_not_disabled %}
+         jmb-on:paste.prevent="images=juiGetImagesFromClipboard($event);if(images){console.log(images[0]);form.{{field.name}}=images[0];{{instant_validate_submit}};}"
          {%- endif %}
          jmb-on:mouseleave="$scope().showControls = false"
          jmb-on:focusin.document="if ($scope().showControls && !$self.contains(document.activeElement)){$scope().showControls=false}" 
@@ -284,7 +289,7 @@
         </div>
         {% endif %}
         {# controls #}
-        <div  class="absolute inset-0 flex justify-center pointer-events-none">
+        <div class="absolute inset-0 flex justify-center">
             <div jmb-show="$scope().showControls"
                  class="flex gap-1 p-2 m-auto rounded-md shadow pointer-events-auto bg-grey-100/80 outline outline-grey-50 outline-1">
                 {% if is_not_disabled %}
@@ -298,7 +303,7 @@
                 <button jmb-on:click="if (juiCanTakeScreenshot) { juiTakeScreenshot().then( function(files){ if (files){ form.{{field.name}}=files[0]; {{instant_validate_submit}}; $jmb.executeCommands();}})}"
                         class="rounded hover:text-primary-900 hover:bg-primary-50 focus:shadow-focus focus:outline-none focus:shadow-primary-500/30 focus:ring-primary-500/30"
                         title="Take screenshot">
-                    {{display_icon("camera-outline", class="w-8 h-8 m-2")}}
+                    {{display_icon("image-outline", class="w-8 h-8 m-2")}}
                 </button>
                 {% endif %}
                 {% if is_not_disabled and field.data and field.enable_image_edit %}
