@@ -21,7 +21,9 @@
     {%- endblock page_head %}
 </head>
 
-<body class="m-0 box-border bg-grey-100 text-grey-900 [font-kerning:normal] ">
+<body class="m-0 box-border bg-grey-100 text-grey-900 [font-kerning:normal]"
+      jmb-on:jui-show-modal.camel.window="$self.classList.add('overflow-hidden')" 
+      jmb-on:jembe-update-page.camel.window="$self.classList.remove('overflow-hidden');">
     <div class="absolute inset-0 z-50 pointer-events-none">
         <div class="box-border flex flex-row-reverse h-full max-w-screen-xl m-auto pt-14">
             <div class="sticky self-start top-14 max-w-[33%]">
