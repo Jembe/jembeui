@@ -244,10 +244,11 @@
                 {%- else %}
                 disabled
                 {%- endif %}
-                style="height: {{field.thumbnail_size[1]}}px; min-width: {{field.thumbnail_size[1]}}px;
-                      {%- if not field.data %}width: {{field.thumbnail_size[0]*1.5}}px;{% endif %}">
+                style="height: {{field.thumbnail_size[1]}}px; min-width: {{field.thumbnail_size[1] if field.thumbnail_size[1] < field.thumbnail_size[0] else field.thumbnail_size[0]}}px; {% if not 'full' in styling %} max-width:{{field.thumbnail_size[0]}}px;{% endif %}">
+                {# style="height: {{field.thumbnail_size[1]}}px; min-width: {{field.thumbnail_size[1]}}px; max-width:{{field.thumbnail_size[0]}}px;"> #}
+                      {# {%- if not field.data %}min-width: {{field.thumbnail_size[0]/1.5}}px; {% else %}{% endif %}"> #}
             {% if field.data %}
-            <img src="{{field.thumbnail().url}}" alt="{{field.data.basename}} thumbnail" class="object-cover w-full h-full">
+            <img src="{{field.thumbnail().url}}" alt="{{field.data.basename}} thumbnail" class="object-scale-down w-full h-full">
             {% endif %}
         </button>
         {# enlarged view #}

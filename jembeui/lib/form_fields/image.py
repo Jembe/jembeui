@@ -44,7 +44,7 @@ class ImageField(FileField):
             _translations,
             _meta,
         )
-        self.thumbnail_size = thumbnail_size
+        self.thumbnail_size = (ceil(thumbnail_size[0]), ceil(thumbnail_size[1]))
         self.enable_screenshot = enable_screenshot
         self.enable_image_edit = enable_image_edit
 
