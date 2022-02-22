@@ -254,8 +254,9 @@
         {# enlarged view #}
         <div jmb-cloak
              jmb-show="$scope().showEnlarged"
+             jmb-ref="{{field_id}}-enlarged"
              class="fixed inset-0 z-50 flex bg-grey-900/90">
-             <button jmb-on:click="$scope().showEnlarged=false"
+             <button jmb-on:click="$scope().showEnlarged=false;$refs['{{field_id}}-enlarged'].removeAttribute('jui-show-modal');$dispatch('jui-show-modal')"
                      class="fixed top-0 right-0 m-2 text-primary-50 hover:text-primary-200">
                      {{display_icon("close-outline", class="w-8 h-8")}}
              </button>
@@ -371,7 +372,7 @@
                 </button>
                 {% endif %}
                 {% if field.data %}
-                <button jmb-on:click="$scope().enlargedUrl = '{{field.data.url if field.data else ''}}';$scope().showEnlarged=true;$scope().showControls=false" 
+                <button jmb-on:click="$scope().enlargedUrl = '{{field.data.url if field.data else ''}}';$scope().showEnlarged=true;$scope().showControls=false;$refs['{{field_id}}-enlarged'].setAttribute('jui-show-modal','');$dispatch('jui-show-modal')" 
                         class="rounded hover:text-primary-900 hover:bg-primary-50 focus:shadow-focus focus:outline-none focus:shadow-primary-500/30 focus:ring-primary-500/30"
                         title="Expand image">
                     {{display_icon("expand-outline", class="w-8 h-8 m-2")}}

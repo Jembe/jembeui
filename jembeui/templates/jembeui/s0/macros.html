@@ -599,7 +599,7 @@
             attrs={"disabled": page==0}
         )}}
         <div class="text-xs font-light ">
-            {{page + 1 if total_pages > 0 else 0}} / {{total_pages}} (rows: {{total_records}})
+            {{page + 1 if total_pages > 0 else 0}} / {{total_pages}} (total: {{total_records}})
         </div>
         {{display_button(
             jrl="page=page+1",
