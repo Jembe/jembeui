@@ -17,6 +17,7 @@ class ImageField(FileField):
         thumbnail_size=(300, 300),
         enable_screenshot: bool = False,
         enable_image_edit: bool = False,
+        confirm_delete_image: bool = False,
         filters=(),
         description="",
         id=None,
@@ -47,6 +48,7 @@ class ImageField(FileField):
         self.thumbnail_size = (ceil(thumbnail_size[0]), ceil(thumbnail_size[1]))
         self.enable_screenshot = enable_screenshot
         self.enable_image_edit = enable_image_edit
+        self.confirm_delete_image = confirm_delete_image
 
     def thumbnail(self, size: Optional[Tuple[int, int]] = None) -> Optional["File"]:
         thumbnail_size = size if size else self.thumbnail_size

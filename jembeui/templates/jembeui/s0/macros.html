@@ -399,12 +399,13 @@
 
 
 {#  DISPLAY MODAL #}
-{% macro display_modal(component, title=none, menu=none, closable=true, styling=(), close_button_title=none)%}
+{% macro display_modal(component, title=none, menu=none, closable=true, styling=(), close_button_title=none, attrs=none)%}
     {# size in small, base, wide, fullscreen #}
     {% set display_header = title is not none or closable %}
     {% set display_footer = menu is not none or (closable and close_button_title is not none)%}
+    {% set attrs = {"jui-show-modal": true} if attrs is none else attrs %}
 
-    <div class="fixed inset-0 z-40 bg-opacity-80 bg-grey-900" jui-show-modal>
+    <div class="fixed inset-0 z-40 bg-opacity-80 bg-grey-900" {{attrs|xmlattr}}>
         <div class=" m-auto
         {%- if 'xs' in styling %}
             min-w-[280px] max-w-[80%] w-[360px] mt-[5vh]

@@ -1,4 +1,4 @@
-{% from "jembeui/s0/macros.html" import display_icon, display_button %}
+{% from "jembeui/s0/macros.html" import display_icon, display_button, display_modal %}
 
 {% macro form_field(form, field, render_kw = none) %}
     {% set render_kw = {} if render_kw is none else render_kw %}
@@ -289,6 +289,29 @@
             </div>
         </div>
         {% endif %}
+        {# Delete confirm dialog #}
+        {% if field.confirm_delete_image %}
+        {% set confirm_delete_menu %}
+            <div class="flex justify-end gap-1">
+                <button jmb-on:click="form.{{field.name}} = null; {{instant_validate_submit}}" jmb-on:ready="$self.focus()" type="button" class="btn btn--danger">Delete</button>
+                <button jmb-on:click="modal = $refs['{{field_id}}-delete-image']; modal.setAttribute('jmb-show', 'false');modal.removeAttribute('jui-show-modal');$updateDom();$dispatch('jui-show-modal');" type="button" class="btn">Cancel</button>
+            </div>
+        {% endset %}
+        {% call display_modal(
+            component, 
+            "Delete The Image", 
+            confirm_delete_menu, 
+            closable=false,
+            attrs={
+                "jmb-ref": field_id + "-delete-image",
+                "jmb-cloak": true,
+                "jmb-show": "false"
+            }
+            ) %}
+            Are you sure you want to delete the image?
+        {% endcall%}
+        {% endif %}
+
         {# controls #}
         <div class="absolute inset-0 flex justify-center">
             <div jmb-show="$scope().showControls"
@@ -337,7 +360,11 @@
                 </button>
                 {% endif %}
                 {% if is_not_disabled and field.data %}
-                <button jmb-on:click="form.{{field.name}} = null; {{instant_validate_submit}}"
+                <button {%- if field.confirm_delete_image %} 
+                        jmb-on:click="modal = $refs['{{field_id}}-delete-image']; modal.setAttribute('jui-show-modal', ''); modal.setAttribute('jmb-show','true');$updateDom();$dispatch('jui-show-modal')"
+                        {%- else %} 
+                        jmb-on:click="form.{{field.name}} = null; {{instant_validate_submit}}"
+                        {%- endif %} 
                         class="rounded hover:text-primary-900 hover:bg-primary-50 focus:shadow-focus focus:outline-none focus:shadow-primary-500/30 focus:ring-primary-500/30"
                         title="Delete image">
                     {{display_icon("trash-outline", class="w-8 h-8 m-2")}}
