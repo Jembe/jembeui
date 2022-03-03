@@ -328,7 +328,7 @@
                 <button jmb-on:click="if (juiCanTakeScreenshot) { juiTakeScreenshot().then( function(files){ if (files){ form.{{field.name}}=files[0]; {{instant_validate_submit}}; $jmb.executeCommands();}})}"
                         class="rounded hover:text-primary-900 hover:bg-primary-50 focus:shadow-focus focus:outline-none focus:shadow-primary-500/30 focus:ring-primary-500/30"
                         title="Take screenshot">
-                    {{display_icon("image-outline", class="w-8 h-8 m-2")}}
+                    {{display_icon("aperture-outline", class="w-8 h-8 m-2")}}
                 </button>
                 {% endif %}
                 {% if is_not_disabled and field.data and field.enable_image_edit %}

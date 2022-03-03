@@ -5,6 +5,7 @@
 [jmb-cloak] {
     @apply hidden;
 }
+
 @layer base{
     .form-input, 
     .form-textarea, 
@@ -64,4 +65,26 @@
     .toolbar-input {
         @apply px-2 py-[2px] text-sm leading-5 rounded-sm grow;
     }
+}
+/* Scroll thumb styles */
+::-webkit-scrollbar {
+    @apply w-2 h-2;
+}
+::-webkit-scrollbar-thumb {
+    @apply rounded bg-grey-400;
+}
+::-webkit-scrollbar-thumb:active {
+    @apply bg-primary-500;
+}
+::-webkit-scrollbar-thumb:hover {
+    @apply bg-primary-500;
+}
+
+/* Scroll track styles (Background) */
+::-webkit-scrollbar-track {
+    @apply rounded bg-grey-100;
+}
+::-webkit-scrollbar-track:hover, 
+::-webkit-scrollbar-track:active {
+    @apply bg-grey-300;
 }
