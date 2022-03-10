@@ -48,13 +48,25 @@
         @apply text-white bg-primary-600 hover:bg-primary-700 active:bg-primary-800 disabled:bg-primary-700/30 disabled:text-primary-900; 
     }
     .btn--brand {
-        @apply text-white bg-brand-600 hover:bg-brand-700 active:bg-brand-800 disabled:bg-brand-300; 
+        @apply text-white bg-brand-600 hover:bg-brand-700 active:bg-brand-800 disabled:bg-brand-300 focus-visible:shadow-focus focus-visible:shadow-brand-500/30; 
     }
     .btn--secondary {
-        @apply text-white bg-secondary-500 hover:bg-secondary-600 active:bg-secondary-700 disabled:bg-secondary-300; 
+        @apply text-white bg-secondary-600 hover:bg-secondary-700 active:bg-secondary-800 disabled:bg-secondary-700/30 disabled:text-secondary-900 focus-visible:shadow-focus focus-visible:shadow-secondary-500/30; 
     }
-    .btn--danger {
-        @apply text-white bg-error-600 hover:bg-error-700 active:bg-error-800 disabled:bg-error-300 focus-visible:shadow-focus focus-visible:shadow-primary-500/30 focus-visible:shadow-error-200; 
+    .btn--tertiary {
+        @apply text-white bg-tertiary-500 hover:bg-tertiary-600 active:bg-tertiary-700 disabled:bg-tertiary-300 focus-visible:shadow-focus focus-visible:shadow-tertiary-500/30; 
+    }
+    .btn--privacy {
+        @apply text-white bg-privacy-500 hover:bg-privacy-600 active:bg-privacy-700 disabled:bg-privacy-300 focus-visible:shadow-focus focus-visible:shadow-privacy-500/30; 
+    }
+    .btn--danger, .btn--error {
+        @apply text-white bg-error-600 hover:bg-error-700 active:bg-error-800 disabled:bg-error-300 focus-visible:shadow-focus focus-visible:shadow-error-500/30; 
+    }
+    .btn--warn {
+        @apply text-white bg-warn-600 hover:bg-warn-700 active:bg-warn-800 disabled:bg-warn-300 focus-visible:shadow-focus focus-visible:shadow-warn-500/30; 
+    }
+    .btn--success {
+        @apply text-white bg-success-600 hover:bg-success-700 active:bg-success-800 disabled:bg-success-300 focus-visible:shadow-focus focus-visible:shadow-success-500/30; 
     }
     .btn--on {
         @apply bg-primary-200 hover:bg-primary-300/70 disabled:bg-primary-100 text-primary-900; 

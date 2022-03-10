@@ -89,10 +89,20 @@
             btn--primary
         {%- elif 'secondary' in styling %}
             btn--secondary
+        {%- elif 'tertiary' in styling %}
+            btn--tertiary
+        {%- elif 'privacy' in styling %}
+            btn--privacy
         {%- elif 'brand' in styling %}
             btn--brand
         {%- elif 'danger' in styling %}
             btn--danger
+        {%- elif 'error' in styling %}
+            btn--error
+        {%- elif 'warn' in styling %}
+            btn--warn
+        {%- elif 'success' in styling %}
+            btn--success
         {%- endif %} 
         {%- if 'on' in styling %}
             btn--on

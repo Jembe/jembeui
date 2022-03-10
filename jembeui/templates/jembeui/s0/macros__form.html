@@ -60,7 +60,7 @@
     {% if fclass == "BooleanField" %}
         {{_boolean_widget(form, field, render_kw, field_id, is_not_disabled, styling, instant_validate, instant_submit)}}
     {% elif fclass == "SelectField" %}
-        {{_default_widget(form, field, render_kw, field_id, is_not_disabled, styling + ('_jui_select_input',), instant_validate, instant_submit)}}
+        {{_default_widget(form, field, render_kw, field_id, is_not_disabled, styling + ['_jui_select_input',], instant_validate, instant_submit)}}
     {% elif fclass == "TextAreaField" %}
         {{_textarea_widget(form, field, render_kw, field_id, is_not_disabled, styling, instant_validate, instant_submit)}}
     {# {% elif fclass == "DateField" %}
@@ -89,7 +89,7 @@
 {% macro _default_field(form, field, render_kw, field_id, is_not_disabled, styling, instant_validate, instant_submit) %}
     {% set default_class = "flex flex-col grow basis-0" if "full" in styling else "flex flex-col" %}
     <div {{form.attr_kw(form.resolve_kw(render_kw._field|default({},true), {"class+":default_class}, false))|xmlattr}}>
-        <div class="flex items-center justify-between mb-1">
+        <div class="flex items-center justify-between gap-8 mb-1">
             <label for="{{field_id}}" class="flex flex-row items-center justify-between text-xs">{{field.label.text}}</label>
             <div class="text-xs font-light text-grey-600">
             {% if is_not_disabled and not field.flags.required %}optional{% endif %}
@@ -232,7 +232,7 @@
          jmb-on:mouseenter="$scope().showControls = true;"
          {%- endif %}
          {%- if is_not_disabled %}
-         jmb-on:paste.prevent="images=juiGetImagesFromClipboard($event);if(images){console.log(images[0]);form.{{field.name}}=images[0];{{instant_validate_submit}};}"
+         jmb-on:paste.prevent="images=juiGetImagesFromClipboard($event);if(images.length > 0){form.{{field.name}}=images[0];{{instant_validate_submit}};}"
          {%- endif %}
          jmb-on:mouseleave="$scope().showControls = false"
          jmb-on:focusin.document="if ($scope().showControls && !$self.contains(document.activeElement)){$scope().showControls=false}" 
