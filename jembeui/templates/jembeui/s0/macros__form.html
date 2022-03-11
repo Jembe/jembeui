@@ -60,7 +60,7 @@
     {% if fclass == "BooleanField" %}
         {{_boolean_widget(form, field, render_kw, field_id, is_not_disabled, styling, instant_validate, instant_submit)}}
     {% elif fclass == "SelectField" %}
-        {{_default_widget(form, field, render_kw, field_id, is_not_disabled, styling + ['_jui_select_input',], instant_validate, instant_submit)}}
+        {{_default_widget(form, field, render_kw, field_id, is_not_disabled, styling|list() + ['_jui_select_input',], instant_validate, instant_submit)}}
     {% elif fclass == "TextAreaField" %}
         {{_textarea_widget(form, field, render_kw, field_id, is_not_disabled, styling, instant_validate, instant_submit)}}
     {# {% elif fclass == "DateField" %}
