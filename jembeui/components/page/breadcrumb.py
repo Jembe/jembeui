@@ -117,6 +117,7 @@ class CBreadcrumb(Component):
             new_bitem = bc.get_breadcrumb_item(self, event.source)
             # print(new_bitem)
             # import pdb; pdb.set_trace()
+
             new_bitem.fresh = True
             bitems_new: List[BreadcrumbItem] = []
 
@@ -129,16 +130,20 @@ class CBreadcrumb(Component):
                     [
                         bi
                         for bi in self.state.bitems
-                        if self._config.breadcrumbs_flat[bi.id].component_full_name is not None
+                        if self._config.breadcrumbs_flat[bi.id].component_full_name
+                        is not None
                     ]
                 )
-            elif self._config.is_parent_breadcrumbitem(self.state.bitems[-1], new_bitem):
+            elif self._config.is_parent_breadcrumbitem(
+                self.state.bitems[-1], new_bitem
+            ):
                 # last item in bitems is parent of new_bitem
                 bitems_new.extend(
                     [
                         bi
                         for bi in self.state.bitems
-                        if self._config.breadcrumbs_flat[bi.id].component_full_name is not None
+                        if self._config.breadcrumbs_flat[bi.id].component_full_name
+                        is not None
                     ]
                 )
                 bitems_new.append(new_bitem)
@@ -162,7 +167,8 @@ class CBreadcrumb(Component):
                         [
                             bi
                             for bi in self.state.bitems[:same_index]
-                            if self._config.breadcrumbs_flat[bi.id].component_full_name is not None
+                            if self._config.breadcrumbs_flat[bi.id].component_full_name
+                            is not None
                         ]
                     )
                     bitems_new.append(new_bitem)
@@ -173,20 +179,44 @@ class CBreadcrumb(Component):
                                 for bi in self.state.bitems[
                                     same_index + 1 : last_fresh_index + 1
                                 ]
-                                if self._config.breadcrumbs_flat[bi.id].component_full_name is not None
+                                if self._config.breadcrumbs_flat[
+                                    bi.id
+                                ].component_full_name
+                                is not None
                             ]
                         )
                 elif parent_index is not None:
                     # add new bitem after its parent and dich all other that
-                    # was prevously after the parent
+                    # was prevously after the parent if parent component_full_name is
+                    # different than new_bitem.component_full_name
                     bitems_new.extend(
                         [
                             bi
                             for bi in self.state.bitems[: parent_index + 1]
-                            if self._config.breadcrumbs_flat[bi.id].component_full_name is not None
+                            if self._config.breadcrumbs_flat[bi.id].component_full_name
+                            is not None
                         ]
                     )
                     bitems_new.append(new_bitem)
+                    if (
+                        self._config.breadcrumbs_flat[
+                            bitems_new[-2].id
+                        ].component_full_name
+                        == self._config.breadcrumbs_flat[
+                            new_bitem.id
+                        ].component_full_name
+                    ):
+                        # dont ditch the rest
+                        bitems_new.extend(
+                            [
+                                bi
+                                for bi in self.state.bitems[parent_index + 1 :]
+                                if self._config.breadcrumbs_flat[
+                                    bi.id
+                                ].component_full_name
+                                is not None
+                            ]
+                        )
                 else:
                     # new bitem is out of existing breadcrumb context/tree
                     if last_fresh_index is not None:
@@ -194,7 +224,8 @@ class CBreadcrumb(Component):
                         bitems_new = [
                             bi
                             for bi in self.state.bitems
-                            if self._config.breadcrumbs_flat[bi.id].component_full_name is not None
+                            if self._config.breadcrumbs_flat[bi.id].component_full_name
+                            is not None
                         ]
                     else:
                         # start new breadcrumb if old one does not have fresh ones
@@ -209,7 +240,10 @@ class CBreadcrumb(Component):
                     # (bad programing but i dont care)
                     non_links = []
                     non_links.append(bdef.parent.get_breadcrumb_item(self))
-                    if bdef.parent.parent and bdef.parent.parent.component_full_name is None:
+                    if (
+                        bdef.parent.parent
+                        and bdef.parent.parent.component_full_name is None
+                    ):
                         non_links.append(bdef.parent.parent.get_breadcrumb_item(self))
                         if (
                             bdef.parent.parent.parent
@@ -222,3 +256,4 @@ class CBreadcrumb(Component):
                 bitems_new_ext.append(bitem)
 
             self.state.bitems = tuple(bitems_new_ext)
+            print(self.state.bitems)

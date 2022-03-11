@@ -3,7 +3,7 @@
 <div class="flex flex-row items-center gap-1 mt-2 text-sm flex-nowrap">
     {% for bitem in bitems %}
         {% if not bitem.is_hidden %}
-            {% if bitem.is_link and not loop.last %}
+            {% if bitem.url and not loop.last %}
                 <a href="{{bitem.url}}" {% if bitem.jrl %}jmb-on:click.prevent="{{bitem.jrl}}"{% endif %} class="block href visited:text-primary-800">{{bitem.title}}</a>
             {% else %}
                 <div>{{bitem.title}}</div>

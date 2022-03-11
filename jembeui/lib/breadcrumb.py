@@ -231,7 +231,11 @@ class Breadcrumb:
         Returns instance of BreadcrumbItem with specific URL and/or JRL attributes,
         ready to be displayed.
         """
-        if to_component and to_component._config.full_name == self.component_full_name:
+        if (
+            to_component
+            and to_component._config.full_name == self.component_full_name
+            and self.is_link
+        ):
             component_reference = from_component.component(
                 self.component_full_name,
                 **(
