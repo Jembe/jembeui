@@ -526,7 +526,7 @@
             <div jmb-show="$scope().opened" jmb-cloak
                 class="absolute z-10 top-7 min-w-[70px] right-0 shadow border-grey-200 rounded-sm overflow-hidden bg-white flex flex-col gap-1 py-1">
                 {% if not multiselect %}
-                <div class="px-2 text-xs tracking-wider uppercase text-grey-600">
+                <div class="px-2 pt-1 text-xs tracking-wider uppercase text-grey-600">
                     {{choice_filter.title}}:
                 </div> 
                 {% endif %}
@@ -556,7 +556,7 @@
         {{display_button(
             choice_filter.title if choice_filter.title and choice_filter.multiselect else (ns.title if not choice_filter.multiselect else " "), 
             "$scope().opened = !$scope().opened", 
-            icon_name="chevron-down-outline" if not ns.other_selected else "caret-down-outline", 
+            icon_name="chevron-down-outline" if not ns.other_selected else "caret-down-outline",
             styling=("micro","icon-last") if not ns.other_selected else ("micro", "icon-last", "on"), 
             attrs={"title": choice_filter.title, "class": "min-w-[5rem]"})
         }}
@@ -569,8 +569,14 @@
         <div jmb-show="$scope().opened" jmb-cloak
              class="absolute z-10 top-7 min-w-[70px] right-0 shadow rounded-sm overflow-hidden bg-white border-grey-200 flex flex-col gap-1 py-1">
         {% for filter_name, choice_filter in filters_config.items() if choice_filter.is_grouped is none  %}
+        {% if choice_filter.title %}
+            <div class="px-2 pt-1 text-xs tracking-wider uppercase text-grey-600">
+                {{choice_filter.title}}:
+            </div> 
+        {% endif %}
         {% for choice in choice_filter.choices  %}
-        <label class="btn bt--white flex justify-start items-center rounded-none whitespace-nowrap
+        <label class="btn btn--white flex justify-start items-center rounded-none whitespace-nowrap
+            {% if choice_filter.title %}pl-4{% endif %}
             {% if choice_filters and filter_name in choice_filters and choice.value_str in choice_filters[filter_name] %}
             btn--on
             {% set ns.other_selected = true %}
