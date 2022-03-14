@@ -1,3 +1,4 @@
+from ast import Call
 from tkinter import W
 from typing import (
     TYPE_CHECKING,
@@ -50,20 +51,28 @@ class CList(Component):
             self,
             expr: Callable[["sa.orm.Query", Iterable[Any]], "sa.orm.Query"],
             *choices: Union[Tuple[str, str], Tuple[str, str, Any]],
-            grouped: bool = False,
             dynamic_choices: Optional[
                 Callable[
-                    ["jembe.Component"],
+                    ["jembe.CList"],
                     Iterable[Union[Tuple[str, str], Tuple[str, str, Any]]],
                 ]
             ] = None,
-            default_choices: Iterable[str] = ()
+            default_choices: Union[
+                Iterable[str], Callable[["jembeui.CList"], Iterable[str]]
+            ] = (),
+            grouped: Optional[bool] = None,
+            title: Optional[Union[str, Callable[["jembeui.CList"], str]]] = None,
+            multiselect: bool = True
         ):
             """
             expr - python function that accepts query and list of values and
                    returns new query with applied filter based on the choices in values
             choices - list of tuples with choice title and choice value
                       that user can select to filter list records
+            grouped: Optional[bool]:
+                - None default grouping under filtes
+                - True custome group witho or without title
+                - False switches in line without grouping
             """
             self.expr = expr
             self.choices: List[Tuple[str, str, Any]] = [
@@ -77,6 +86,10 @@ class CList(Component):
             self._check_for_duplicate_choices()
             self.is_grouped = grouped
             self.default_choices = default_choices
+            if isinstance(self.default_choices, (list, tuple)):
+                self.default_choices = tuple([str(v) for v in self.default_choices])
+            self.title = title
+            self.multiselect = multiselect
 
         def map_values(self, str_values: Iterable[str]) -> Iterable[Any]:
             """Map str values to actual valuse when passing to choicde expression"""
@@ -97,9 +110,24 @@ class CList(Component):
                 )
 
         def mount(self, component: "jembe.Component") -> "jembeui.CList.ChoiceFilter":
-            if self._dynamic_choices:
+            if (
+                self._dynamic_choices
+                or callable(self.title)
+                or callable(self.default_choices)
+            ):
                 cfcopy = CList.ChoiceFilter(
-                    self.expr, *self.choices, grouped=self.is_grouped
+                    self.expr,
+                    *self.choices,
+                    default_choices=(
+                        tuple(str(v) for v in self.default_choices(component))
+                        if callable(self.default_choices)
+                        else self.default_choices
+                    ),
+                    grouped=self.is_grouped,
+                    title=(
+                        self.title(component) if callable(self.title) else self.title
+                    ),
+                    multiselect=self.multiselect
                 )
                 cfcopy.choices.extend(
                     self.ListChoiceType(
@@ -243,7 +271,10 @@ class CList(Component):
         # if self.state.choice_filters is None:
         #     self.state.choice_filters = dict()
 
-        if filter_name not in self.state.choice_filters:
+        if (
+            filter_name not in self.state.choice_filters
+            or self.jui_choice_filters_config[filter_name].multiselect == False
+        ):
             self.state.choice_filters[filter_name] = [filter_value_str]
         else:
             self.state.choice_filters[filter_name].append(filter_value_str)

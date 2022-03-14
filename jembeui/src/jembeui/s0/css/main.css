@@ -68,6 +68,9 @@
     .btn--success {
         @apply text-white bg-success-600 hover:bg-success-700 active:bg-success-800 disabled:bg-success-300 focus-visible:shadow-focus focus-visible:shadow-success-500/30; 
     }
+    .btn--white {
+        @apply bg-white text-grey-900;
+    }
     .btn--on {
         @apply bg-primary-200 hover:bg-primary-300/70 disabled:bg-primary-100 text-primary-900; 
     }

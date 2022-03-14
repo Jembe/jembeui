@@ -256,4 +256,3 @@ class CBreadcrumb(Component):
                 bitems_new_ext.append(bitem)
 
             self.state.bitems = tuple(bitems_new_ext)
-            print(self.state.bitems)

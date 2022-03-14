@@ -59,8 +59,6 @@ class BreadcrumbList(List["Breadcrumb"]):
 
         if breadcrumb with component_full_name can't be found raise JembeUI Exception
         """
-        # TODO
-
         breadcrumb = self._find_breadcrumb(
             self, lambda bc: bc.component_full_name == component_full_name
         )
