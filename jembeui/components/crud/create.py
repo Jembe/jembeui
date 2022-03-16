@@ -91,13 +91,14 @@ class CCreateRecord(CForm):
         self, submited_record: Optional[Union["Model", dict]]
     ) -> Optional[bool]:
         self.state.modified_fields = ()
-        self.jui_push_notification("Created sucessefuly", "success")
         return super().on_submit_success(submited_record)
 
     def on_cancel(self) -> Optional[bool]:
         self.state.modified_fields = ()
         return super().on_cancel()
 
-    def on_invalid_form(self):
+    def push_notification_on_submit(self):
+        self.jui_push_notification("'{}' created".format(self.title), "success")
+
+    def push_notification_on_invalid_form(self):
         self.jui_push_notification("Form is invalid", "warn")
-        return super().on_invalid_form()

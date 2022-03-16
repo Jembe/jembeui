@@ -99,9 +99,6 @@ class CUpdateRecord(CForm):
     def on_submit_success(
         self, submited_record: Optional[Union["Model", dict]]
     ) -> Optional[bool]:
-        self.jui_push_notification(
-            "Saved '{}' sucessefuly".format(self.title), "success"
-        )
         self.state.modified_fields = ()
         return super().on_submit_success(submited_record)
 
@@ -109,6 +106,10 @@ class CUpdateRecord(CForm):
         self.state.modified_fields = ()
         return super().on_cancel()
 
-    def on_invalid_form(self):
+    def push_notification_on_invalid_form(self):
         self.jui_push_notification("Form is invalid", "warn")
-        return super().on_invalid_form()
+
+    def push_notification_on_submit(self):
+        self.jui_push_notification(
+            "'{}' saved sucessefuly".format(self.title), "success"
+        )

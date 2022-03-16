@@ -191,7 +191,7 @@
                 title=menu.title, 
                 icon_name=menu.icon_name if menu.icon_name or menu.icon_html else "chevron-down-outline", 
                 icon_html=menu.icon_html, 
-                styling=open_styling + ("icon-last",),
+                styling=open_styling + ("icon-last",) + (("ghost",) if not menu.title else ()),
                 attrs={
                     'jmb-on:click.prevent': 
                         "if ($scope().opened === '{0}'){{$scope().opened = null}}else{{$scope().opened = '{0}'}}".format(menu.id)
@@ -440,7 +440,7 @@
                 <div>{{title|default('', true)}}</div>
                 {% if closable %}
                 <button jmb-on:click="{%- if component('cancel()').is_accessible %}cancel(){% else %}$jmb.emit('cancel'){% endif -%}" type="button" title="Close" class="btn-ghost">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><title>Close</title><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M368 368L144 144M368 144L144 368"/></svg>
+                    {{display_icon("close-outline")}}
                 </button>
                 {% endif %}
             </div>

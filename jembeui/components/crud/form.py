@@ -197,6 +197,7 @@ class CFormBase(Component):
     def on_submit_success(
         self, submited_record: Optional[Union["Model", dict]]
     ) -> Optional[bool]:
+        self.push_notification_on_submit()
         return None
 
     def on_submit_exception(self, error: Exception):
@@ -213,7 +214,7 @@ class CFormBase(Component):
             self.jui_push_notification(str(error), "error")
 
     def on_invalid_form(self):
-        pass
+        self.push_notification_on_invalid_form()
 
     @action
     def cancel(self, confirmed: bool = False):
@@ -241,10 +242,11 @@ class CFormBase(Component):
             self.jui_confirm_action(
                 "cancel",
                 "Unsaved changes",
-                "You have unsaved changes in {} that will be lost.".format(self.title),
+                "Unsaved changes in '{}' will be lost!".format(self.title),
             )
 
     def on_cancel(self) -> Optional[bool]:
+        self.push_notification_on_cancel()
         return None
 
     @action
@@ -269,6 +271,15 @@ class CFormBase(Component):
         if not is_valid:
             self.on_invalid_form()
         return True
+
+    def push_notification_on_submit(self):
+        pass
+
+    def push_notification_on_cancel(self):
+        pass
+
+    def push_notification_on_invalid_form(self):
+        pass
 
 
 class CForm(CFormBase):
@@ -348,14 +359,16 @@ class CForm(CFormBase):
     def on_submit_success(
         self, submited_record: Optional[Union["Model", dict]]
     ) -> Optional[bool]:
-        # super().on_submit_success(submited_record)
+        super().on_submit_success(submited_record)
+
         if self._config.redisplay_on_submit:
             # repopulate form from database
             self.state.form = None
         return self._config.redisplay_on_submit
-
+    
     def on_cancel(self) -> Optional[bool]:
-        # super().on_cancel()
+        super().on_cancel()
+
         if self._config.redisplay_on_cancel:
             # repopulate form from database
             self.state.form = None

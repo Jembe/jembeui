@@ -40,6 +40,7 @@ def default_on_submit_exception(c: "jembeui.CDeleteRecord", error: "Exception"):
 
 
 class CDeleteRecord(Component):
+    # TODO rewrite to match API of form , create and update components
     class Config(Component.Config):
         default_template_exp = "jembeui/{style}/components/crud/delete.html"
 
