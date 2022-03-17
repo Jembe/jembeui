@@ -107,3 +107,6 @@ class CPage(Component):
             )
 
     _config: Config
+
+    def redisplay_navigation(self):
+        self.emit("redisplay").to(("__main_menu", "__system_menu", "__braedcrumb"))

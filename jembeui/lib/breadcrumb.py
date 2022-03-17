@@ -197,7 +197,7 @@ class Breadcrumb:
 
         self._update_all_childrens_ids()
 
-    def insert_into(self, *children: "jembeui.Breadcrumb") -> "jembeui.Breadcrumb":
+    def insert(self, *children: "jembeui.Breadcrumb") -> "jembeui.Breadcrumb":
         self.children = self.children + list(children)
         return self
 

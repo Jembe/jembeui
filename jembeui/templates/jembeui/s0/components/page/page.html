@@ -41,14 +41,14 @@
             {# Title and open menu button #}
             <div class="sticky top-0 z-40 flex items-center gap-2 pt-1 pl-1 border-b border-b-grey-300 sm:pr-4 bg-grey-100 opacity-95">
                 {# Open close main menu #}
-                {% if "__main_menu" in _config.components and not component("__main_menu").component_instance.is_empty() %}
-                <button class="btn-ghost w-7 h-7" type="button" 
+                <button class="btn-ghost w-7 h-7
+                               {%- if '__main_menu' not in _config.components or component('__main_menu').component_instance.is_empty() %} sm:hidden{% endif %}" 
+                        type="button" 
                         jmb-ref="menuButton"
                         jmb-on:click="$local.mainMenuOpen = ! $local.mainMenuOpen;">
                         <svg jmb-show="! $local.mainMenuOpen" class="text-brand-900" xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><title>Menu</title><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="32" d="M80 160h352M80 256h352M80 352h352"/></svg>
                         <svg jmb-cloak jmb-show="$local.mainMenuOpen" class="text-brand-900" xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><title>Close</title><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M368 368L144 144M368 144L144 368"/></svg>
                 </button>
-                {% endif %}
                 {# Application title #}
                 {% block app_title -%}
                 <a href="{{url_for('index')}}" class="text-3xl font-light leading-10 tracking-tighter text-brand-900 hover:underline focus-visible:underline focus-visible:outline-none">{{title}}</a>

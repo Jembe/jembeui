@@ -3,7 +3,9 @@
     {%- if icon_html %}
         {{icon_html}}
     {%- elif icon_name %}
-        {%- include "jembeui/s0/icons/{}.svg".format(icon_name) with context %}
+        {% set iname = icon_name.split(" ")[0] %}
+        {% set class = class|default("", true) + " " +  icon_name.split(" ", 1)[1]|default("", true) %}
+        {%- include "jembeui/s0/icons/{}.svg".format(iname) with context %}
     {%- elif default_icon_name %}
         {%- include "jembeui/s0/icons/{}.svg".format(default_icon_name) with context %}
     {%- endif %}
@@ -234,8 +236,20 @@
                             <button type="button"
                                 jmb-on:focus="$scope().opened='{{mi.id}}'"
                                 jmb-bind:class="{'sm:!font-semibold': $scope().active === '{{mi.id}}'}"
-                                class="block mb-2 text-sm font-light tracking-wider uppercase focus-visible:outline-none sm:mb-0 text-grey-600 sm:tracking-normal sm:font-normal sm:text-base sm:normal-case sm:hover:underline sm:focus-visible:underline">
-                                {{mi.title}}
+                                class="
+                                block mb-2 text-sm font-light tracking-wider uppercase focus-visible:outline-none text-grey-600
+                                {%- if mi.icon or mi.icon_html %}
+                                sm:btn-ghost sm:mb-0
+                                {%- else %}
+                                sm:mb-0 sm:tracking-normal sm:font-normal sm:text-base sm:normal-case sm:hover:underline sm:focus-visible:underline
+                                {%- endif %}"
+                                title="{{mi.description if mi.description else mi.title}}">
+                                {%- if mi.icon  or mi.icon_html%}
+                                    {{display_icon(mi.icon, mi.icon_html, class="hidden p-1 sm:block")}} 
+                                    <span class="sm:hidden">{{mi.title}}</span>
+                                {%- else %}
+                                    {{mi.title}}
+                                {%- endif %}
                             </button>
                             <div jmb-cloak 
                                 class="sm:absolute sm:right-0 sm:z-50 sm:-mt-2"
@@ -248,7 +262,10 @@
                                 </div>
                                 {# dropdown #}
                                 <div class="pl-4 sm:px-4 sm:py-4 sm:-mt-[1px] sm:bg-white sm:border sm:rounded-sm sm:shadow-md sm:border-grey-200 sm:whitespace-nowrap flex flex-col gap-2 sm:min-w-[8rem]">
-                                    {% set ns.topMenuId = mi.id %}
+                                    {%- set ns.topMenuId = mi.id %}
+                                    {%- if mi.description %}
+                                    <div class="hidden pb-2 text-sm font-light tracking-wider uppercase sm:block text-grey-500">{{mi.description}}</div> 
+                                    {%- endif %}
                                     {{loop(mi.items)}}
                                 </div>
                             </div>
@@ -279,8 +296,22 @@
                             && ($scope().active = '{{ns.topMenuId}}')
                             {%- endif %}
                         }"
-                        class="block text-grey-600 hover:underline focus-visible:outline-none focus-visible:underline">
-                        {{mi.title}} 
+                        class="block text-grey-600 hover:underline focus-visible:outline-none focus-visible:underline
+                        {%- if loop.depth == 1 and (mi.icon or mi.icon_html) %}
+                        sm:btn-ghost
+                        {%- else %}
+                        {%- endif %}"
+                        title="{{mi.description if mi.description else mi.title}}">
+                        {%- if loop.depth == 1 %}
+                                {%- if mi.icon  or mi.icon_html%}
+                                    {{display_icon(mi.icon, mi.icon_html, class="hidden p-1 sm:block")}} 
+                                    <span class="sm:hidden">{{mi.title}}</span>
+                                {%- else %}
+                                    {{mi.title}}
+                                {%- endif %}
+                        {%- else %}
+                            {{mi.title}} 
+                        {%- endif %}
                     </a>
                 {% endif %}
             {% endif %}
@@ -753,8 +784,10 @@
 
 {% macro display_list_toolbar(ctx, display_order_by=true) %}
     <div class="flex flex-wrap items-center justify-end gap-1">
+        {% if ctx.total_records > 0 or (ctx.state.search or ctx.state.choice_filters) %}
         {{display_list__clear_filters_button(ctx._config.search_filter, ctx.jui_choice_filters_config)}}
         {{display_list__search_input(ctx.search, ctx._config.search_filter)}}
+        {%- endif %}
         {% if ctx._config.search_filter %}
         <div class="h-0 basis-full sm:hidden"></div>
         {% endif %}
