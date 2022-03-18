@@ -1,6 +1,7 @@
+{% from "jembeui/s0/macros.html" import display_icon %}
 <div>
 {% if bitems|length > 1  or (bitems|length == 1 and not bitems[0].is_hidden )%}
-<div class="flex flex-row items-center gap-1 mt-2 text-sm flex-nowrap">
+<div class="flex flex-row flex-wrap items-center gap-1 mt-2 text-sm whitespace-nowrap">
     {% for bitem in bitems %}
         {% if not bitem.is_hidden %}
             {% if bitem.url and not loop.last %}
@@ -9,7 +10,7 @@
                 <div>{{bitem.title}}</div>
             {% endif %}
             {% if not loop.last %}
-                <svg class="block w-3 h-3" xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><title>Chevron Forward</title><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="48" d="M184 112l144 144-144 144"/></svg>
+                {{display_icon("chevron-forward-outline", class="w-3 h-3")}}
             {% endif %}
         {% endif %}
     {% endfor %}
