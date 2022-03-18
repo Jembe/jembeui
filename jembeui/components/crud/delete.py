@@ -9,8 +9,9 @@ from typing import (
 )
 import sqlalchemy as sa
 from flask_sqlalchemy import Model, SQLAlchemy
-from jembe import action
 from sqlalchemy.orm.scoping import scoped_session
+from flask import current_app
+from jembe import action, NotFound
 from ..component import Component
 from ...helpers import get_jembeui
 from ...exceptions import JembeUIError
@@ -22,25 +23,7 @@ if TYPE_CHECKING:
 __all__ = ("CDeleteRecord",)
 
 
-
-def default_on_submit(c: "jembeui.CDeleteRecord", r: Union["Model", str]):
-    c.jui_push_notification("Deleted successefully", "success")
-
-
-def default_on_submit_exception(c: "jembeui.CDeleteRecord", error: "Exception"):
-    if isinstance(error, sa.exc.SQLAlchemyError):
-        c.jui_push_notification(
-            str(getattr(error, "orig", error))
-            if isinstance(error, sa.exc.SQLAlchemyError)
-            else str(error),
-            "error",
-        )
-    else:
-        c.jui_push_notification(str(error), "error")
-
-
 class CDeleteRecord(Component):
-    # TODO rewrite to match API of form , create and update components
     class Config(Component.Config):
         default_template_exp = "jembeui/{style}/components/crud/delete.html"
 
@@ -49,14 +32,6 @@ class CDeleteRecord(Component):
             get_record: Optional[
                 Callable[["jembeui.CDeleteRecord"], Union["Model", dict]]
             ] = None,
-            redisplay_on_submit: bool = False,
-            on_submit: Optional[
-                Callable[["jembeui.CDeleteRecord", Union["Model", dict]], None]
-            ] = default_on_submit,
-            on_submit_exception: Optional[
-                Callable[["jembeui.CDeleteRecord", "Exception"], None]
-            ] = default_on_submit_exception,
-            on_cancel: Optional[Callable[["jembeui.CDeleteRecord"], None]] = None,
             db: Optional["SQLAlchemy"] = None,
             title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
             template: Optional[Union[str, Iterable[str]]] = None,
@@ -65,14 +40,10 @@ class CDeleteRecord(Component):
                 Callable[["jembe.Component", "jembe.ComponentConfig"], dict]
             ] = None,
             redisplay: Tuple["jembe.RedisplayFlag", ...] = (),
-            changes_url: bool = True,
+            changes_url: bool = False,
             url_query_params: Optional[Dict[str, str]] = None,
         ):
             self.get_record_callback = get_record
-            self.on_submit = on_submit
-            self.on_submit_exception = on_submit_exception
-            self.on_cancel = on_cancel
-            self.redisplay_on_submit = redisplay_on_submit
             # defult db can be useds when db is None
             if db is not None:
                 self.db: "SQLAlchemy" = db
@@ -114,31 +85,61 @@ class CDeleteRecord(Component):
             self.emit(
                 "submit",
                 record=self.record,
-                record_id=self.record["id"]
-                if isinstance(self.record, dict)
-                else self.record.id,
+                record_id=(
+                    self.record.get("id", None)
+                    if isinstance(self.record, dict)
+                    else getattr(self.record, "id", None)
+                ),
             )
-
-            if self._config.on_submit:
-                self._config.on_submit(self, self.record)
-            return self._config.redisplay_on_submit
+            return self.on_submit_success()
         except Exception as error:
-            if self._config.on_submit_exception:
-                self._config.on_submit_exception(self, error)
+            self.on_submit_exception(error)
+            if current_app.debug or current_app.testing:
+                import traceback
+
+                traceback.print_exc()
         self.session.rollback()
         return True
 
+    def on_submit_success(self):
+        self.push_notification_on_submit()
+        return None
+
+    def on_submit_exception(self, error: Exception):
+        if isinstance(error, sa.exc.SQLAlchemyError):
+            self.jui_push_notification(
+                str(getattr(error, "orig", error))
+                if isinstance(error, sa.exc.SQLAlchemyError)
+                else str(error),
+                "error",
+            )
+        elif isinstance(error, ValueError):
+            self.jui_push_notification(str(error), "warn")
+        else:
+            self.jui_push_notification(str(error), "error")
+
     @action
     def cancel(self):
+        self.on_cancel()
         self.emit(
             "cancel",
             record=self.record,
-            record_id=self.record["id"]
-            if isinstance(self.record, dict)
-            else self.record.id,
+            record_id=(
+                self.record.get("id", None)
+                if isinstance(self.record, dict)
+                else getattr(self.record, "id", None)
+            ),
         )
-        if self._config.on_cancel:
-            self._config.on_cancel(self)
+
+    def on_cancel(self) -> Optional[bool]:
+        self.push_notification_on_cancel()
+        return None
+
+    def push_notification_on_submit(self):
+        self.jui_push_notification("{} deleted.".format(self.title), "success")
+
+    def push_notification_on_cancel(self):
+        pass
 
     def get_record(self) -> Union["Model", dict]:
         if self._config.get_record_callback is None:
@@ -155,6 +156,9 @@ class CDeleteRecord(Component):
             return self._record
         except AttributeError:
             self._record = self.get_record()
+
+        if self._record is None:
+            raise NotFound()
         return self._record
 
     @property
