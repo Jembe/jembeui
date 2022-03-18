@@ -26,7 +26,7 @@
       jmb-on:jui-show-modal="$self.classList.remove('overflow-hidden');if (document.querySelector('[jui-show-modal]')){$self.classList.add('overflow-hidden')}">
     <div class="absolute inset-0 z-50 pointer-events-none">
         <div class="box-border flex flex-row-reverse h-full max-w-screen-xl m-auto pt-14">
-            <div class="sticky self-start top-14 max-w-[33%]">
+            <div class="sticky self-start top-14 max-w-[66%] sm:max-w-[33%]">
                 {{component("__notifications")}}
             </div>
         </div>
@@ -39,7 +39,7 @@
         <div class="flex-grow grid grid-cols-1 grid-rows-[auto_auto_auto_1fr] sm:grid-cols-[minmax(100px,_25%)_minmax(0,1fr)] sm:grid-rows-[_auto_1fr] "
             jmb-bind:class="{'grid-rows-[auto_1fr]': ! $local.mainMenuOpen}">
             {# Title and open menu button #}
-            <div class="sticky top-0 z-40 flex items-center gap-2 pt-1 pl-1 border-b border-b-grey-300 sm:pr-4 bg-grey-100 opacity-95">
+            <div class="sticky top-0 z-40 flex flex-row-reverse items-center justify-between gap-2 px-2 pt-1 border-b sm:justify-start sm:flex-row sm:pl-1 border-b-grey-300 sm:pr-4 bg-grey-100 opacity-95">
                 {# Open close main menu #}
                 <button class="btn-ghost w-7 h-7
                                {%- if '__main_menu' not in _config.components or component('__main_menu').component_instance.is_empty() %} sm:hidden{% endif %}" 
@@ -59,7 +59,8 @@
             {% if "__main_menu" in _config.components and not component("__main_menu").component_instance.is_empty() %}
             <div jmb-cloak jmb-bind:class="{'hidden': ! $local.mainMenuOpen}" class="bg-white sm:row-start-2 sm:border-r sm:border-r-grey-200">
             {% block main_menu -%}
-                <div class="sm:sticky sm:top-11">
+                <div class="sm:sticky sm:top-11"
+                     jmb-on:click="if (window.innerWidth < 640 && ($event.target.closest('a') !== null || $event.target.closest('button') !== null)) {$local.mainMenuOpen=false}">
                     {{component("__main_menu")}}
                 </div>
             {%- endblock main_menu %}
@@ -67,8 +68,10 @@
             {% endif %} 
 
             {# System menu #}
-            <div class="sm:z-40 sm:row-start-1 sm:col-start-2 sm:block sm:border-b sm:border-b-grey-300 bg-grey-100 sm:opacity-95 sm:sticky sm:top-0 sm:pt-1"
-                jmb-bind:class="{'hidden': ! $local.mainMenuOpen}">
+            <div class="pb-2 bg-white border-b sm:bg-grey-100 sm:z-40 sm:row-start-1 sm:col-start-2 sm:block border-b-grey-300 sm:pb-0 sm:opacity-95 sm:sticky sm:top-0 sm:pt-1"
+                jmb-cloak
+                jmb-bind:class="{'hidden': ! $local.mainMenuOpen}"
+                jmb-on:click="if (window.innerWidth < 640 && ($event.target.closest('a') !== null || $event.target.closest('button') !== null)) {$local.mainMenuOpen=false}">
             {% block system_menu -%}
                 {% if "__system_menu" in _config.components %}
                 {{component("__system_menu")}}
@@ -76,7 +79,7 @@
             {%- endblock system_menu %}
             </div>
 
-            <div class="px-2 sm:px-4" jmb-bind:class="{'sm:col-span-2': ! $local.mainMenuOpen}">
+            <div class="px-2" jmb-bind:class="{'sm:col-span-2': ! $local.mainMenuOpen}">
                 {# Bradcrumb #}
                 {% if "__breadcrumb" in _config.components %}
                 {{component("__breadcrumb")}}

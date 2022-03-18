@@ -71,6 +71,7 @@
     {% set is_short = (has_icon or default_icon_name) and not title %}
     {% set attrs = attrs if attrs else {} %}
     <button type="button" class="
+        whitespace-nowrap
         {%- if is_ghost %}
             {%- if 'ghost-micro' in styling%}
                 btn-ghost-micro
@@ -173,7 +174,7 @@
 {# M E N U S #}
 
 {# DISPLAY MENU DROP DOWN #}
-{% macro display_menu_dropdown(menu, from_link=false, open_styling=()) %}
+{% macro display_menu_dropdown(menu, from_link=false, align_left=false, open_styling=()) %}
     {% if menu.is_accessible %}
         <div class="relative {% if from_link %}inline{% else%}h-8{% endif %}" 
             jmb-on:click.away="if ($scope().opened === '{{menu.id}}'){$scope().opened=null}">
@@ -203,9 +204,18 @@
             <div jmb-cloak 
                 jmb-show="$scope().opened === '{{menu.id}}'"
                 jmb-on:click.prevent="if($event.target.tagName ==='A'){$scope().opened=null}"
-                class="absolute right-0 z-50 -mt-1">
+                {% if align_left %}
+                class="absolute left-0 z-50 -mt-1" 
+                {%- else %}
+                class="absolute right-0 z-50 -mt-1"
+                {%- endif %}>
                 {# arrow on top of dropdown #}
-                <div class="flex justify-end mr-1">
+                <div 
+                {% if align_left %}
+                class="flex justify-start ml-1"
+                {%- else %}
+                class="flex justify-end mr-1"
+                {%- endif %}>
                     <div class="w-6 overflow-hidden">
                         <div class="w-4 h-4 origin-bottom-left transform rotate-45 bg-white border border-grey-300"></div>
                     </div>
@@ -223,7 +233,7 @@
 {% macro display_system_menu(menu) %}
     <div jmb-scope="{opened:null, active:null, timeout:null}"
             jmb-on:jembe-update-page.camel.window="$scope().active = null;$updateDom();"
-            class="flex flex-col gap-2 pt-4 pb-2 pl-4 pr-2 bg-white border-b border-grey-300 sm:bg-transparent sm:border-none sm:flex-row sm:items-center sm:justify-end sm:h-full sm:gap-2 sm:py-0 sm:pr-2 sm:px-0">
+            class="flex flex-col gap-3 pt-3 pb-3 pl-4 pr-2 sm:bg-transparent sm:border-none sm:flex-row sm:items-center sm:justify-end sm:h-full sm:gap-2 sm:py-0 sm:pr-2 sm:px-0">
         {% set ns = namespace(topMenuId = none) %}
         {% for mi in menu.items recursive %}
             {% if mi.is_accessible %}
@@ -232,16 +242,16 @@
                         <div jmb-on:mouseleave="if ($scope().opened === '{{mi.id}}') {$scope().timeout=setTimeout(function(){$scope().opened=null}, 50)}" 
                              jmb-on:click.away="if ($scope().opened === '{{mi.id}}') {$scope().opened=null}"
                              jmb-on:mouseover="clearTimeout($scope().timeout); $scope().opened = '{{mi.id}}'"
-                             class="relative my-4 sm:m-0">
+                             class="relative sm:m-0">
                             <button type="button"
                                 jmb-on:focus="$scope().opened='{{mi.id}}'"
                                 jmb-bind:class="{'sm:!font-semibold': $scope().active === '{{mi.id}}'}"
                                 class="
-                                block mb-2 text-sm font-light tracking-wider uppercase focus-visible:outline-none text-grey-600
+                                block mb-3 sm:mb-0 text-sm font-light tracking-wider uppercase focus-visible:outline-none text-grey-800
                                 {%- if mi.icon or mi.icon_html %}
-                                sm:btn-ghost sm:mb-0
+                                sm:btn-ghost 
                                 {%- else %}
-                                sm:mb-0 sm:tracking-normal sm:font-normal sm:text-base sm:normal-case sm:hover:underline sm:focus-visible:underline
+                                sm:tracking-normal sm:font-normal sm:text-base sm:normal-case sm:hover:underline sm:focus-visible:underline
                                 {%- endif %}"
                                 title="{{mi.description if mi.description else mi.title}}">
                                 {%- if mi.icon  or mi.icon_html%}
@@ -255,16 +265,16 @@
                                 class="sm:absolute sm:right-0 sm:z-50 sm:-mt-2"
                                 jmb-bind:class="{'sm:block': $scope().opened === '{{mi.id}}', 'sm:hidden': $scope().opened !== '{{mi.id}}'}">
                                 {# arrow on top of dropdown #}
-                                <div class="hidden sm:flex sm:justify-end sm:mr-4">
+                                <div class="hidden sm:flex sm:justify-end sm:mr-2">
                                     <div class="w-6 overflow-hidden">
                                         <div class="w-4 h-4 origin-bottom-left transform rotate-45 bg-white border border-grey-200"></div>
                                     </div>
                                 </div>
                                 {# dropdown #}
-                                <div class="pl-4 sm:px-4 sm:py-4 sm:-mt-[1px] sm:bg-white sm:border sm:rounded-sm sm:shadow-md sm:border-grey-200 sm:whitespace-nowrap flex flex-col gap-2 sm:min-w-[8rem]">
+                                <div class="pl-4 sm:px-4 sm:py-4 sm:-mt-[1px] sm:bg-white sm:border sm:rounded-sm sm:shadow-md sm:border-grey-200 sm:whitespace-nowrap flex flex-col gap-3 sm:gap-2 sm:min-w-[8rem]">
                                     {%- set ns.topMenuId = mi.id %}
                                     {%- if mi.description %}
-                                    <div class="hidden pb-2 text-sm font-light tracking-wider uppercase sm:block text-grey-500">{{mi.description}}</div> 
+                                    <div class="hidden text-sm font-light tracking-wider uppercase sm:block text-grey-700">{{mi.description}}</div> 
                                     {%- endif %}
                                     {{loop(mi.items)}}
                                 </div>
@@ -323,18 +333,17 @@
 {% macro display_main_menu(menu) %}
     <div jmb-scope="{active:null}"
             jmb-on:jembe-update-page.camel.window="$scope().active = null; $updateDom();"
-            class="flex flex-col h-full gap-2 pt-4 pb-2 pl-4 pr-2">
+            class="flex flex-col h-full gap-3 pt-4 pl-4 pr-2">
         {% for mi in menu.items recursive %}
             {% if mi.is_accessible %}
                 {% if mi.is_menu %}
                     {% if loop.depth == 1 %}
-                        <div class="mt-4">
-                            <button type="button"
-                                class="block mb-2 text-sm font-light tracking-wider uppercase focus-visible:outline-none text-grey-600 "
+                        <div>
+                            <div class="block mb-3 text-sm font-light tracking-wider uppercase focus-visible:outline-none text-grey-800"
                                 {%- if mi.description %}title="{{mi.description}}"{% endif %}>
                                 {{mi.title}}
-                            </button>
-                            <div class="flex flex-col gap-2 pl-4 ">
+                            </div>
+                            <div class="flex flex-col gap-3 pl-4 ">
                                 {{loop(mi.items)}}
                             </div>
                         </div>
@@ -381,7 +390,7 @@
                 {% if mi.is_accessible %}
                     {% if mi.is_menu %}
                         {% if loop.depth == 1 %}
-                            {% call display_menu_dropdown(mi, open_styling=mi.styling + buttons_styling)%}
+                            {% call display_menu_dropdown(mi, align_left='align-right' in styling, open_styling=mi.styling + buttons_styling)%}
                                 {{loop(mi.items)}}
                             {% endcall %}
                         {% else %}
@@ -451,19 +460,19 @@
     <div class="fixed inset-0 z-40 bg-opacity-80 bg-grey-900" {{attrs|xmlattr}}>
         <div class=" m-auto
         {%- if 'xs' in styling %}
-            min-w-[280px] max-w-[80%] w-[360px] mt-[5vh]
+            min-w-[280px] w-[360px] max-w-[92%] mt-[3vh] sm:mt-[5vh] sm:max-w-[80%] 
         {%- elif 'sm' in styling %}
-            min-w-[280px] max-w-[80%] w-[420px] mt-[5vh]
+            min-w-[280px] max-w-[92%] w-[420px] mt-[3vh] sm:mt-[5vh] sm:max-w-[80%] 
         {%- elif 'md' in styling %}
-            min-w-[280px] max-w-[80%] w-[768px] mt-[5vh]
+            min-w-[280px] max-w-[92%] w-[768px] mt-[3vh] sm:mt-[5vh] sm:max-w-[80%]
         {%- elif 'lg' in styling %}
-            min-w-[280px] max-w-[90%] w-[1024px] mt-[5vh]
+            min-w-[280px] max-w-[92%] w-[1024px] mt-[3vh] sm:mt-[5vh] sm:max-w-[80%]
         {%- elif 'xl' in styling %}
-            min-w-[280px] max-w-[80%] w-4/5 mt-[5vh]
+            min-w-[280px] max-w-[92%] w-4/5 mt-[3vh] sm:mt-[5vh] sm:max-w-[80%]
         {%- elif 'full' in styling %}
             min-w-full min-h-screen h-full flex flex-col
         {%- else%}
-            min-w-[280px] max-w-[80%] w-[640px] mt-[5vh]
+            min-w-[280px] w-[640px] max-w-[92%] mt-[3vh] sm:mt-[5vh] sm:max-w-[80%]
         {%- endif %}">
             {# header #}
             {% if display_header %}
@@ -490,7 +499,7 @@
                     {% if menu is string() %}
                     {{menu}}
                     {% else %}
-                    {{display_menu_as_buttons(menu, ("align-right"))}}
+                    {{display_menu_as_buttons(menu, ("align-right",))}}
                     {% endif %}
                 {% elif menu is none and closable and close_button_title %}
                     <div class="flex justify-end">
