@@ -98,7 +98,7 @@ class CCreateRecord(CForm):
         return super().on_cancel()
 
     def push_notification_on_submit(self):
-        self.jui_push_notification("'{}' created".format(self.title), "success")
+        self.jui_push_notification("{} created.".format(self.title), "success")
 
     def push_notification_on_invalid_form(self):
         self.jui_push_notification("Form is invalid", "warn")

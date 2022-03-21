@@ -797,19 +797,21 @@
 
 {% macro display_list_toolbar(ctx, display_order_by=true) %}
     <div class="flex flex-wrap items-center justify-end gap-1">
-        {% if ctx.total_records > 0 or (ctx.state.search or ctx.state.choice_filters) %}
+    {% if ctx.total_records > 0 or (ctx.state.search or ctx.state.choice_filters) %}
         {{display_list__clear_filters_button(ctx._config.search_filter, ctx.jui_choice_filters_config)}}
         {{display_list__search_input(ctx.search, ctx._config.search_filter)}}
-        {%- endif %}
         {% if ctx._config.search_filter %}
         <div class="h-0 basis-full sm:hidden"></div>
         {% endif %}
+        <div class="flex flex-wrap justify-start w-full gap-1 sm:contents">
         {{display_list__choice_filters(ctx.state.choice_filters, ctx.jui_choice_filters_config)}}
         {% if display_order_by %}
         {{display_list__order_by(ctx.state.order_by, ctx._config.order_by)}}
         {% endif %}
-        {% if ctx.total_records > 0 or (ctx.state.search or ctx.state.choice_filters) %}
+        <div class="flex justify-end grow sm:grow-0 basis-0 sm:basis-auto">
         {{display_list__pagination(ctx.state.page, ctx.total_pages, ctx.total_records)}}
-        {% endif %}
+        </div>
+        </div>
+    {%- endif %}
     </div>
 {% endmacro %}

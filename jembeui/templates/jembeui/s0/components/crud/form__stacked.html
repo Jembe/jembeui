@@ -1,13 +1,13 @@
 {% from 'jembeui/s0/macros.html' import display_menu_as_buttons %}
 <div class="sm:grid sm:grid-cols-[1fr_3fr] sm:gap-2 border-b border-b-grey-300 my-4 pb-12">
-    <div>
+    <div class="mt-6 sm:mt-0">
     {% block header %}
         <div class="prose">
             <h3>{{title}}</h3>
         </div>
     {% endblock header %}
     </div>
-    <div>
+    <div class="mt-4 sm:mt-0">
     {% block content %}
         {{form.as_html()}}
         <div class="mt-2">{{display_menu_as_buttons(menu)}}</div>

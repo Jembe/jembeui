@@ -24,7 +24,10 @@
 <body class="m-0 box-border bg-grey-100 text-grey-900 [font-kerning:normal]"
       jmb-on:jembe-update-page.camel.window="$self.classList.remove('overflow-hidden');if (document.querySelector('[jui-show-modal]')){$self.classList.add('overflow-hidden')}"
       jmb-on:jui-show-modal="$self.classList.remove('overflow-hidden');if (document.querySelector('[jui-show-modal]')){$self.classList.add('overflow-hidden')}">
-    <div class="absolute inset-0 z-50 pointer-events-none">
+    <div class="absolute inset-0 z-50 pointer-events-none" 
+        jmb-on:resize.window="$self.setAttribute('style', 'height:'+document.body.scrollHeight+'px;')"
+        jmb-on:jembe-update-page.camel.window="$self.setAttribute('style', 'height:'+document.body.scrollHeight+'px;')"
+        jmb-on:ready.once="$self.setAttribute('style', 'height:'+document.body.scrollHeight+'px;')">
         <div class="box-border flex flex-row-reverse h-full max-w-screen-xl m-auto pt-14">
             <div class="sticky self-start top-14 max-w-[90%] sm:max-w-[33%]">
                 {{component("__notifications")}}

@@ -111,5 +111,5 @@ class CUpdateRecord(CForm):
 
     def push_notification_on_submit(self):
         self.jui_push_notification(
-            "'{}' saved sucessefuly".format(self.title), "success"
+            "{} updated.".format(self.title), "success"
         )

@@ -8,6 +8,7 @@ from typing import (
     Union,
     Sequence,
 )
+from jembe import listener
 from ..component import Component
 from .title import CPageTitle
 from .notifications import CPageNotifications
@@ -110,3 +111,7 @@ class CPage(Component):
 
     def redisplay_navigation(self):
         self.emit("redisplay").to(("__main_menu", "__system_menu", "__braedcrumb"))
+
+    @listener(event="redisplay_navigation")
+    def on_event_redisplay_navigation(self, event: "jembe.Event"):
+        self.redisplay_navigation()

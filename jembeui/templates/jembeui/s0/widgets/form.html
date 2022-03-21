@@ -3,6 +3,8 @@
 {% set fields_styling = form.__fields_styling__|default((), true) %}
 
 <div class="{%- if 'full' in form_styling %}
+            {%- elif '2xs' in form_styling %}
+            max-w-[280px]
             {%- elif 'xs' in form_styling %}
             max-w-[420px]
             {%- elif 'sm' in form_styling %}
