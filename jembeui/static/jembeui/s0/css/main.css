@@ -1139,6 +1139,7 @@ Ensure the default browser behavior of the `hidden` attribute.
   height: 2rem;
   min-width: 96px;
   cursor: pointer;
+  white-space: nowrap;
   border-radius: 0.25rem;
   --tw-bg-opacity: 1;
   background-color: rgb(212 212 212 / var(--tw-bg-opacity));
@@ -1182,6 +1183,7 @@ Ensure the default browser behavior of the `hidden` attribute.
   height: 2rem;
   min-width: 96px;
   cursor: pointer;
+  white-space: nowrap;
   border-radius: 0.25rem;
   --tw-bg-opacity: 1;
   background-color: rgb(212 212 212 / var(--tw-bg-opacity));
@@ -1856,6 +1858,10 @@ Ensure the default browser behavior of the `hidden` attribute.
   height: 0.25rem;
 }
 
+.max-h-\[94vh\] {
+  max-height: 94vh;
+}
+
 .min-h-screen {
   min-height: 100vh;
 }
@@ -2144,6 +2150,10 @@ Ensure the default browser behavior of the `hidden` attribute.
   overflow-x: auto;
 }
 
+.overflow-y-auto {
+  overflow-y: auto;
+}
+
 .whitespace-nowrap {
   white-space: nowrap;
 }
@@ -2160,12 +2170,12 @@ Ensure the default browser behavior of the `hidden` attribute.
   border-radius: 0px;
 }
 
-.rounded-lg {
-  border-radius: 0.5rem;
-}
-
 .rounded-md {
   border-radius: 0.375rem;
+}
+
+.rounded-lg {
+  border-radius: 0.5rem;
 }
 
 .rounded-t-sm {
@@ -2290,6 +2300,18 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .bg-opacity-80 {
   --tw-bg-opacity: 0.8;
+}
+
+.bg-opacity-50 {
+  --tw-bg-opacity: 0.5;
+}
+
+.bg-opacity-70 {
+  --tw-bg-opacity: 0.7;
+}
+
+.bg-opacity-60 {
+  --tw-bg-opacity: 0.6;
 }
 
 .object-scale-down {
@@ -2858,6 +2880,10 @@ Ensure the default browser behavior of the `hidden` attribute.
 
   .sm\:h-full {
     height: 100%;
+  }
+
+  .sm\:max-h-\[90vh\] {
+    max-height: 90vh;
   }
 
   .sm\:min-w-\[8rem\] {

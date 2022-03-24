@@ -714,9 +714,9 @@
 
 
 {# TABLE #}
-{% macro display_list__table(records, fields_config, field_values, order_by, order_by_config, record_menu_config, get_record_menu, search, choice_filters, total_records) %}
-    {% if  not records  and total_records == 0 and not search and not choice_filters %}
-    <div class="text-sm text-center text-grey-500">No data found</div>  
+{% macro display_list__table(records, fields_config, field_values, order_by, order_by_config, record_menu_config, get_record_menu, search, choice_filters, total_records, has_records=true) %}
+    {% if  not has_records %}
+    <div class="text-sm text-center text-grey-500 ">No data found</div>  
     {% else %}
     <div class="pb-2 overflow-x-auto">
       <div class="inline-block min-w-full align-middle">
@@ -791,13 +791,14 @@
         ctx.get_record_menu,
         ctx.state.search,
         ctx.state.choice_filters,
-        ctx.total_records
+        ctx.total_records,
+        ctx.has_records
     )}}
 {% endmacro %}
 
 {% macro display_list_toolbar(ctx, display_order_by=true) %}
     <div class="flex flex-wrap items-center justify-end gap-1">
-    {% if ctx.total_records > 0 or (ctx.state.search or ctx.state.choice_filters) %}
+    {% if ctx.has_records %}
         {{display_list__clear_filters_button(ctx._config.search_filter, ctx.jui_choice_filters_config)}}
         {{display_list__search_input(ctx.search, ctx._config.search_filter)}}
         {% if ctx._config.search_filter %}
