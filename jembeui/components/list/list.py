@@ -315,7 +315,9 @@ class CList(Component):
             if isinstance(self._config.query, sa.orm.Query)
             else self._config.query(self)
         )
-        self.has_records = self.session.query(query.with_session(self.session()).exists()).scalar()
+        self.has_records = self.session.query(
+            query.with_session(self.session()).order_by(None).exists()
+        ).scalar()
         self.records = query.with_session(self.session()).only_return_tuples(True)
 
         # apply search filter
