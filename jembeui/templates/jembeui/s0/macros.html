@@ -385,7 +385,7 @@
 {# DISPLAY MENU AS BUTTONS #}
 {% macro display_menu_as_buttons(menu, styling=(), buttons_styling=())%}
     {% if menu.is_accessible %}
-        <div jmb-scope="{opened:null}" class="flex items-center gap-1 {% if 'align-right' in styling %} flex-row-reverse{% endif %}">
+        <div jmb-scope="{opened:null}" class="flex flex-wrap items-center gap-1 {% if 'align-right' in styling %} flex-row-reverse{% endif %}">
             {% for mi in menu.items recursive %}
                 {% if mi.is_accessible %}
                     {% if mi.is_menu %}
@@ -458,7 +458,7 @@
     {% set attrs = {"jui-show-modal": true} if attrs is none else attrs %}
 
     <div class="fixed inset-0 z-40 bg-opacity-80 bg-grey-900" {{attrs|xmlattr}}>
-        <div class=" m-auto
+        <div class="m-auto max-h-[94vh] sm:max-h-[90vh] flex flex-col
         {%- if 'xs' in styling %}
             min-w-[280px] w-[360px] max-w-[92%] mt-[3vh] sm:mt-[5vh] sm:max-w-[80%] 
         {%- elif 'sm' in styling %}
@@ -486,7 +486,7 @@
             </div>
             {% endif %}
             {# content #}
-            <div class="p-4 bg-grey-50 
+            <div class="p-4 bg-grey-50 grow overflow-y-auto
                         {%- if not display_header %} rounded-t-sm{% endif -%} 
                         {%- if not display_footer %} rounded-b-sm{% endif -%} 
                         {%- if 'full' in styling %} grow overflow-auto{% endif -%}">

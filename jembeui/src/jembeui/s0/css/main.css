@@ -30,7 +30,7 @@
 
 @layer components {
     .btn {
-        @apply bg-grey-300  text-grey-900 rounded h-8 px-2 text-sm min-w-[96px] sm:min-w-[132px] cursor-pointer hover:bg-grey-300 hover:bg-opacity-60 focus-visible:outline-none focus-visible:shadow-focus focus-visible:shadow-primary-500/30 disabled:bg-grey-200 disabled:opacity-40 disabled:cursor-default;
+        @apply bg-grey-300 whitespace-nowrap  text-grey-900 rounded h-8 px-2 text-sm min-w-[96px] sm:min-w-[132px] cursor-pointer hover:bg-grey-300 hover:bg-opacity-60 focus-visible:outline-none focus-visible:shadow-focus focus-visible:shadow-primary-500/30 disabled:bg-grey-200 disabled:opacity-40 disabled:cursor-default;
     }
     .btn-short {
         @apply btn min-w-[unset];

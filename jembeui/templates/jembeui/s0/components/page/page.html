@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" jmb-local="{mainMenuOpen:false}">
+<html lang="en" jmb-local="{mainMenuOpen:false, scrollY:0}" 
+    jmb-init="$watch('mainMenuOpen', function(v){ if(window.innerWidth < 640){if(v===true){$local.scrollY = window.scrollY; window.scroll(0,0)} else {window.scroll(0, $local.scrollY)}}})">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -63,7 +64,7 @@
             <div jmb-cloak jmb-bind:class="{'hidden': ! $local.mainMenuOpen}" class="bg-white sm:row-start-2 sm:border-r sm:border-r-grey-200">
             {% block main_menu -%}
                 <div class="sm:sticky sm:top-11"
-                     jmb-on:click="if (window.innerWidth < 640 && ($event.target.closest('a') !== null || $event.target.closest('button') !== null)) {$local.mainMenuOpen=false}">
+                     jmb-on:click="if (window.innerWidth < 640 && ($event.target.closest('a') !== null || $event.target.closest('button') !== null)) {$local.mainMenuOpen=false; window.scroll(0,0)}">
                     {{component("__main_menu")}}
                 </div>
             {%- endblock main_menu %}
@@ -74,7 +75,7 @@
             <div class="pb-2 bg-white border-b sm:bg-grey-100 sm:z-40 sm:row-start-1 sm:col-start-2 sm:block border-b-grey-300 sm:pb-0 sm:opacity-95 sm:sticky sm:top-0 sm:pt-1"
                 jmb-cloak
                 jmb-bind:class="{'hidden': ! $local.mainMenuOpen}"
-                jmb-on:click="if (window.innerWidth < 640 && ($event.target.closest('a') !== null || $event.target.closest('button') !== null)) {$local.mainMenuOpen=false}">
+                jmb-on:click="if (window.innerWidth < 640 && ($event.target.closest('a') !== null || $event.target.closest('button') !== null)) {$local.mainMenuOpen=false; window.scroll(0,0)}">
             {% block system_menu -%}
                 {% if "__system_menu" in _config.components %}
                 {{component("__system_menu")}}
