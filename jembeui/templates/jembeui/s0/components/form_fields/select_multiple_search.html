@@ -1,3 +1,4 @@
+{% from '/jembeui/s0/macros.html' import display_icon %}
 <div 
     jmb-local="{
         focusedOptionId: null,
@@ -63,12 +64,12 @@
     jmb-update="function () {
         this.$local.focusedOptionId = {{ "'{}'".format(choices[0][0]) if choices else 'null'}};
     }"
-    class="form-field__select-multiple-search">
+    class="relative">
     {% if selected_choices %}
-    <div class="form-field__select-multiple-search__selected--container">
+    <div class="border border-b-0 rounded-t-sm border-grey-300 min-h-[2rem] ">
     {% for choice in selected_choices  %}
-        <div class="form-field__select-multiple-search__selected {{loop.cycle('form-field__select-multiple-search__selected--even','form-field__select-multiple-search__selected--odd')}}">
-            <div>
+        <div class="px-2 py-1 flex items-center min-h-[2rem] {{loop.cycle('bg-grey-50','bg-white')}}">
+            <div class="grow">
                 {% if has_view_component %}
                 <a jmb-on:click.prevent.stop="{{component('view', id=choice[0]).jrl}}" href="{{component().url}}">
                     {{choice[1]}}
@@ -78,24 +79,25 @@
                         {{choice[1]}}
                     </a>
                 {% else %}
-                    {{choice[1]}}
+                    <span class="text-sm">{{choice[1]}}</span>
                 {% endif %}
             </div>
             {% if has_update_component and has_view_component and _config.display_update_link %}
-                <button jmb-on:click.prevent.stop="{{component('update', id=choice[0]).jrl}}" href="{{component().url}}" type="button" class="button button--ghost">
-                    <img src="{{url_for('jembeui.static', filename='/jembeui/s0/icons/edit-16-grey-90-a80.svg')}}" alt="edit">
+                <button jmb-on:click.prevent.stop="{{component('update', id=choice[0]).jrl}}" type="button" class="btn-ghost">
+                    {{display_icon("create-outline", class="p-1 text-grey-500")}}
                 </button>
             {% endif %}
             {% if not is_disabled %}
-            <button jmb-on:click="selected = selected.filter(function(item){ return item !='{{choice[0]}}'});$dispatch('select-option-changed',{selected:selected});" type="button" class="button button--ghost">
-                <img src="{{url_for('jembeui.static', filename='/jembeui/s0/icons/stop-16-grey-90-a80.svg')}}" alt="remove">
+            <button jmb-on:click="selected = selected.filter(function(item){ return item !='{{choice[0]}}'});$dispatch('select-option-changed',{selected:selected});" type="button" class="btn-ghost">
+                {{display_icon("close-outline", class="p-1 text-grey-500")}}
+                {# <img src="{{url_for('jembeui.static', filename='/jembeui/s0/icons/stop-16-grey-90-a80.svg')}}" alt="remove"> #}
             </button>
             {% endif %}
         </div>
     {% endfor %}
     </div>
     {% elif is_disabled %}
-    <div class="form-field__select-multiple-search__selected--container"></div>
+    <div class="border border-b-0 rounded-t-sm border-grey-300 min-h-[2rem] "></div>
     {% endif %}
 
     {% if not is_disabled %}
@@ -122,10 +124,9 @@
                 jmb-on:keydown.enter.prevent="$local.focusedOptionId !== null && $local.selectOption($context, $dispatch, $local.focusedOptionId)" 
                 jmb-on:keydown.enter.ctrl.prevent="$dispatch('select-option-submit')" 
             {%endif%} 
-            placeholder="Search ..."
+            placeholder="Select ..."
             type="text" 
-            class="input text-input input--icon input--icon--arrowhead-down form-field__select-multiple__search-input "
-            style="flex-grow:1;">
+            class="form-select grow">
             {% if has_create_component %}
             <button type="button" class="button button--ghost"
                 jmb-on:click.stop.prevent="{{component('create').jrl}}">
@@ -134,16 +135,17 @@
             
             {% endif %}
         </div>
-
         {% if search is not none and choices %}
-        <div class="form-field__select-multiple-search__dropdown">
-            <div class="form-field__select-multiple-search__dropdown__items">
+        <div class="absolute left-0 right-0 z-50 mb-6 overflow-auto bg-white border rounded rounded-t-none shadow border-grey-300 shadow-grey-400 max-h-60">
+            <div class="flex flex-col gap-1 py-1">
             {% for choice in  choices %}
-            <button jmb-on:click="$local.selectOption($context, $dispatch, '{{choice[0]}}')" type="button" class="form-field__select-multiple-search__dropdown__item {{loop.cycle('even','odd')}}"
-            tabindex="-1"
-            jmb-on:mouseover="$local.focusedOptionId='{{choice[0]}}'"
-            jmb-bind:class="{focused: $local.focusedOptionId === '{{choice[0]}}'}"
-            option-id='{{choice[0]}}'>{{choice[1]}}</button>
+            <button type="button" 
+                jmb-on:click="$local.selectOption($context, $dispatch, '{{choice[0]}}')" 
+                jmb-on:mouseover="$local.focusedOptionId='{{choice[0]}}'"
+                jmb-bind:class="{'bg-grey-200': $local.focusedOptionId === '{{choice[0]}}'}"
+                class="flex items-center justify-start px-4 btn btn--white "
+                tabindex="-1"
+                option-id='{{choice[0]}}'>{{choice[1]}}</button>
             {# {%else%}
             <div class="form-field__select-multiple-search__dropdown__item even no-more">
                 No more choices
@@ -151,8 +153,8 @@
             {% endfor %}
             </div>
             {% if choices|length != choices_count %}
-            <div class="form-field__select-multiple-search__dropdown__item more-choices-avaiable">
-                More choices avaiable using search.
+            <div class="flex items-center justify-center px-4 py-2 text-sm italic bg-white text-grey-600">
+                More choices avaiable on search.
             </div>
             {% endif %}
         

@@ -486,10 +486,12 @@
             </div>
             {% endif %}
             {# content #}
-            <div class="p-4 bg-grey-50 grow overflow-y-auto
+            <div class="p-4 bg-grey-50 grow overflow-y-auto  h-fit
                         {%- if not display_header %} rounded-t-sm{% endif -%} 
                         {%- if not display_footer %} rounded-b-sm{% endif -%} 
-                        {%- if 'full' in styling %} grow overflow-auto{% endif -%}">
+                        {%- if 'full' in styling %} grow overflow-auto{% endif -%}"
+                        {# support select multiple dropdown to resize modal window #}
+                        jmb-on:jembe-update-page.camel.window="$self.removeAttribute('style');$self.setAttribute('style', 'height:'+$self.scrollHeight+'px;')">
                 {{caller()}}
             </div>
             {# footer #}
@@ -566,7 +568,7 @@
             <div jmb-show="$scope().opened" jmb-cloak
                 class="absolute z-10 top-7 min-w-[70px] left-0 sm:right-0 shadow border-grey-200 rounded-sm overflow-hidden bg-white flex flex-col gap-1 py-1">
                 {% if not multiselect %}
-                <div class="px-2 pt-1 text-xs tracking-wider uppercase text-grey-600">
+                <div class="px-2 pt-1 text-xs tracking-wider uppercase whitespace-nowrap text-grey-600">
                     {{choice_filter.title}}:
                 </div> 
                 {% endif %}
@@ -610,7 +612,7 @@
              class="absolute z-10 top-7 min-w-[70px] left:0 sm:right-0 shadow rounded-sm overflow-hidden bg-white border-grey-200 flex flex-col gap-1 py-1">
         {% for filter_name, choice_filter in filters_config.items() if choice_filter.is_grouped is none  %}
         {% if choice_filter.title %}
-            <div class="px-2 pt-1 text-xs tracking-wider uppercase text-grey-600">
+            <div class="px-2 pt-1 text-xs tracking-wider uppercase whitespace-nowrap text-grey-600">
                 {{choice_filter.title}}:
             </div> 
         {% endif %}

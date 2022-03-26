@@ -98,9 +98,9 @@ class CSelectMultipleSearch(Component):
     def choices_count(self) -> int:
         all_choices_result = self.field._get_all_choices_result()
         if isinstance(all_choices_result, list):
-            return len(all_choices_result)
+            return len(all_choices_result) - len(self.selected_choices)
         else:
-            return all_choices_result.count()
+            return all_choices_result.count() - len(self.selected_choices)
 
     @property
     def has_view_component(self) -> bool:

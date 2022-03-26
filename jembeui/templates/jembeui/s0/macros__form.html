@@ -15,9 +15,8 @@
         {{_boolean_field(form, field, render_kw, field_id, is_not_disabled, styling, instant_validate, instant_submit)}}
     {# {% elif fclass == "DateField" %}
     {% elif fclass == "DateTimeField" %}
-    {% elif fclass == "SelectMultipleField" %}
     {% elif fclass == "FileField" %} #}
-    {% elif fclass == "ImageField" %}
+    {% elif fclass in ("ImageField", "SelectMultipleField") %}
         {{_default_field(form, field, render_kw, field_id, is_not_disabled, styling, instant_validate, instant_submit)}}
     {% else %}
         {{_default_field(form, field, render_kw, field_id, is_not_disabled, styling, instant_validate, instant_submit)}}
@@ -65,8 +64,9 @@
         {{_textarea_widget(form, field, render_kw, field_id, is_not_disabled, styling, instant_validate, instant_submit)}}
     {# {% elif fclass == "DateField" %}
     {% elif fclass == "DateTimeField" %}
-    {% elif fclass == "SelectMultipleField" %}
     {% elif fclass == "FileField" %} #}
+    {% elif fclass == "SelectMultipleField" %}
+        {{_select_multiple_widget(form, field, render_kw, field_id, is_not_disabled, styling, instant_validate, instant_submit)}}
     {% elif fclass == "ImageField" %}
         {{_image_widget(form, field, render_kw, field_id, is_not_disabled, styling, instant_validate, instant_submit)}}
     {% else %}
@@ -382,5 +382,16 @@
         </div>
         {# hidden image input #}
         {{field(**form.attr_kw(render_kw))}}
+    </div>
+{% endmacro %}
+{% macro _select_multiple_widget(form, field, render_kw, field_id, is_not_disabled, styling, instant_validate, instant_submit) %}
+    <div
+        {% if is_not_disabled and not instant_validate and not instant_submit %}
+        jmb-on:select-option-changed.prevent.stop.defer="form.{{field.name}}=$event.detail.selected;{% if 'modified_fields' in state %}modified_fields.indexOf('{{field.name}}')===-1 && modified_fields.push('{{field.name}}');{% endif %}"
+        {% else %}
+        jmb-on:select-option-changed.prevent.stop="form.{{field.name}}=$event.detail.selected;{% if 'modified_fields' in state %}modified_fields.indexOf('{{field.name}}')===-1 && modified_fields.push('{{field.name}}');{% endif %}{% if instant_validate %}validate();{% endif %}{% if instant_submit %}submit();{% endif %}"
+        {% endif %}
+        jmb-on:select-option-submit.prevent.stop="submit()">
+    {{field.jui_component("search", selected=field.data if field.data else [], is_disabled=not is_not_disabled)}}
     </div>
 {% endmacro %}

@@ -29,7 +29,7 @@ class SelectMultipleField(JUIFieldMixin, wtforms.Field):
     of respectiv CViewRecord, CUpdateRecord and CCreateRecord jembe UI components
     """
 
-    widget = wtforms.widgets.HiddenInput
+    widget = wtforms.widgets.Input
 
     def __init__(
         self,

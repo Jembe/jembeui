@@ -247,12 +247,6 @@ class CList(Component):
     ):
         if page_size < 1:
             self.state.page_size = self._config.page_size
-        if self.state.choice_filters is None:
-            # apply default filters
-            self.state.choice_filters = {
-                name: list(cf.default_choices)
-                for name, cf in self.jui_choice_filters_config.items()
-            }
         super().__init__()
 
     @property
@@ -310,6 +304,12 @@ class CList(Component):
         }
 
     def hydrate(self):
+        if self.state.choice_filters is None:
+            # apply default filters
+            self.state.choice_filters = {
+                name: list(cf.default_choices)
+                for name, cf in self.jui_choice_filters_config.items()
+            }
         query = (
             self._config.query
             if isinstance(self._config.query, sa.orm.Query)
