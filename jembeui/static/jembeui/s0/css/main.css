@@ -1679,6 +1679,10 @@ Ensure the default browser behavior of the `hidden` attribute.
   top: 3.5rem;
 }
 
+.-right-1 {
+  right: -0.25rem;
+}
+
 .z-50 {
   z-index: 50;
 }
@@ -1976,6 +1980,14 @@ Ensure the default browser behavior of the `hidden` attribute.
   min-width: 5rem;
 }
 
+.min-w-\[180px\] {
+  min-width: 180px;
+}
+
+.min-w-\[220px\] {
+  min-width: 220px;
+}
+
 .max-w-\[92\%\] {
   max-width: 92%;
 }
@@ -2122,6 +2134,10 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .flex-nowrap {
   flex-wrap: nowrap;
+}
+
+.items-start {
+  align-items: flex-start;
 }
 
 .items-center {
@@ -2528,6 +2544,14 @@ Ensure the default browser behavior of the `hidden` attribute.
   line-height: 2.5rem;
 }
 
+.leading-3 {
+  line-height: .75rem;
+}
+
+.leading-4 {
+  line-height: 1rem;
+}
+
 .tracking-wider {
   letter-spacing: 0.05em;
 }
@@ -2614,6 +2638,11 @@ Ensure the default browser behavior of the `hidden` attribute.
 .text-primary-800 {
   --tw-text-opacity: 1;
   color: rgb(6 95 70 / var(--tw-text-opacity));
+}
+
+.text-primary-700 {
+  --tw-text-opacity: 1;
+  color: rgb(4 120 87 / var(--tw-text-opacity));
 }
 
 .text-opacity-40 {
@@ -2799,6 +2828,15 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .focus-visible\:ring-primary-500\/30:focus-visible {
   --tw-ring-color: rgb(16 185 129 / 0.3);
+}
+
+.disabled\:border-t-0:disabled {
+  border-top-width: 0px;
+}
+
+.disabled\:border-grey-300:disabled {
+  --tw-border-opacity: 1;
+  border-color: rgb(212 212 212 / var(--tw-border-opacity));
 }
 
 @media (min-width: 640px) {

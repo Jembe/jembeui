@@ -115,7 +115,11 @@ class CListRecords(CList):
                     self.field_values[field_name] = self.__class__.default_field_value
 
             # order by
-            order_by = self.fields
+            order_by = {k:v for k, v in self.fields.items()}
+            if order_by_exp is not None:
+                for o, e in order_by_exp.items():
+                    if e is None and o in order_by:
+                        del order_by[o]
 
             # field stylings
             fields_styling = fields_styling if fields_styling is not None else dict()

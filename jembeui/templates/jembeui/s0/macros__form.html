@@ -91,9 +91,21 @@
     <div {{form.attr_kw(form.resolve_kw(render_kw._field|default({},true), {"class+":default_class}, false))|xmlattr}}>
         <div class="flex items-center justify-between gap-8 mb-1">
             <label for="{{field_id}}" class="flex flex-row items-center justify-between text-xs">{{field.label.text}}</label>
-            <div class="text-xs font-light text-grey-600">
-            {% if is_not_disabled and not field.flags.required %}optional{% endif %}
-            {% if field.description %}{{field.description}}{% endif %}
+            <div class="flex items-center gap-1 flex-nowrap">
+                {% if is_not_disabled and not field.flags.required %}
+                <div class="text-xs font-light text-grey-600">optional</div>
+                {% endif %}
+                {% if field.description %}
+                <div class="relative leading-3" jmb-scope="{open:false}" 
+                    jmb-on:click.away="$scope().open=false;$nextTick(function(){$dispatch('jembeRecalcHeight')});" 
+                    jmb-on:mouseleave="$scope().open=false;$nextTick(function(){$dispatch('jembeRecalcHeight')});" 
+                    jmb-on:mouseenter="$scope().open=true;$nextTick(function(){$dispatch('jembeRecalcHeight')})">
+                    <button type="button" class="w-4 h-4 btn-ghost" jmb-on:click="$scope().open=true">{{display_icon("help-circle-outline", class="w-4 h-4")}}</button>
+                    <div jmb-cloak jmb-show="$scope().open" class="absolute -right-1 z-50 p-2 text-xs font-normal bg-white border rounded-md shadow border-grey-300 text-grey-900 min-w-[220px]">
+                        {{field.description}}
+                    </div>
+                </div>
+                {% endif %}
             </div>
         </div>
         {{_form_field_widget(form, field, render_kw, field_id, is_not_disabled, styling, instant_validate, instant_submit)}}
@@ -106,11 +118,23 @@
 {% macro _boolean_field(form, field, render_kw, field_id, is_not_disabled, styling, instant_validate, instant_submit) %}
     {% set default_class = "flex flex-col mt-2" if "full" not in styling else "flex flex-col grow basis-0 mt-2" %}
     <div {{form.attr_kw(form.resolve_kw(render_kw._field|default({},true), {"class+":default_class}, false))|xmlattr}}>
-        <div class="flex flex-row items-center">
+        <div class="flex flex-row items-center justify-between gap-2">
             {{_form_field_widget(form, field, render_kw, field_id, is_not_disabled, styling, instant_validate, instant_submit)}}
-            <div class="text-xs font-light text-grey-600">
-                {# {% if is_not_disabled and not field.flags.required %}optional{% endif %} #}
-                {% if field.description %}{{field.description}}{% endif %}
+            <div class="flex items-center gap-1 flex-nowrap">
+                {# {% if is_not_disabled and not field.flags.required %}
+                    <div class="text-xs font-light text-grey-600">optional</div>
+                {% endif %} #}
+                {% if field.description %}
+                <div class="relative leading-3" jmb-scope="{open:false}" 
+                    jmb-on:click.away="$scope().open=false;$nextTick(function(){$dispatch('jembeRecalcHeight')});" 
+                    jmb-on:mouseleave="$scope().open=false;$nextTick(function(){$dispatch('jembeRecalcHeight')});" 
+                    jmb-on:mouseenter="$scope().open=true;$nextTick(function(){$dispatch('jembeRecalcHeight')})">
+                    <button type="button" class="w-4 h-4 btn-ghost" jmb-on:click="$scope().open=true">{{display_icon("help-circle-outline", class="w-4 h-4")}}</button>
+                    <div jmb-cloak jmb-show="$scope().open" class="absolute -right-1 z-50 p-2 text-xs font-normal bg-white border rounded-md shadow border-grey-300 text-grey-900 min-w-[220px]">
+                        {{field.description}}
+                    </div>
+                </div>
+                {% endif %}
             </div>
         </div>
         {% for error in field.errors %}
@@ -208,7 +232,6 @@
         <label for="{{field_id}}" class="w-full ml-1 text-sm {% if is_not_disabled %} cursor-pointer {% endif %} basis-0 grow">{{field.label.text}}</label>
     </div>
 {% endmacro %}
-
 
 
 {% macro _image_widget(form, field, render_kw, field_id, is_not_disabled, styling, instant_validate, instant_submit) %}
@@ -384,6 +407,8 @@
         {{field(**form.attr_kw(render_kw))}}
     </div>
 {% endmacro %}
+
+
 {% macro _select_multiple_widget(form, field, render_kw, field_id, is_not_disabled, styling, instant_validate, instant_submit) %}
     <div
         {% if is_not_disabled and not instant_validate and not instant_submit %}

@@ -180,9 +180,9 @@ class FormBase(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
     def cancel(self, record: Union["Model", dict]):
         pass
 
-    def set_disabled(self, *fields: "wtforms.Field"):
+    def set_disabled(self, *fields: "wtforms.Field", disabled: bool = True):
         for field in fields:
-            self.set_renderkw(field, "disabled", True)
+            self.set_renderkw(field, "disabled", disabled)
 
     def as_html(self, _variant_or_template_name: Optional[str] = None) -> str:
         """Renders form using self.__template__ jinja2 template or specific template if provided in argument.
@@ -299,10 +299,10 @@ class FormBase(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
             and isinstance(v, (str, int, bool))
         }
 
-    def set_renderkw(
-        self, field: "wtforms.Field", param_name: str, value: Any
-    ) -> Any:
-        return self.RENDER_KW[field.name].setdefault(param_name, value)
+    def set_renderkw(self, field: "wtforms.Field", param_name: str, value: Any) -> Any:
+        self.RENDER_KW[field.name][param_name] = value
+        return value
+        # return self.RENDER_KW[field.name].setdefault(param_name, value)
         # return field.render_kw.setdefault(param_name, value)
 
 

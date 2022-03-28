@@ -80,7 +80,7 @@ class SelectMultipleField(JUIFieldMixin, wtforms.Field):
                 "SelectMultipleField must have choices defined with"
                 " Callable[['SelectMultipleField', 'jembeui.CForm', str], Union['sa.orm.Query', list]] "
             )
-        self.choices: Callable[
+        self._choices: Callable[
             ["SelectMultipleField", "jembeui.CForm", str],
             Union["sa.orm.Query", list],
         ] = choices
@@ -104,11 +104,14 @@ class SelectMultipleField(JUIFieldMixin, wtforms.Field):
                     "Invalid choice(s): one or more data inputs could not be coerced"
                 )
             )
+    @property
+    def choices(self):
+        return list(self._get_all_choices_result())
 
     def _get_all_choices_result(self) -> Union["sa.orm.Query", list]:
         temp_data = self.data
         self.data = None
-        result = self.choices(self, self.cform, "")
+        result = self._choices(self, self.cform, "")
         self.data = temp_data
 
         if isinstance(result, Query):
@@ -169,7 +172,7 @@ class SelectMultipleField(JUIFieldMixin, wtforms.Field):
         temp_data = self.data
         self.data = [self.coerce(id) for id in selected_ids]
         choices = []
-        for choice in self.choices(self, self.cform, search):
+        for choice in self._choices(self, self.cform, search):
             choices.append(
                 (
                     self.coerce(getattr(choice, "id", choice[0])),

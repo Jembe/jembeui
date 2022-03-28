@@ -16,7 +16,7 @@
 {# L I N K S #}
 
 {# Display link as HREF #}
-{% macro display_link(title=none, url=none, jrl=none, icon_name=none, icon_html=none, styling=(), attrs=none) %}
+{% macro display_link(title=none, description=none, url=none, jrl=none, icon_name=none, icon_html=none, styling=(), attrs=none) %}
     {% set has_icon = icon_name  or icon_html %}
     {% set attrs = attrs if attrs else {} %}
     <a  href="{{url if url else '#'}}"{% if jrl %} jmb-on:click.prevent="{{jrl}}"{% endif %} 
@@ -27,10 +27,13 @@
             {%- for k,v in attrs.items() %}
                 {{k}}="{{v}}"
             {%- endfor %}
+        {%- endif %}
+        {%- if description %}
+        title="{{description}}"
         {%- endif %}>
         {%- if has_icon %}
             {%- set icon_is_last = "icon-last" in styling %}
-            {%- set icon_class = "inline-block  align-bottom w-6 h-6 p-1 mx-1 hover:bg-grey-200"  %}
+            {%- set icon_class = "inline-block  align-bottom w-6 h-6  mx-1 hover:bg-grey-200"  %}
             {%- if has_icon and not icon_is_last %}
                 {{display_icon(icon_name, icon_html, class=icon_class)}} 
             {%- endif -%}
@@ -53,6 +56,7 @@
         {%- set styling = styling if styling else link.styling %}
         {{display_link(
             title=link.title,
+            description=link.description,
             url=link.url,
             jrl=link.jrl,
             icon_name=link.icon,
@@ -181,6 +185,7 @@
             {% if from_link %}
             {{display_link(
                 title=menu.title, 
+                description=menu.description,
                 icon_name=menu.icon_name if menu.icon_name or menu.icon_html else ("ellipsis-vertical-outline" if not menu.title else none), 
                 icon_html=menu.icon_html, 
                 styling=open_styling +  ("icon-last",),
@@ -491,7 +496,8 @@
                         {%- if not display_footer %} rounded-b-sm{% endif -%} 
                         {%- if 'full' in styling %} grow overflow-auto{% endif -%}"
                         {# support select multiple dropdown to resize modal window #}
-                        jmb-on:jembe-update-page.camel.window="$self.removeAttribute('style');$self.setAttribute('style', 'height:'+$self.scrollHeight+'px;')">
+                        jmb-on:jembe-update-page.camel.window="$self.removeAttribute('style');$self.setAttribute('style', 'height:'+$self.scrollHeight+'px;')"
+                        jmb-on:jembe-recalc-height.camel.window="$self.removeAttribute('style');$self.setAttribute('style', 'height:'+$self.scrollHeight+'px;')">
                 {{caller()}}
             </div>
             {# footer #}
@@ -731,14 +737,14 @@
                         <th class="font-normal text-primary-900 bg-primary-200/80">
                             <a href="" class="flex items-center justify-between px-2 py-1" jmb-on:click.prevent="order_by='-{{field_name}}'; page=0">
                                 {{field_title|capitalize}}
-                                {{display_icon('arrow-up-outline', class="w-5 h-5")}}
+                                {{display_icon('arrow-down-outline', class="w-5 h-5")}}
                             </a>
                         </th>
                         {% elif order_by == "-" + field_name %}
                         <th class="font-normal text-primary-900 bg-primary-200/80">
                             <a href="" class="flex items-center justify-between px-2 py-1" jmb-on:click.prevent="order_by=null; page=0">
                                 {{field_title|capitalize}}
-                                {{display_icon('arrow-down-outline', class="w-5 h-5")}}
+                                {{display_icon('arrow-up-outline', class="w-5 h-5")}}
                             </a>
                         </th>
                         {% else %}
@@ -749,13 +755,13 @@
                         </th>
                         {% endif %}
                     {% else %}
-                    <th>
+                    <th class="flex items-center justify-start px-2 py-1 font-normal">
                         {{field_title|capitalize}}
                     </th>
                     {% endif %}
                     {% endfor %}
                     {% if record_menu_config %}
-                    <th><span class="flex items-center justify-between px-2 py-1">Actions</span></th>
+                    <th><span class="flex items-center justify-end px-4 py-1">Actions</span></th>
                     {% endif %}
                 </tr>
             </thead>
@@ -768,7 +774,7 @@
                 </td>
                 {% endfor %}
                 {% if record_menu_config %}
-                <td class="px-2 py-2">
+                <td class="flex items-start justify-end px-4 py-2">
                     {{display_menu_as_links(get_record_menu(record))}}
                 </td> 
                 {% endif %}
