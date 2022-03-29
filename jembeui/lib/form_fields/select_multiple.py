@@ -104,6 +104,7 @@ class SelectMultipleField(JUIFieldMixin, wtforms.Field):
                     "Invalid choice(s): one or more data inputs could not be coerced"
                 )
             )
+
     @property
     def choices(self):
         return list(self._get_all_choices_result())

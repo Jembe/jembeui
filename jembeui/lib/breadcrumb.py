@@ -245,6 +245,7 @@ class Breadcrumb:
             return BreadcrumbItem(
                 self.id,
                 self.title if isinstance(self.title, str) else self.title(to_component),
+                component_reference.exec_name,
                 component_reference.url,
                 component_reference.jrl,
                 self.is_hidden,
@@ -253,6 +254,7 @@ class Breadcrumb:
             return BreadcrumbItem(
                 self.id,
                 self.title if isinstance(self.title, str) else self.title(to_component),
+                None,
                 None,
                 None,
                 self.is_hidden,
@@ -346,6 +348,7 @@ class Breadcrumb:
 class BreadcrumbItem(JembeInitParamSupport):
     id: str
     title: str
+    exec_name: Optional[str]
     url: Optional[str]
     jrl: Optional[str]
 
@@ -358,6 +361,7 @@ class BreadcrumbItem(JembeInitParamSupport):
         return dict(
             id=value.id,
             title=value.title,
+            exec_name=value.exec_name,
             url=value.url,
             jrl=value.jrl,
             is_hidden=value.is_hidden,
@@ -368,6 +372,7 @@ class BreadcrumbItem(JembeInitParamSupport):
         return BreadcrumbItem(
             id=value.get("id"),
             title=value.get("title"),
+            exec_name=value.get("exec_name"),
             url=value.get("url"),
             jrl=value.get("jrl"),
             is_hidden=value.get("is_hidden"),
@@ -379,6 +384,7 @@ class BreadcrumbItem(JembeInitParamSupport):
         return (
             self.id == o.id
             and self.title == o.title
+            and self.exec_name == o.exec_name
             and self.url == o.url
             and self.jrl == o.jrl
             and self.is_hidden == o.is_hidden

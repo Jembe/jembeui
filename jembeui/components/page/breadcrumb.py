@@ -9,6 +9,7 @@ from typing import (
     Tuple,
     Union,
 )
+from jembe.common import is_child_name
 from jembe import listener
 from ..component import Component
 from ...lib import Breadcrumb, BreadcrumbItem
@@ -109,14 +110,14 @@ class CBreadcrumb(Component):
 
     @listener(event="_display")
     def on_component_display(self, event: "jembe.Event"):
+        if event.source_full_name == self.exec_name:
+            return False
         if event.source_full_name not in self._config.breadcrumbs_mapping:
             # component that has been displayed does not have associated breadcrumb
-            return
+            return False
 
         for bc in self._config.breadcrumbs_mapping[event.source_full_name]:
             new_bitem = bc.get_breadcrumb_item(self, event.source)
-            # print(new_bitem)
-            # import pdb; pdb.set_trace()
 
             new_bitem.fresh = True
             bitems_new: List[BreadcrumbItem] = []
@@ -256,3 +257,18 @@ class CBreadcrumb(Component):
                 bitems_new_ext.append(bitem)
 
             self.state.bitems = tuple(bitems_new_ext)
+
+    @listener(event="_remove")
+    def on_component_remove(self, event: "jembe.Event"):
+        bitems_new = []
+        for bi in self.state.bitems:
+            if bi.exec_name is None or (
+                bi.exec_name != event.removed_exec_name
+                and not is_child_name(event.removed_exec_name, bi.exec_name)
+            ):
+                bitems_new.append(bi)
+            else:
+                break
+        while bitems_new and bitems_new[-1].exec_name is None:
+            bitems_new.pop()
+        self.state.bitems = tuple(bitems_new)
