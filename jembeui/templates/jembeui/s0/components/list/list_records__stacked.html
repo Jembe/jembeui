@@ -8,9 +8,9 @@
         <h3>{{title}}</h3>
     </div>
     <div class="mt-3 sm:mt-0">
-        <div class="flex flex-col gap-3 lg:flex-row lg:gap-1 lg:items-center lg:justify-between">
+        <div class="flex flex-col gap-3 lg:flex-row lg:gap-4 lg:items-center lg:justify-between">
         {%- block toolbar %}
-            <div>
+            <div class="lg:shrink-0">
                 {{display_menu_as_buttons(menu, buttons_styling=("micro",))}}
             </div>
             {{display_list_toolbar(_context, display_order_by=false)}}
