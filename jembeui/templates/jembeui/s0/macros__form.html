@@ -196,7 +196,7 @@
                 + ("submit();" if instant_submit else "")
             ).format(fname=field.name) if is_not_disabled and (instant_validate or instant_submit) else none,
             "jmb-on:keydown.ctrl.enter": "$self.blur();$self.focus();submit()" if is_not_disabled and "submit" in form.cform._config.component_actions else none,
-        }
+        },
     )%}
     {{field(**form.attr_kw(render_kw))}}
 {% endmacro %}
@@ -261,17 +261,20 @@
          jmb-on:focusin.document="if ($scope().showControls && !$self.contains(document.activeElement)){$scope().showControls=false}" 
          class="relative">
         {# thumbnail #}
-        <button class="z-0 flex items-center justify-center w-full overflow-hidden bg-white rounded-lg cursor-pointer focus-visible:shadow-focus focus-visible:outline-none focus-visible:shadow-primary-500/30 focus-visible:ring-primary-500/30"
+        <button type="button"
+                class="z-0 flex items-center justify-center w-full overflow-hidden bg-white rounded-lg cursor-pointer focus-visible:shadow-focus focus-visible:outline-none focus-visible:shadow-primary-500/30 focus-visible:ring-primary-500/30"
                 {%- if field.data or is_not_disabled %}
                 jmb-on:focus="$scope().showControls = true"
                 {%- else %}
                 disabled
                 {%- endif %}
-                style="height: {{field.thumbnail_size[1]}}px; min-width: {{field.thumbnail_size[1] if field.thumbnail_size[1] < field.thumbnail_size[0] else field.thumbnail_size[0]}}px; {% if not 'full' in styling %} max-width:{{field.thumbnail_size[0]}}px;{% endif %}">
-                {# style="height: {{field.thumbnail_size[1]}}px; min-width: {{field.thumbnail_size[1]}}px; max-width:{{field.thumbnail_size[0]}}px;"> #}
-                      {# {%- if not field.data %}min-width: {{field.thumbnail_size[0]/1.5}}px; {% else %}{% endif %}"> #}
+                {%- set img_style_width %}min-width: calc(min({{field.thumbnail_size[1] if field.thumbnail_size[1] < field.thumbnail_size[0] else field.thumbnail_size[0]}}px, 100%)); {% if not 'full' in styling %} max-width:{{field.thumbnail_size[0]}}px;{% endif %}{% endset %}
+                jmb-on:jembe-update-page.camel.window="$self.setAttribute('style', '{{img_style_width}}  height:calc(min({{field.thumbnail_size[1]}}px,'+$self.clientWidth+'px))')"
+                jmb-on:resize.window="$self.setAttribute('style', '{{img_style_width}}  height:calc(min({{field.thumbnail_size[1]}}px,'+$self.clientWidth+'px))')">
+                {# jmb-on:jembe-update-page.camel.window="$self.setAttribute('style', '{{img_style_width}}' + (window.innerWidth > 600 ? ' height:{{field.thumbnail_size[1]}}px;': 'max-height:{{field.thumbnail_size[1]}}px;height:'+$self.clientWidth+'px;'))"
+                jmb-on:resize.window="$self.setAttribute('style', '{{img_style_width}}' + (window.innerWidth > 600 ? ' height:{{field.thumbnail_size[1]}}px;': 'max-height:{{field.thumbnail_size[1]}}px;height:'+$self.clientWidth+'px;'))"> #}
             {% if field.data %}
-            <img src="{{field.thumbnail().url}}" alt="{{field.data.basename}} thumbnail" class="object-scale-down w-full h-full">
+            <img src="{{field.thumbnail().url}}" alt="{{field.data.basename}} thumbnail" class="{% if 'cover' in styling %}object-cover{% else %}object-scale-down{% endif %} w-full h-full">
             {% endif %}
         </button>
         {# enlarged view #}

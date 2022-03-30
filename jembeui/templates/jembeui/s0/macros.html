@@ -569,6 +569,7 @@
     {% endfor %}
     {% if filters_config.values()|selectattr('is_grouped', "true")|list|length > 0 %}
         {% for filter_name, choice_filter in filters_config.items() if choice_filter.is_grouped == true  %}
+        {% if choice_filter.choices|length > 0 %}
         {% set ns = namespace(other_selected = false, title = choice_filter.title) %}
         <div jmb-scope="{opened:false}" jmb-on:click.away="$scope().opened = false;" class="relative">
             <div jmb-show="$scope().opened" jmb-cloak
@@ -609,6 +610,7 @@
             attrs={"title": choice_filter.title, "class": "min-w-[5rem]"})
         }}
         </div>
+        {% endif %}
         {% endfor %}
     {% endif %}
     {% if filters_config.values()|selectattr('is_grouped', "none")|list|length > 0 %}

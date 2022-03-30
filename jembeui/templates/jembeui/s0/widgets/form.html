@@ -67,7 +67,8 @@
     {# start field row #}
     {% if start_new_field_row%}
         {% set top.open_divs = top.open_divs + 1 %}
-    <div class="flex flex-col sm:flex-row sm:items-stretch sm:gap-4">
+    <div {{form.attr_kw(form.resolve_kw(render_kw.get('_row', {}),{'class': 'flex flex-col sm:flex-row sm:items-stretch sm:gap-4'}))|xmlattr}}>
+    {# <div class="flex flex-col sm:flex-row sm:items-stretch sm:gap-4"> #}
     {% endif %}
 
     {# field #}
