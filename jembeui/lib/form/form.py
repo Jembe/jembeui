@@ -1,4 +1,5 @@
 from typing import TYPE_CHECKING, Any, Dict, Optional, Sequence, Union
+from copy import deepcopy
 from datetime import date, datetime
 from abc import ABCMeta
 from markupsafe import Markup
@@ -65,14 +66,15 @@ class FormBase(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
         if "RENDER_KW" not in self.__class__.__dict__:
             self.__class__.RENDER_KW = dict()
             for field in self:
-                self.RENDER_KW[field.name] = {}
+                self.__class__.RENDER_KW[field.name] = {}
                 if field.render_kw:
-                    self.RENDER_KW[field.name] = field.render_kw.copy()
+                    self.__class__.RENDER_KW[field.name] = field.render_kw.copy()
                     field.render_kw = {
                         k: v
                         for k, v in field.render_kw.items()
                         if not k.endswith("+") and not k.startswith("_")
                     }
+        self.RENDER_KW = deepcopy(self.__class__.RENDER_KW)
 
         # to change render_kw dynamicaly by subclasses we must
         # oweride render_kw of every field instance with fresh copy
