@@ -573,7 +573,7 @@
         {% set ns = namespace(other_selected = false, title = choice_filter.title) %}
         <div jmb-scope="{opened:false}" jmb-on:click.away="$scope().opened = false;" class="relative">
             <div jmb-show="$scope().opened" jmb-cloak
-                class="absolute z-10 top-7 min-w-[70px] left-0 sm:right-0 shadow border-grey-200 rounded-sm overflow-hidden bg-white flex flex-col gap-1 py-1">
+                class="absolute z-10 top-7 min-w-[70px] left-0 sm:left-auto sm:right-0 shadow border border-grey-300 rounded-sm overflow-hidden bg-white flex flex-col gap-1 py-1">
                 {% if not multiselect %}
                 <div class="px-2 pt-1 text-xs tracking-wider uppercase whitespace-nowrap text-grey-600">
                     {{choice_filter.title}}:
@@ -617,7 +617,7 @@
     <div jmb-scope="{opened:false}" jmb-on:click.away="$scope().opened = false;" class="relative">
         {% set ns = namespace(other_selected = false) %}
         <div jmb-show="$scope().opened" jmb-cloak
-             class="absolute z-10 top-7 min-w-[70px] left:0 sm:right-0 shadow rounded-sm overflow-hidden bg-white border-grey-200 flex flex-col gap-1 py-1">
+             class="absolute z-10 top-7 min-w-[70px] left:0 sm:left-auto sm:right-0 shadow rounded-sm overflow-hidden bg-white border border-grey-300 flex flex-col gap-1 py-1">
         {% for filter_name, choice_filter in filters_config.items() if choice_filter.is_grouped is none  %}
         {% if choice_filter.title %}
             <div class="px-2 pt-1 text-xs tracking-wider uppercase whitespace-nowrap text-grey-600">
@@ -666,9 +666,9 @@
     <div class="relative" jmb-scope="{opened:false}" jmb-on:click.away="$scope().opened = false;">
         {% set ns = namespace(ordered = false) %}
         <div jmb-show="$scope().opened" jmb-cloak
-             class="absolute z-10 top-7 min-w-[70px] right-0 shadow rounded-sm overflow-hidden bg-grey-50">
+             class="absolute z-10 top-7 min-w-[70px] left:0 sm:left-auto sm:right-0 shadow rounded-sm overflow-hidden bg-white border border-grey-300 flex flex-col gap-1 py-1">
         {% for order_name, order_title in order_by_config.items()  %}
-        <label class="btn-micro flex justify-between items-center rounded-none whitespace-nowrap
+        <label class="btn btn--white flex justify-between items-center rounded-none whitespace-nowrap
             {% if order_by == order_name  or order_by == '-' + order_name %}
             btn--on
             {% set ns.ordered = true %}
@@ -679,9 +679,9 @@
                 class="hidden">
                 {{order_title}} 
                 {%- if order_by == '-' + order_name %}
-                {{display_icon('arrow-down-outline', class="w-5 h-5 p-1")}}
+                {{display_icon('arrow-down-outline', class="w-5 h-5")}}
                 {%- elif order_by == order_name %}
-                {{display_icon('arrow-up-outline', class="w-5 h-5 p-1")}}
+                {{display_icon('arrow-up-outline', class="w-5 h-5")}}
                 {%- else %}
                 <div class="w-5 h-5"></div>
                 {%- endif %}
