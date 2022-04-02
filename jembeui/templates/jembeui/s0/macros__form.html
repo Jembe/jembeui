@@ -271,8 +271,6 @@
                 {%- set img_style_width %}min-width: calc(min({{field.thumbnail_size[1] if field.thumbnail_size[1] < field.thumbnail_size[0] else field.thumbnail_size[0]}}px, 100%)); {% if not 'full' in styling %} max-width:{{field.thumbnail_size[0]}}px;{% endif %}{% endset %}
                 jmb-on:jembe-update-page.camel.window="$self.setAttribute('style', '{{img_style_width}}  height:calc(min({{field.thumbnail_size[1]}}px,'+$self.clientWidth+'px))')"
                 jmb-on:resize.window="$self.setAttribute('style', '{{img_style_width}}  height:calc(min({{field.thumbnail_size[1]}}px,'+$self.clientWidth+'px))')">
-                {# jmb-on:jembe-update-page.camel.window="$self.setAttribute('style', '{{img_style_width}}' + (window.innerWidth > 600 ? ' height:{{field.thumbnail_size[1]}}px;': 'max-height:{{field.thumbnail_size[1]}}px;height:'+$self.clientWidth+'px;'))"
-                jmb-on:resize.window="$self.setAttribute('style', '{{img_style_width}}' + (window.innerWidth > 600 ? ' height:{{field.thumbnail_size[1]}}px;': 'max-height:{{field.thumbnail_size[1]}}px;height:'+$self.clientWidth+'px;'))"> #}
             {% if field.data %}
             <img src="{{field.thumbnail().url}}" alt="{{field.data.basename}} thumbnail" class="{% if 'cover' in styling %}object-cover{% else %}object-scale-down{% endif %} w-full h-full">
             {% endif %}

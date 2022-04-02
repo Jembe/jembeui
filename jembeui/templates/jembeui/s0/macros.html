@@ -667,8 +667,11 @@
         {% set ns = namespace(ordered = false) %}
         <div jmb-show="$scope().opened" jmb-cloak
              class="absolute z-10 top-7 min-w-[70px] left:0 sm:left-auto sm:right-0 shadow rounded-sm overflow-hidden bg-white border border-grey-300 flex flex-col gap-1 py-1">
+            <div class="px-2 pt-1 text-xs tracking-wider uppercase whitespace-nowrap text-grey-600">
+                Order by:
+            </div> 
         {% for order_name, order_title in order_by_config.items()  %}
-        <label class="btn btn--white flex justify-between items-center rounded-none whitespace-nowrap
+        <label class="btn btn--white pl-4 flex justify-between items-center rounded-none whitespace-nowrap
             {% if order_by == order_name  or order_by == '-' + order_name %}
             btn--on
             {% set ns.ordered = true %}

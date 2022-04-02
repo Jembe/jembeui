@@ -86,20 +86,20 @@
     @apply w-2 h-2;
 }
 ::-webkit-scrollbar-thumb {
-    @apply rounded bg-grey-400;
+    @apply rounded bg-grey-900/20;
 }
 ::-webkit-scrollbar-thumb:active {
-    @apply bg-primary-500;
+    @apply bg-primary-500/70;
 }
 ::-webkit-scrollbar-thumb:hover {
-    @apply bg-primary-500;
+    @apply bg-primary-500/70;
 }
 
 /* Scroll track styles (Background) */
 ::-webkit-scrollbar-track {
-    @apply rounded bg-grey-100;
+    @apply bg-transparent rounded;
 }
 ::-webkit-scrollbar-track:hover, 
 ::-webkit-scrollbar-track:active {
-    @apply bg-grey-300;
+    @apply bg-grey-900/10;
 }
