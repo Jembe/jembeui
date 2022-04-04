@@ -280,10 +280,15 @@
              jmb-show="$scope().showEnlarged"
              jmb-ref="{{field_id}}-enlarged"
              class="fixed inset-0 z-50 flex bg-grey-900/90">
-             <button jmb-on:click="$scope().showEnlarged=false;$refs['{{field_id}}-enlarged'].removeAttribute('jui-show-modal');$dispatch('jui-show-modal')"
-                     class="fixed top-0 right-0 m-2 text-primary-50 hover:text-primary-200">
-                     {{display_icon("close-outline", class="w-8 h-8")}}
-             </button>
+             <div class="fixed top-0 right-0 flex items-center gap-4 m-2">
+                <a jmb-bind:href="$scope().enlargedUrl" class="text-primary-50 hover:text-primary-200 " title="Download image" download>
+                    {{display_icon("download-outline", class="w-6 h-6")}}
+                </a>
+                <button jmb-on:click="$scope().showEnlarged=false;$refs['{{field_id}}-enlarged'].removeAttribute('jui-show-modal');$dispatch('jui-show-modal')"
+                        class=" text-primary-50 hover:text-primary-200" title="Close">
+                        {{display_icon("close-outline", class="w-8 h-8")}}
+                </button>
+             </div>
              <img jmb-bind:src="$scope().enlargedUrl" alt="{{field.data.basename}}"
                   class="object-scale-down w-screen h-screen m-auto">
         </div>
@@ -338,7 +343,11 @@
         {% endif %}
 
         {# controls #}
-        <div class="absolute inset-0 flex justify-center">
+        <div class="absolute inset-0 flex justify-center"
+                {%- if field.data %}
+                jmb-on:dblclick.prevent.stop="$scope().enlargedUrl = '{{field.data.url if field.data else ''}}';$scope().showEnlarged=true;$scope().showControls=false;$refs['{{field_id}}-enlarged'].setAttribute('jui-show-modal','');$dispatch('jui-show-modal');document.getSelection().removeAllRanges()"
+                jmb-on:click.prevent
+                {%- endif %}>
             <div jmb-show="$scope().showControls"
                  class="flex gap-1 p-2 m-auto rounded-md shadow pointer-events-auto bg-grey-100/80 outline outline-grey-50 outline-1">
                 {% if is_not_disabled %}
