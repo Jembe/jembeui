@@ -23,6 +23,7 @@ from .lib import (
 )
 from .components import (
     Component,
+    ComponentWithMenu,
     CPage,
     CMenu,
     CBreadcrumb,
@@ -57,6 +58,7 @@ __all__ = (
     "SelectMultipleField",
     "JUIFieldMixin",
     "Component",
+    "ComponentWithMenu",
     "CPage",
     "CMenu",
     "CBreadcrumb",

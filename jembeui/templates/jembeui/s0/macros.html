@@ -462,8 +462,8 @@
     {% set display_footer = menu is not none or (closable and close_button_title is not none)%}
     {% set attrs = {"jui-show-modal": true} if attrs is none else attrs %}
 
-    <div class="fixed inset-0 z-40 bg-opacity-80 bg-grey-900" {{attrs|xmlattr}}>
-        <div class="m-auto max-h-[94vh] sm:max-h-[90vh] flex flex-col
+    <div class="fixed inset-0 z-40 bg-grey-900/75" {{attrs|xmlattr}}>
+        <div class="m-auto max-h-[94vh] sm:max-h-[90vh] flex flex-col 
         {%- if 'xs' in styling %}
             min-w-[280px] w-[360px] max-w-[92%] mt-[3vh] sm:mt-[5vh] sm:max-w-[80%] 
         {%- elif 'sm' in styling %}
@@ -481,19 +481,19 @@
         {%- endif %}">
             {# header #}
             {% if display_header %}
-            <div class="flex items-center justify-between py-1 pl-4 pr-2 text-lg leading-6 rounded-t-sm bg-grey-200">
+            <div class="flex items-center justify-between py-1 pl-4 pr-2 text-lg leading-5 rounded-t text-grey-700 bg-grey-200">
                 <div>{{title|default('', true)}}</div>
                 {% if closable %}
-                <button jmb-on:click="{%- if component('cancel()').is_accessible %}cancel(){% else %}$jmb.emit('cancel'){% endif -%}" type="button" title="Close" class="btn-ghost">
-                    {{display_icon("close-outline")}}
+                <button jmb-on:click="{%- if component('cancel()').is_accessible %}cancel(){% else %}$jmb.emit('cancel'){% endif -%}" type="button" title="Close" class="btn-ghost text-grey-600">
+                    {{display_icon("close-outline", class="text-grey-500")}}
                 </button>
                 {% endif %}
             </div>
             {% endif %}
             {# content #}
             <div class="p-4 bg-grey-50 grow overflow-y-auto  h-fit
-                        {%- if not display_header %} rounded-t-sm{% endif -%} 
-                        {%- if not display_footer %} rounded-b-sm{% endif -%} 
+                        {%- if not display_header %} rounded-t{% endif -%} 
+                        {%- if not display_footer %} rounded-b{% endif -%} 
                         {%- if 'full' in styling %} grow overflow-auto{% endif -%}"
                         {# support select multiple dropdown to resize modal window #}
                         jmb-on:jembe-update-page.camel.window="$self.removeAttribute('style');$self.setAttribute('style', 'height:'+$self.scrollHeight+'px;')"
@@ -502,7 +502,7 @@
             </div>
             {# footer #}
             {% if display_footer %}
-            <div class="p-4 rounded-b-sm bg-grey-50">
+            <div class="p-4 rounded-b bg-grey-50">
                 {% if menu is not none  %}
                     {% if menu is string() %}
                     {{menu}}
