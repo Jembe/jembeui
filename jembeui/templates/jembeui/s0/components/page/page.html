@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" jmb-local="{mainMenuOpen:false, scrollY:0}" 
+<html lang="en" jmb-local="{mainMenuOpen:false, scrollY:0}"
     jmb-init="$watch('mainMenuOpen', function(v){ if(window.innerWidth < 640){if(v===true){$local.scrollY = window.scrollY; window.scroll(0,0)} else {window.scroll(0, $local.scrollY)}}})">
 <head>
     <meta charset="UTF-8">
@@ -24,6 +24,7 @@
 </head>
 
 <body class="m-0 box-border bg-grey-100 text-grey-900 [font-kerning:normal]"
+      jmb-on:ready="if ({% if '_main_menu' not in _config.components or component('_main_menu').component_instance.is_empty()%}true{%else%}false{%endif%}) {$local.mainMenuOpen=false}"
       jmb-on:jembe-update-page.camel.window="$self.classList.remove('overflow-hidden');if (document.querySelector('[jui-show-modal]')){$self.classList.add('overflow-hidden')}"
       jmb-on:jui-show-modal="$self.classList.remove('overflow-hidden');if (document.querySelector('[jui-show-modal]')){$self.classList.add('overflow-hidden')}">
     <div class="absolute inset-0 z-50 pointer-events-none" 
