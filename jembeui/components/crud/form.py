@@ -332,9 +332,12 @@ class CForm(CFormBase):
     _config: Config
 
     def __init__(self, form: Optional[Form] = None):
+        super().__init__()
+
+    def init(self):
+        super().init()
         # form must be mounted in init to clean up files in temp
         self.form
-        super().__init__()
 
     @property
     def form(self) -> "Form":
@@ -365,7 +368,7 @@ class CForm(CFormBase):
             # repopulate form from database
             self.state.form = None
         return self._config.redisplay_on_submit
-    
+
     def on_cancel(self) -> Optional[bool]:
         super().on_cancel()
 
