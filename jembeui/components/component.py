@@ -162,14 +162,14 @@ class Component(jembe.Component):
             self.ac_deny()
             if current_app.debug or current_app.testing:
                 current_app.logger.warning(
-                    "Exception in {}.update_ac. Access to compomonent {} is denied.".format(
+                    "Exception in {}.update_ac. Access to compomonent {} is denied. "
+                    "(exceptation trackback below)".format(
                         self.__class__.__name__, self.exec_name
                     )
                 )
                 import traceback
 
                 traceback.print_exc()
-
         return avaiable != self.ac_check() and avaiable == False
 
     def update_ac(self):
