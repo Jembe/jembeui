@@ -153,8 +153,8 @@ class Component(jembe.Component):
     def jui_on_redisplay(self, event: "jembe.Event"):
         return True
 
-    @listener(event="ac_update")
-    def jui_on_ac_update(self, event: "jembe.Event"):
+    @listener(event="update_ac")
+    def jui_on_update_ac(self, event: "jembe.Event"):
         avaiable = self.ac_check()
         try:
             self.update_ac()
