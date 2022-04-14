@@ -47,7 +47,7 @@
             <div class="sticky top-0 z-40 flex flex-row-reverse items-center justify-between gap-2 px-2 pt-1 border-b sm:justify-start sm:flex-row sm:pl-1 border-b-grey-300 sm:pr-4 bg-grey-100 opacity-95">
                 {# Open close main menu #}
                 <button class="btn-ghost w-7 h-7
-                               {%- if '__main_menu' not in _config.components or component('__main_menu').component_instance.is_empty() %} sm:hidden{% endif %}" 
+                               {%- if '_main_menu' not in _config.components or component('_main_menu').component_instance.is_empty() %} sm:hidden{% endif %}" 
                         type="button" 
                         jmb-ref="menuButton"
                         jmb-on:click="$local.mainMenuOpen = ! $local.mainMenuOpen;">
