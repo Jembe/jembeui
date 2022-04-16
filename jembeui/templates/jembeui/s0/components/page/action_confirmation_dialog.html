@@ -1,7 +1,7 @@
 {% from "jembeui/s0/macros.html" import display_modal %}
 {% if confirmation %}
     {% set menu %}
-        <div class="flex flex-wrap justify-end gap-1">
+        <div class="flex flex-row-reverse flex-wrap gap-1">
             <button jmb-on:click="confirm()" jmb-on:ready="$self.focus()" type="button" class="btn {% if confirmation.danger %}btn--danger{% else %}btn--primary{% endif %}">{{confirmation.confirm_title}}</button>
             <button jmb-on:click="cancel()" type="button" class="btn">Cancel</button>
         </div>

@@ -296,6 +296,7 @@ class CForm(CFormBase):
             redisplay_on_submit: bool = False,
             redisplay_on_cancel: bool = False,
             grab_focus_on_display: bool = False,
+            cancel_needs_confirmation: bool = True,
             db: Optional["SQLAlchemy"] = None,
             title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
             template: Optional[Union[str, Iterable[str]]] = None,
@@ -309,6 +310,7 @@ class CForm(CFormBase):
         ):
             self.redisplay_on_submit = redisplay_on_submit
             self.redisplay_on_cancel = redisplay_on_cancel
+            self.cancel_needs_confirmation = cancel_needs_confirmation
 
             self.menu: "jembeui.Menu" = (
                 Menu()
@@ -368,6 +370,12 @@ class CForm(CFormBase):
             # repopulate form from database
             self.state.form = None
         return self._config.redisplay_on_submit
+
+    @action
+    def cancel(self, confirmed: bool = False):
+        return super().cancel(
+            confirmed if self._config.cancel_needs_confirmation else True
+        )
 
     def on_cancel(self) -> Optional[bool]:
         super().on_cancel()

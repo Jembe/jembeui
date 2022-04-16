@@ -1,37 +1,37 @@
 {% from "jembeui/s0/macros.html" import display_icon, display_button, display_modal %}
 
 {% macro form_field(form, field, render_kw = none) %}
-    {% set render_kw = {} if render_kw is none else render_kw %}
-    {% set render_kw = form.resolve_kw(form.RENDER_KW[field.name], render_kw, false) %}
+    {%- set render_kw = {} if render_kw is none else render_kw %}
+    {%- set render_kw = form.resolve_kw(form.RENDER_KW[field.name], render_kw, false) %}
 
-    {% set field_id = "{}--{}".format(form.cform.exec_name.replace("/","-").replace(".","-_-"), field.name) %}
-    {% set styling = render_kw.get("_styling", []) %}
-    {% set is_not_disabled = render_kw.get("disabled", false) == false and not form.is_disabled %}
-    {% set instant_validate = ((form.__instant_validate__ and render_kw.get('__instant_validate__', none) in (none, true)) or render_kw.get('_instant_validate', none) == true) and "validate" in form.cform._config.component_actions  %}
-    {% set instant_submit = ((form.__instant_submit__ and render_kw.get('__instant_submit__', none) in (none, true)) or render_kw.get('__instant_submit__', none) == true ) and "submit" in form.cform._config.component_actions %}
+    {%- set field_id = "{}--{}".format(form.cform.exec_name.replace("/","-").replace(".","-_-"), field.name) %}
+    {%- set styling = render_kw.get("_styling", []) %}
+    {%- set is_not_disabled = render_kw.get("disabled", false) == false and not form.is_disabled %}
+    {%- set instant_validate = ((form.__instant_validate__ and render_kw.get('__instant_validate__', none) in (none, true)) or render_kw.get('_instant_validate', none) == true) and "validate" in form.cform._config.component_actions  %}
+    {%- set instant_submit = ((form.__instant_submit__ and render_kw.get('__instant_submit__', none) in (none, true)) or render_kw.get('__instant_submit__', none) == true ) and "submit" in form.cform._config.component_actions %}
 
-    {% set fclass = field.__class__.__name__ %}
-    {% if fclass == "BooleanField" %}
+    {%- set fclass = field.__class__.__name__ %}
+    {%- if fclass == "BooleanField" %}
         {{_boolean_field(form, field, render_kw, field_id, is_not_disabled, styling, instant_validate, instant_submit)}}
-    {# {% elif fclass == "DateField" %}
-    {% elif fclass == "DateTimeField" %}
-    {% elif fclass == "FileField" %} #}
-    {% elif fclass in ("ImageField", "SelectMultipleField") %}
+    {# {%- elif fclass == "DateField" %}
+    {%- elif fclass == "DateTimeField" %}
+    {%- elif fclass == "FileField" %} #}
+    {%- elif fclass in ("ImageField", "SelectMultipleField") %}
         {{_default_field(form, field, render_kw, field_id, is_not_disabled, styling, instant_validate, instant_submit)}}
-    {% else %}
+    {%- else %}
         {{_default_field(form, field, render_kw, field_id, is_not_disabled, styling, instant_validate, instant_submit)}}
-    {% endif %}
+    {%- endif %}
 {% endmacro %}
 
 {% macro form_field_widget(form, field, render_kw = none) %}
-    {% set render_kw = {} if render_kw is none else render_kw %}
-    {% set render_kw = form.resolve_kw(form.RENDER_KW[field.name], render_kw, false) %}
+    {%- set render_kw = {} if render_kw is none else render_kw %}
+    {%- set render_kw = form.resolve_kw(form.RENDER_KW[field.name], render_kw, false) %}
 
-    {% set field_id = "{}--{}".format(form.cform.exec_name.replace("/","-").replace(".","-_-"), field.name) %}
-    {% set styling = render_kw.get("_styling", []) %}
-    {% set is_not_disabled = render_kw.get("disabled", false) == false and not form.is_disabled %}
-    {% set instant_validate = ((form.__instant_validate__ and render_kw.get('__instant_validate__', none) in (none, true)) or render_kw.get('_instant_validate', none) == true) and "validate" in form.cform._config.component_actions  %}
-    {% set instant_submit = ((form.__instant_submit__ and render_kw.get('__instant_submit__', none) in (none, true)) or render_kw.get('__instant_submit__', none) == true ) and "submit" in form.cform._config.component_actions %}
+    {%- set field_id = "{}--{}".format(form.cform.exec_name.replace("/","-").replace(".","-_-"), field.name) %}
+    {%- set styling = render_kw.get("_styling", []) %}
+    {%- set is_not_disabled = render_kw.get("disabled", false) == false and not form.is_disabled %}
+    {%- set instant_validate = ((form.__instant_validate__ and render_kw.get('__instant_validate__', none) in (none, true)) or render_kw.get('_instant_validate', none) == true) and "validate" in form.cform._config.component_actions  %}
+    {%- set instant_submit = ((form.__instant_submit__ and render_kw.get('__instant_submit__', none) in (none, true)) or render_kw.get('__instant_submit__', none) == true ) and "submit" in form.cform._config.component_actions %}
 
     {{_form_field_widget(form, field, render_kw, field_id, is_not_disabled, styling, instant_validate, instant_submit)}}
 {% endmacro %}
@@ -55,23 +55,23 @@
 
 {# Callaed internaly asume that render_kw is resolved #}
 {% macro _form_field_widget(form, field, render_kw, field_id, is_not_disabled, styling, instant_validate, instant_submit) %}
-    {% set fclass = field.__class__.__name__ %}
-    {% if fclass == "BooleanField" %}
+    {%- set fclass = field.__class__.__name__ %}
+    {%- if fclass == "BooleanField" %}
         {{_boolean_widget(form, field, render_kw, field_id, is_not_disabled, styling, instant_validate, instant_submit)}}
-    {% elif fclass == "SelectField" %}
+    {%- elif fclass == "SelectField" %}
         {{_default_widget(form, field, render_kw, field_id, is_not_disabled, styling|list() + ['_jui_select_input',], instant_validate, instant_submit)}}
-    {% elif fclass == "TextAreaField" %}
+    {%- elif fclass == "TextAreaField" %}
         {{_textarea_widget(form, field, render_kw, field_id, is_not_disabled, styling, instant_validate, instant_submit)}}
-    {# {% elif fclass == "DateField" %}
-    {% elif fclass == "DateTimeField" %}
-    {% elif fclass == "FileField" %} #}
-    {% elif fclass == "SelectMultipleField" %}
+    {# {%- elif fclass == "DateField" %}
+    {%- elif fclass == "DateTimeField" %}
+    {%- elif fclass == "FileField" %} #}
+    {%- elif fclass == "SelectMultipleField" %}
         {{_select_multiple_widget(form, field, render_kw, field_id, is_not_disabled, styling, instant_validate, instant_submit)}}
-    {% elif fclass == "ImageField" %}
+    {%- elif fclass == "ImageField" %}
         {{_image_widget(form, field, render_kw, field_id, is_not_disabled, styling, instant_validate, instant_submit)}}
-    {% else %}
+    {%- else %}
         {{_default_widget(form, field, render_kw, field_id, is_not_disabled, styling, instant_validate, instant_submit)}}
-    {% endif %}
+    {%- endif %}
 {% endmacro %}
 
 
@@ -87,15 +87,15 @@
 
 {# S P E C I F I C   F I E L D S   I M P L E M E N T A T I O N S #}
 {% macro _default_field(form, field, render_kw, field_id, is_not_disabled, styling, instant_validate, instant_submit) %}
-    {% set default_class = "flex flex-col grow basis-0" if "full" in styling else "flex flex-col" %}
+    {%- set default_class = "flex flex-col grow basis-0" if "full" in styling else "flex flex-col" %}
     <div {{form.attr_kw(form.resolve_kw(render_kw._field|default({},true), {"class+":default_class}, false))|xmlattr}}>
         <div class="flex items-center justify-between gap-8 mb-1">
             <label for="{{field_id}}" class="flex flex-row items-center justify-between text-xs">{{field.label.text}}</label>
             <div class="flex items-center gap-1 flex-nowrap">
-                {% if is_not_disabled and not field.flags.required %}
+                {%- if is_not_disabled and not field.flags.required %}
                 <div class="text-xs font-light text-grey-600">optional</div>
-                {% endif %}
-                {% if field.description %}
+                {%- endif %}
+                {%- if field.description %}
                 <div class="relative leading-3" jmb-scope="{open:false}" 
                     jmb-on:click.away="$scope().open=false;$nextTick(function(){$dispatch('jembeRecalcHeight')});" 
                     jmb-on:mouseleave="$scope().open=false;$nextTick(function(){$dispatch('jembeRecalcHeight')});" 
@@ -105,13 +105,13 @@
                         {{field.description}}
                     </div>
                 </div>
-                {% endif %}
+                {%- endif %}
             </div>
         </div>
         {{_form_field_widget(form, field, render_kw, field_id, is_not_disabled, styling, instant_validate, instant_submit)}}
-        {% for error in field.errors %}
+        {%- for error in field.errors %}
         <div class="mt-1 text-sm leading-6 text-error-500">{{error}}</div>
-        {% endfor %}
+        {%- endfor %}
     </div>
 {% endmacro %}
 
@@ -146,7 +146,7 @@
 
 {# S P E C I F I C   W I D G E T S   I M P L E M E N T A T I O N #}
 {% macro _default_widget(form, field, render_kw, field_id, is_not_disabled, styling, instant_validate, instant_submit) %}
-    {% set render_kw = form.resolve_kw(
+    {%- set render_kw = form.resolve_kw(
         render_kw,
         {
             "id":field_id,
