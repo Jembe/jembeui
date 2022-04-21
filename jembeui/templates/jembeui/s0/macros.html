@@ -538,7 +538,7 @@
 {# LIST SEARCH INPUT #}
 {% macro display_list__search_input(search, search_filter) %}
     {% if search_filter is not none %}
-        <input jmb-on:input="page=0;search=$self.value;" value="{{search}}" type="search" placeholder="Search..." class="form-input toolbar-input" >
+        <input jmb-on:input.debounce.450ms="page=0;search=$self.value;" value="{{search}}" type="search" placeholder="Search..." class="form-input toolbar-input" >
     {% endif %}
 {% endmacro %}
 
