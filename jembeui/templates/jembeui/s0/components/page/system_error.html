@@ -4,14 +4,19 @@
         $refs.content.innerHTML = '';
         $local.networkError = $event.detail.networkError;
         if (!$local.networkError){
-            $refs.title.innerText = '!!! Server error: ' + $event.detail.response.status;
-            $event.detail.response.text().then(
-                function(content) {
-                    $refs.content.innerHTML = '<iframe></iframe>';
-                    $refs.content.children[0].classList.add('h-[70vh]','border-none','w-full');
-                    $refs.content.children[0].contentDocument.write(content);
-                }
-            )
+            if ($event.detail.response.status === 413) {
+                $refs.title.innerText = 'File Upload Error';
+                $refs.content.innerHTML = '<p>File is bigger than server allows.</p>'
+            } else {
+                $refs.title.innerText = '!!! Server error: ' + $event.detail.response.status;
+                $event.detail.response.text().then(
+                    function(content) {
+                        $refs.content.innerHTML = '<iframe></iframe>';
+                        $refs.content.children[0].classList.add('h-[70vh]','border-none','w-full');
+                        $refs.content.children[0].contentDocument.write(content);
+                    }
+                )
+            }
         } else {
             $refs.title.innerText = '!!! Network error';
             $refs.content.innerHTML = '<p>Application server unreachable.<br>Please check your internet connection and/or contact Application Administrator.</p>'
