@@ -1,5 +1,3 @@
-from ast import Call
-from tkinter import W
 from typing import (
     TYPE_CHECKING,
     List,
