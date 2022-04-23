@@ -258,7 +258,7 @@
                                 {%- else %}
                                 sm:tracking-normal sm:font-normal sm:text-base sm:normal-case sm:hover:underline sm:focus-visible:underline
                                 {%- endif %}"
-                                title="{{mi.description if mi.description else mi.title}}">
+                                title="{{mi.title}}">
                                 {%- if mi.icon  or mi.icon_html%}
                                     {{display_icon(mi.icon, mi.icon_html, class="hidden p-1 sm:block")}} 
                                     <span class="sm:hidden">{{mi.title}}</span>
@@ -458,11 +458,13 @@
 {#  DISPLAY MODAL #}
 {% macro display_modal(component, title=none, menu=none, closable=true, styling=(), close_button_title=none, attrs=none)%}
     {# size in small, base, wide, fullscreen #}
-    {% set display_header = title is not none or closable %}
-    {% set display_footer = menu is not none or (closable and close_button_title is not none)%}
-    {% set attrs = {"jui-show-modal": true} if attrs is none else attrs %}
+    {%- set display_header = title is not none or closable %}
+    {%- set display_footer = menu is not none or (closable and close_button_title is not none)%}
+    {%- set attrs = {"jui-show-modal": true} if attrs is none else attrs %}
+    {%- set attrs_class = "fixed inset-0 z-40 bg-grey-900/75" if "class" not in attrs else attrs["class"] %}
+    {%- set attrs_class_plus = "" if "class+" not in attrs else attrs["class+"] %}
 
-    <div class="fixed inset-0 z-40 bg-grey-900/75" {{attrs|xmlattr}}>
+    <div class="{{attrs_class}} {{attrs_class_plus}}" {{attrs|xmlattr}}>
         <div class="m-auto max-h-[94vh] sm:max-h-[90vh] flex flex-col 
         {%- if 'xs' in styling %}
             min-w-[280px] w-[360px] max-w-[92%] mt-[3vh] sm:mt-[5vh] sm:max-w-[80%] 
@@ -496,8 +498,8 @@
                         {%- if not display_footer %} rounded-b{% endif -%} 
                         {%- if 'full' in styling %} grow overflow-auto{% endif -%}"
                         {# support select multiple dropdown to resize modal window #}
-                        jmb-on:jembe-update-page.camel.window="$self.removeAttribute('style');$self.setAttribute('style', 'height:'+$self.scrollHeight+'px;')"
-                        jmb-on:jembe-recalc-height.camel.window="$self.removeAttribute('style');$self.setAttribute('style', 'height:'+$self.scrollHeight+'px;')">
+                        jmb-on:jembe-update-page.camel.window="if ($self.scrollHeight > 0){$self.removeAttribute('style');$self.setAttribute('style', 'height:'+$self.scrollHeight+'px;')}"
+                        jmb-on:jembe-recalc-height.camel.window="if ($self.scrollHeight > 0){$self.removeAttribute('style');$self.setAttribute('style', 'height:'+$self.scrollHeight+'px;')}">
                 {{caller()}}
             </div>
             {# footer #}

@@ -393,7 +393,7 @@
                     {{display_icon("pencil-outline", class="w-8 h-8 m-2")}}
                 </button>
                 {% endif %}
-                {% if is_not_disabled and field.data %}
+                {% if is_not_disabled and field.data and not field.flags.required %}
                 <button {%- if field.confirm_delete_image %} 
                         jmb-on:click="modal = $refs['{{field_id}}-delete-image']; modal.setAttribute('jui-show-modal', ''); modal.setAttribute('jmb-show','true');$updateDom();$dispatch('jui-show-modal')"
                         {%- else %} 

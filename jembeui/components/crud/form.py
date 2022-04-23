@@ -240,9 +240,7 @@ class CFormBase(Component):
             return redisplay
         else:
             self.jui_confirm_action(
-                "cancel",
-                "Unsaved changes",
-                "Unsaved changes in '{}' will be lost!".format(self.title),
+                "cancel", "Unsaved changes", self.create_cancel_confirmation_question()
             )
 
     def on_cancel(self) -> Optional[bool]:
@@ -280,6 +278,9 @@ class CFormBase(Component):
 
     def push_notification_on_invalid_form(self):
         pass
+
+    def create_cancel_confirmation_question(self) -> str:
+        return "Unsaved changes in will be lost!"
 
 
 class CForm(CFormBase):
