@@ -3048,6 +3048,10 @@ Ensure the default browser behavior of the `hidden` attribute.
     max-height: 90vh;
   }
 
+  .sm\:max-h-\[calc\(100vh-44px\)\] {
+    max-height: calc(100vh - 44px);
+  }
+
   .sm\:min-w-\[8rem\] {
     min-width: 8rem;
   }
@@ -3114,6 +3118,10 @@ Ensure the default browser behavior of the `hidden` attribute.
 
   .sm\:gap-0 {
     gap: 0px;
+  }
+
+  .sm\:overflow-y-auto {
+    overflow-y: auto;
   }
 
   .sm\:whitespace-nowrap {
@@ -3198,6 +3206,10 @@ Ensure the default browser behavior of the `hidden` attribute.
 
   .sm\:pt-1 {
     padding-top: 0.25rem;
+  }
+
+  .sm\:pb-12 {
+    padding-bottom: 3rem;
   }
 
   .sm\:text-base {

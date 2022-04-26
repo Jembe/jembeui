@@ -340,7 +340,7 @@
 {% macro display_main_menu(menu) %}
     <div jmb-scope="{active:null}"
             jmb-on:jembe-update-page.camel.window="$scope().active = null; $updateDom();"
-            class="flex flex-col h-full gap-3 pt-4 pl-4 pr-2 pb-12 max-h-[calc(100vh-44px)] overflow-y-auto">
+            class="flex flex-col h-full gap-3 pt-4 pl-4 pr-2 sm:pb-12 sm:max-h-[calc(100vh-44px)] sm:overflow-y-auto">
         {% for mi in menu.items recursive %}
             {% if mi.is_accessible %}
                 {% if mi.is_menu %}
