@@ -110,6 +110,8 @@
             btn--warn
         {%- elif 'success' in styling %}
             btn--success
+        {%- elif 'white' in styling %}
+            btn--white
         {%- endif %} 
         {%- if 'on' in styling %}
             btn--on
@@ -707,24 +709,138 @@
 
 
 {# LIST PAGINATION #}
-{% macro display_list__pagination(page, total_pages, total_records) %}
-    <nav class="flex items-center gap-1 flex-nowrap">
+{% macro display_list__pagination(ctx, extra_javascript="") %}
+    <div class="relative"
+        jmb-scope="{opened:false}"
+         jmb-on:mouseleave="if ($scope().opened === true){$scope().opened=false}">
+    <nav class="flex items-center gap-1 flex-nowrap" >
         {{display_button(
-            jrl="page=page-1",
+            jrl="page=page-1;" + extra_javascript,
             styling=("ghost-micro"),
             icon_name="chevron-back-outline",
-            attrs={"disabled": page==0}
+            attrs={"disabled": ctx.page==0}
         )}}
-        <div class="text-xs font-light ">
-            {{page + 1 if total_pages > 0 else 0}} / {{total_pages}} (total: {{total_records}})
+        <div class="text-xs font-light " title="Current page / Total pages (Total records)">
+            {%- if ctx.total_pages > 0 %}
+            <span role="textbox" contenteditable="true" 
+                class="focus:outline-none focus:border-b focus:border-primary-600"
+                jmb-on:focus="$self._initial_value = $self.innerText"
+                jmb-on:blur="if($self.innerText !== $self._initial_value){
+                    var new_page = $self.innerText.replace(/[^\d]/,'');
+                    if (new_page > 0 && new_page < {{ctx.total_pages}} ) {
+                        page = new_page - 1;
+                        {{extra_javascript}}
+                    } else if (new_page <=0 ) {
+                        page = 0;
+                        {{extra_javascript}}
+                    } else if (new_page >= {{ctx.total_pages}}) {
+                        page = {{ctx.total_pages}} - 1;
+                        {{extra_javascript}}
+                    } else {
+                        $self.innerText = $self._initial_value;
+                    }
+                }"
+                jmb-on:keydown.enter.prevent="$self.blur()">{{ctx.state.page + 1 }}</span>
+             / {{ctx.total_pages}} <a href="" jmb-on:click.prevent="$scope().opened=true" jmb-on:mouseover="$scope().opened=true">(total: {{ctx.total_records}})</a>
+             {%- else %}
+             0 / 0 (total: 0)
+             {%- endif %}
         </div>
         {{display_button(
-            jrl="page=page+1",
+            jrl="page=page+1;" + extra_javascript,
             styling=("ghost-micro"),
             icon_name="chevron-forward-outline",
-            attrs={"disabled": page==total_pages -1 or total_pages==0}
+            attrs={"disabled": ctx.page==ctx.total_pages -1 or ctx.total_pages==0}
         )}}
     </nav>
+    {# drop down#}
+    <div jmb-cloak 
+        jmb-show="$scope().opened"
+        jmb-on:click.prevent="if($event.target.tagName ==='A'){$scope().opened=false}"
+        class="absolute z-50 -mt-2 right-8">
+        {# arrow on top of dropdown #}
+        <div class="flex justify-end mr-6">
+            <div class="w-3 overflow-hidden">
+                <div class="w-2 h-2 origin-bottom-left transform rotate-45 bg-white border border-grey-300"></div>
+            </div>
+        </div>
+        {# dropdown #}
+        <div class="py-2 -mt-[1px] text-sm font-light bg-white border rounded shadow shadow-grey-400 border-grey-300 whitespace-nowrap flex flex-col gap-2 min-w-[4rem]">
+            <div class="px-2 text-xs tracking-wider uppercase text-grey-700">Page size</div>
+            {% for ps in [5,10, 25, 50 ,100]  %}
+            <a href="#" jmb-on:click.prevent="page_size={{ps}}" class="text-right {%if ctx.state.page_size == ps%}bg-primary-300/70{%endif%} px-2 hover:bg-grey-300">{{ps}}</a>
+            {% endfor %}
+        </div>
+    </div>
+    </div>
+{% endmacro %}
+
+{% macro display_list__bottom_pagination(ctx, extra_javascript="window.scroll(0,0)") %}
+    <div class="relative"
+        jmb-scope="{opened:false}"
+         jmb-on:mouseleave="if ($scope().opened === true){$scope().opened=false}">
+    <nav class="flex items-center gap-1 flex-nowrap">
+        {{display_button(
+            title="Previous page",
+            jrl="page=page-1;" + extra_javascript,
+            styling=("micro"),
+            icon_name="chevron-back-outline",
+            attrs={"disabled": ctx.page==0}
+        )}}
+        <div class="px-4 text-sm " title="Current page / Total pages (Total records)">
+            {%- if ctx.total_pages > 0 %}
+            <span role="textbox" contenteditable="true" 
+                class="focus:outline-none focus:border-b focus:border-primary-600"
+                jmb-on:focus="$self._initial_value = $self.innerText"
+                jmb-on:blur="if($self.innerText !== $self._initial_value){
+                    var new_page = $self.innerText.replace(/[^\d]/,'');
+                    if (new_page > 0 && new_page < {{ctx.total_pages}} ) {
+                        page = new_page - 1;
+                        {{extra_javascript}}
+                    } else if (new_page <=0 ) {
+                        page = 0;
+                        {{extra_javascript}}
+                    } else if (new_page >= {{ctx.total_pages}}) {
+                        page = {{ctx.total_pages}} - 1;
+                        {{extra_javascript}}
+                    } else {
+                        $self.innerText = $self._initial_value;
+                    }
+                }"
+                jmb-on:keydown.enter.prevent="$self.blur()">{{ctx.state.page + 1 }}</span>
+             / {{ctx.total_pages}} <a href="" jmb-on:click.prevent="$scope().opened=true" jmb-on:mouseover="$scope().opened=true">(total: {{ctx.total_records}})</a>
+             {%- else %}
+             0 / 0 (total: 0)
+             {%- endif %}
+        </div>
+        {{display_button(
+            title="Next page",
+            jrl="page=page+1;" + extra_javascript,
+            styling=("micro", "icon-last"),
+            icon_name="chevron-forward-outline",
+            attrs={"disabled": ctx.page==ctx.total_pages -1 or ctx.total_pages==0}
+        )}}
+    </nav>
+    {# drop down#}
+    <div jmb-cloak 
+        jmb-show="$scope().opened"
+        jmb-on:click.prevent="if($event.target.tagName ==='A'){$scope().opened=false}"
+        class="absolute z-50 -mt-2 bottom-6 right-1/3">
+        {# dropdown #}
+        <div class="py-2 -mt-[1px] text-sm font-light bg-white border rounded shadow shadow-grey-400 border-grey-300 whitespace-nowrap flex flex-col gap-2 min-w-[4rem]">
+            {% for ps in [100, 50, 25, 10, 5]  %}
+            <a href="#" jmb-on:click.prevent="page_size={{ps}}" class="text-right {%if ctx.state.page_size == ps%}bg-primary-300/70{%endif%} px-2 hover:bg-grey-300">{{ps}}</a>
+            {% endfor %}
+            <div class="px-2 text-xs tracking-wider uppercase text-grey-700">Page size</div>
+        </div>
+        {# arrow on top of dropdown #}
+        {# <div class="flex justify-end mr-6">
+            <div class="w-4 overflow-hidden">
+                <div class="w-2 h-2 origin-bottom-right transform rotate-45 bg-white border border-grey-300"></div>
+            </div>
+        </div> #}
+    </div>
+    </div>
 {% endmacro %}
 
 
@@ -825,7 +941,7 @@
         {{display_list__order_by(ctx.state.order_by, ctx._config.order_by)}}
         {% endif %}
         <div class="flex justify-end grow sm:grow-0 basis-0 sm:basis-auto">
-        {{display_list__pagination(ctx.state.page, ctx.total_pages, ctx.total_records)}}
+        {{display_list__pagination(ctx)}}
         </div>
         </div>
     {%- endif %}

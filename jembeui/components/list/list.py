@@ -10,6 +10,7 @@ from typing import (
     Tuple,
     Any,
 )
+import re
 from collections import namedtuple
 from functools import cached_property
 from math import ceil
