@@ -1920,6 +1920,10 @@ Ensure the default browser behavior of the `hidden` attribute.
   max-height: 15rem;
 }
 
+.max-h-\[calc\(100vh-44px\)\] {
+  max-height: calc(100vh - 44px);
+}
+
 .min-h-screen {
   min-height: 100vh;
 }
@@ -2509,6 +2513,10 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .pt-14 {
   padding-top: 3.5rem;
+}
+
+.pb-6 {
+  padding-bottom: 1.5rem;
 }
 
 .text-left {
