@@ -346,7 +346,7 @@
                 {% if mi.is_menu %}
                     {% if loop.depth == 1 %}
                         <div>
-                            <button class="flex items-center justify-between w-full py-1 pl-2 mb-2 -ml-2 overflow-hidden text-sm tracking-wider uppercase rounded focus-visible:outline-none text-grey-700 bg-grey-100 hover:bg-grey-200"
+                            <button class="flex items-center justify-between w-[calc(100%+0.5rem)] py-1 pl-2 mb-2 -ml-2 overflow-hidden text-sm tracking-wider uppercase rounded focus-visible:outline-none text-grey-700 bg-grey-100 hover:bg-grey-200"
                                 {%- if mi.description %}title="{{mi.description}}"{% endif %}
                                 jmb-on:click.stop="if($scope().closed.includes('{{mi.id}}')) {$scope().closed = $scope().closed.filter(function(itm){return itm!=='{{mi.id}}'})} else {$scope().closed.push('{{mi.id}}')}">
                                 <div>{{mi.title}}</div>
@@ -360,7 +360,7 @@
                             </div>
                         </div>
                     {% else %}
-                        <div class="pt-1 pl-2 -ml-2 text-sm font-medium tracking-wide uppercase rounded text-grey-700 bg-grey-100">
+                        <div class="pt-1 pl-2 -ml-2 text-sm font-medium tracking-wide uppercase border-b border-grey-300">
                             {{mi.title}}
                         </div>
                         <div class="flex flex-col gap-2 pl-6">

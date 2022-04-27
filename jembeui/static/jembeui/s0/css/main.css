@@ -1992,6 +1992,10 @@ Ensure the default browser behavior of the `hidden` attribute.
   width: 1.75rem;
 }
 
+.w-\[calc\(100\%\+0\.5rem\)\] {
+  width: calc(100% + 0.5rem);
+}
+
 .min-w-\[8rem\] {
   min-width: 8rem;
 }
@@ -2299,6 +2303,10 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .border-b-0 {
   border-bottom-width: 0px;
+}
+
+.border-b-2 {
+  border-bottom-width: 2px;
 }
 
 .border-none {
