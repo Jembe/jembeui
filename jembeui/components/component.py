@@ -1,13 +1,10 @@
-from typing import TYPE_CHECKING, Callable, Dict, Iterable, Optional, Tuple, Union
+from typing import Callable, Dict, Iterable, Optional, Tuple, Union
 from flask import current_app
 import jembe
 from jembe import listener
 from ..settings import settings
-from ..helpers import get_component_template_variants
+from ..helpers import get_component_template_variants, create_thumbnail
 from ..exceptions import JembeUIError
-
-if TYPE_CHECKING:
-    import jembe
 
 
 __all__ = ("Component",)
@@ -195,4 +192,5 @@ class Component(jembe.Component):
 
     def display(self) -> "jembe.DisplayResponse":
         self.hydrate()
+        self.create_thumbnail = create_thumbnail
         return super().display()

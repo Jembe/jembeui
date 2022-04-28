@@ -1147,8 +1147,6 @@ Ensure the default browser behavior of the `hidden` attribute.
   padding-right: 0.5rem;
   font-size: 0.875rem;
   line-height: 1.25rem;
-  --tw-text-opacity: 1;
-  color: rgb(23 23 23 / var(--tw-text-opacity));
 }
 
 .btn:hover {
@@ -1191,8 +1189,6 @@ Ensure the default browser behavior of the `hidden` attribute.
   padding-right: 0.5rem;
   font-size: 0.875rem;
   line-height: 1.25rem;
-  --tw-text-opacity: 1;
-  color: rgb(23 23 23 / var(--tw-text-opacity));
 }
 
 .btn-short:hover {
@@ -1237,8 +1233,6 @@ Ensure the default browser behavior of the `hidden` attribute.
   padding-right: 0.5rem;
   font-size: 0.75rem;
   line-height: 1rem;
-  --tw-text-opacity: 1;
-  color: rgb(23 23 23 / var(--tw-text-opacity));
 }
 
 .btn-micro:hover {
@@ -1271,7 +1265,6 @@ Ensure the default browser behavior of the `hidden` attribute.
   background-color: transparent;
   font-size: 0.875rem;
   line-height: 1.25rem;
-  color: rgb(23 23 23 / var(--tw-text-opacity));
   --tw-text-opacity: 0.8;
 }
 
@@ -1304,7 +1297,6 @@ Ensure the default browser behavior of the `hidden` attribute.
   background-color: transparent;
   font-size: 0.875rem;
   line-height: 1.25rem;
-  color: rgb(23 23 23 / var(--tw-text-opacity));
   --tw-text-opacity: 0.8;
 }
 
@@ -1762,8 +1754,12 @@ Ensure the default browser behavior of the `hidden` attribute.
   margin-bottom: 0.5rem;
 }
 
-.-ml-1 {
-  margin-left: -0.25rem;
+.-ml-2 {
+  margin-left: -0.5rem;
+}
+
+.mr-2 {
+  margin-right: 0.5rem;
 }
 
 .mt-\[3vh\] {
@@ -1812,14 +1808,6 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .mt-\[5vh\] {
   margin-top: 5vh;
-}
-
-.-ml-2 {
-  margin-left: -0.5rem;
-}
-
-.mr-2 {
-  margin-right: 0.5rem;
 }
 
 .box-border {
@@ -1944,6 +1932,10 @@ Ensure the default browser behavior of the `hidden` attribute.
   width: 1rem;
 }
 
+.w-\[calc\(100\%\+0\.5rem\)\] {
+  width: calc(100% + 0.5rem);
+}
+
 .w-\[360px\] {
   width: 360px;
 }
@@ -1990,10 +1982,6 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .w-7 {
   width: 1.75rem;
-}
-
-.w-\[calc\(100\%\+0\.5rem\)\] {
-  width: calc(100% + 0.5rem);
 }
 
 .min-w-\[8rem\] {
@@ -2293,20 +2281,16 @@ Ensure the default browser behavior of the `hidden` attribute.
   border-width: 1px;
 }
 
-.border-t-0 {
-  border-top-width: 0px;
-}
-
 .border-b {
   border-bottom-width: 1px;
 }
 
-.border-b-0 {
-  border-bottom-width: 0px;
+.border-t-0 {
+  border-top-width: 0px;
 }
 
-.border-b-2 {
-  border-bottom-width: 2px;
+.border-b-0 {
+  border-bottom-width: 0px;
 }
 
 .border-none {
@@ -2492,10 +2476,6 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .pt-4 {
   padding-top: 1rem;
-}
-
-.pl-1 {
-  padding-left: 0.25rem;
 }
 
 .pl-6 {
@@ -2891,11 +2871,6 @@ Ensure the default browser behavior of the `hidden` attribute.
   .sm\:btn-ghost {
     font-size: 0.875rem;
     line-height: 1.25rem;
-  }
-
-  .sm\:btn-ghost {
-    --tw-text-opacity: 1;
-    color: rgb(23 23 23 / var(--tw-text-opacity));
   }
 
   .sm\:btn-ghost {
