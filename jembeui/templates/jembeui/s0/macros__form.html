@@ -88,6 +88,7 @@
 {# S P E C I F I C   F I E L D S   I M P L E M E N T A T I O N S #}
 {% macro _default_field(form, field, render_kw, field_id, is_not_disabled, styling, instant_validate, instant_submit) %}
     {%- set default_class = "flex flex-col grow basis-0" if "full" in styling else "flex flex-col" %}
+    {%- set default_class = default_class +" h-full" if "h-full" in styling else default_class %}
     <div {{form.attr_kw(form.resolve_kw(render_kw._field|default({},true), {"class+":default_class}, false))|xmlattr}}>
         <div class="flex items-center justify-between gap-8 mb-1">
             <label for="{{field_id}}" class="flex flex-row items-center justify-between text-xs">{{field.label.text}}</label>
@@ -182,7 +183,8 @@
             "class":" ".join(
                 [
                     "form-textarea",
-                    "input--error" if field.errors else ""
+                    "input--error" if field.errors else "",
+                    "h-full" if "h-full" in styling else ""
                 ]
             ),
             "jmb-on:change.defer": (
@@ -259,18 +261,18 @@
          {%- endif %}
          jmb-on:mouseleave="$scope().showControls = false"
          jmb-on:focusin.document="if ($scope().showControls && !$self.contains(document.activeElement)){$scope().showControls=false}" 
-         class="relative">
+         class="relative {% if 'h-full' in styling %}h-full{% endif %}">
         {# thumbnail #}
         <button type="button"
-                class="z-0 flex items-center justify-center w-full overflow-hidden bg-white rounded-lg cursor-pointer focus-visible:shadow-focus focus-visible:outline-none focus-visible:shadow-primary-500/30 focus-visible:ring-primary-500/30"
+                class="z-0 flex items-center justify-center w-full overflow-hidden bg-white rounded-lg cursor-pointer focus-visible:shadow-focus focus-visible:outline-none focus-visible:shadow-primary-500/30 focus-visible:ring-primary-500/30 {% if 'h-full' in styling %}h-full{% endif %}"
                 {%- if field.data or is_not_disabled %}
                 jmb-on:focus="$scope().showControls = true"
                 {%- else %}
                 disabled
                 {%- endif %}
                 {%- set img_style_width %}min-width: calc(min({{field.thumbnail_size[1] if field.thumbnail_size[1] < field.thumbnail_size[0] else field.thumbnail_size[0]}}px, 100%)); {% if not 'full' in styling %} max-width:{{field.thumbnail_size[0]}}px;{% endif %}{% endset %}
-                jmb-on:jembe-update-page.camel.window="$self.setAttribute('style', '{{img_style_width}}  height:calc(min({{field.thumbnail_size[1]}}px,'+$self.clientWidth+'px))')"
-                jmb-on:resize.window="$self.setAttribute('style', '{{img_style_width}}  height:calc(min({{field.thumbnail_size[1]}}px,'+$self.clientWidth+'px))')">
+                jmb-on:jembe-update-page.camel.window="$self.setAttribute('style', '{{img_style_width}} {% if 'h-full' not in styling %}height:calc(min({{field.thumbnail_size[1]}}px,'+$self.clientWidth+'px)){% endif %}')"
+                jmb-on:resize.window="$self.setAttribute('style', '{{img_style_width}} {% if 'h-full' not in styling %}height:calc(min({{field.thumbnail_size[1]}}px,'+$self.clientWidth+'px)){% endif %}')">
             {% if field.data %}
             <img src="{{field.thumbnail().url}}" alt="{{field.data.basename}} thumbnail" class="{% if 'cover' in styling %}object-cover{% else %}object-scale-down{% endif %} w-full h-full">
             {% endif %}

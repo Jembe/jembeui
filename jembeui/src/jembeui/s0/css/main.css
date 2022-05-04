@@ -26,6 +26,9 @@
     .input--error {
         @apply border-error-600 shadow-focus shadow-error-600/30
     }
+    .form-select  {
+        @apply pr-10
+    }
 }
 
 @layer components {
