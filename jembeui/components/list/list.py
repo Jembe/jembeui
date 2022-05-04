@@ -302,6 +302,24 @@ class CList(Component):
             name: cf.mount(self) for name, cf in self._config.choice_filters.items()
         }
 
+    @cached_property
+    def jui_pagination_steps(self) -> List[int]:
+        ps = self._config.page_size
+        step = ps
+        if step * 5 >= 100:
+            # use arithemtic sequence
+            steps = [ps * (i+1) for i in range(100//ps)]
+        else:
+            # use fibonacci sequence
+            cstep= step
+            steps = []
+            while cstep <=100 :
+                steps.append(cstep)
+                cstep = cstep + cstep
+        if ps//2 >= 10:
+            steps.insert(0, ps//2)
+        return steps
+
     def hydrate(self):
         if self.state.choice_filters is None:
             # apply default filters
