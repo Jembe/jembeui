@@ -1,3 +1,5 @@
+ ☐ Form Flask-Session and save it to redis only if it's modified, install it from github directly in requrements
+    ☐ Create Pull request to original Flask-Session
  page/systemerrors: @done(21-06-01 12:51)
     ✔ s0 @done(21-06-01 13:18)
     ✔ s1 @done(21-06-01 13:18)

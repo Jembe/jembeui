@@ -70,7 +70,7 @@ __all__ = (
     "CCreateRecord",
     "CViewRecord",
     "CDeleteRecord",
-    "create_thumbnail"
+    "create_thumbnail",
 )
 
 
@@ -150,16 +150,19 @@ class JembeUI:
 
         @babel.timezoneselector
         def get_user_timezone():
-            if "jembeuiTimezone" in request.cookies:
-                tz = request.cookies["jembeuiTimezone"]
-                session["jembeui_timezone"] = tz
+            if "jembeuiTimezone" in request.cookies and request.cookies.get(
+                "jembeuiTimezone"
+            ) != session.get("jembeui_timezone", None):
+                session["jembeui_timezone"] = request.cookies["jembeuiTimezone"]
             return session.get("jembeui_timezone", None)
 
         @babel.localeselector
         def get_user_locale():
             from jembeui.settings import settings
 
-            if "jembeuiLocaleCode" in request.cookies:
+            if "jembeuiLocaleCode" in request.cookies and request.cookies.get(
+                "jembeuiLocalCode"
+            ) != session.get("jembeui_local_code", None):
                 lc = request.cookies["jembeuiLocaleCode"]
                 if lc in settings.supported_locales:
                     session["jembeui_locale_code"] = lc
