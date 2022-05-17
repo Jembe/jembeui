@@ -306,7 +306,7 @@
                         'font-semibold': 
                             (   
                                 {{mi.active_for_exec_names|tojson|forceescape}}.some(function(en){return $jmb.componentsOnPage().includes(en)})
-                                || {{mi.active_for_pathnames|tojson|forceescape}}.some(function(pn){return window.location.pathname === pn})
+                                || {{mi.active_for_pathnames|tojson|forceescape}}.some(function(pn){return pn.endsWith('*')? (window.location.pathname === pn.slice(0,-1) || window.location.pathname.startsWith(pn.replace('*','/'))) :window.location.pathname === pn })
                             ) 
                             {# Add ns.topMenuid to active #}
                             {% if ns.topMenuId is not none -%}
@@ -378,7 +378,7 @@
                                 'font-semibold': 
                                     (   
                                         {}.some(function(en){{return $jmb.componentsOnPage().includes(en)}})
-                                        || {}.some(function(pn){{return window.location.pathname === pn}})
+                                        || {}.some(function(pn){{console.log(pn.replace('*','/'));return pn.endsWith('*')? (window.location.pathname === pn.slice(0,-1) || window.location.pathname.startsWith(pn.replace('*','/'))):window.location.pathname === pn}})
                                     ) 
                                 }}".format(mi.active_for_exec_names|tojson, mi.active_for_pathnames|tojson)|forceescape,
                             "class":"block text-grey-600 hover:underline focus-visible:outline-none focus-visible:underline"
