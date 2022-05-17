@@ -110,7 +110,7 @@ class Breadcrumb:
         self,
         component_full_name: Optional[str] = None,
         component_init_params: Optional[dict] = None,
-        title: Union[str, Callable[["jembe.Component"], str]] = "",
+        title: Union[str, Callable[["jembe.Component"], Optional[str]]] = "",
         children: Optional[Sequence["jembeui.Breadcrumb"]] = None,
         is_hidden: bool = False,
         is_link: Optional[bool] = None,
@@ -347,7 +347,7 @@ class Breadcrumb:
 @dataclass
 class BreadcrumbItem(JembeInitParamSupport):
     id: str
-    title: str
+    title: Optional[str]
     exec_name: Optional[str]
     url: Optional[str]
     jrl: Optional[str]

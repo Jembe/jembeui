@@ -3,7 +3,7 @@
 {% if bitems|length > 1  or (bitems|length == 1 and not bitems[0].is_hidden )%}
 <div class="flex flex-row flex-wrap items-center gap-1 mt-2 text-sm whitespace-nowrap">
     {% for bitem in bitems %}
-        {% if not bitem.is_hidden %}
+        {% if not bitem.is_hidden and bitem.title is not none %}
             {% if bitem.url and not loop.last %}
                 <a href="{{bitem.url}}" {% if bitem.jrl %}jmb-on:click.prevent="{{bitem.jrl}}"{% endif %} class="block href visited:text-primary-800">{{bitem.title}}</a>
             {% else %}
