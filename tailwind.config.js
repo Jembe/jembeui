@@ -4,22 +4,22 @@ module.exports = {
         "./jembeui/templates/jembeui/s0/**/*.html"
     ],
     theme: {
-        colors: {
-            transparent: 'transparent',
-            current: 'currentColor',
-            black: colors.black,
-            white: colors.white,
-            grey: colors.neutral,
-            primary: colors.emerald,
-            secondary: colors.cyan,
-            tertiary: colors.fuchsia,
-            brand: colors.green,
-            success: colors.emerald,
-            warn: colors.yellow,
-            error: colors.red,
-            privacy: colors.violet,
-        },
         extend: {
+            colors: {
+                // transparent: 'transparent',
+                // current: 'currentColor',
+                // black: { ...colors.black },
+                // white: { ...colors.white },
+                grey: { ...colors.neutral },
+                primary: { ...colors.emerald },
+                secondary: { ...colors.cyan },
+                tertiary: { ...colors.fuchsia },
+                brand: { ...colors.green },
+                success: { ...colors.emerald },
+                warn: { ...colors.yellow },
+                error: { ...colors.red },
+                privacy: { ...colors.violet },
+            },
             fontFamily: {
                 'sans': ['Fira\\ Sans', 'sans-serif']
             },

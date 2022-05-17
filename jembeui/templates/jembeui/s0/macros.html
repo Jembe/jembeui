@@ -463,7 +463,7 @@
 
 
 {#  DISPLAY MODAL #}
-{% macro display_modal(component, title=none, menu=none, closable=true, styling=(), close_button_title=none, attrs=none)%}
+{% macro display_modal(component, title=none, menu=none, closable=true, styling=(), close_button_title=none, attrs=none, danger=false)%}
     {# size in small, base, wide, fullscreen #}
     {%- set display_header = title is not none or closable %}
     {%- set display_footer = menu is not none or (closable and close_button_title is not none)%}
@@ -490,7 +490,7 @@
         {%- endif %}">
             {# header #}
             {% if display_header %}
-            <div class="flex items-center justify-between py-1 pl-4 pr-2 text-lg leading-5 rounded-t text-grey-700 bg-grey-200">
+            <div class="flex items-center justify-between py-1 pl-4 pr-2 text-lg leading-5 rounded-t {% if danger %}text-error-900 bg-error-100 {% else %} text-grey-700 bg-grey-200{% endif %}">
                 <div>{{title|default('', true)}}</div>
                 {% if closable %}
                 <button jmb-on:click="{%- if component('cancel()').is_accessible %}cancel(){% else %}$jmb.emit('cancel'){% endif -%}" type="button" title="Close" class="btn-ghost text-grey-600">

@@ -6,7 +6,7 @@
             <button jmb-on:click="cancel()" type="button" class="btn">Cancel</button>
         </div>
     {%endset%}
-    {% call display_modal(component, confirmation.title, menu) %}
+    {% call display_modal(component, confirmation.title, menu, danger=confirmation.danger) %}
         {{confirmation.question}}
     {% endcall%}
 {% endif %}
