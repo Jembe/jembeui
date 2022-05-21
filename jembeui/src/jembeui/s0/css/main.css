@@ -74,6 +74,9 @@
     .btn--white {
         @apply bg-white text-grey-900;
     }
+    .btn--grey {
+        @apply text-grey-600;
+    }
     .btn--on {
         @apply bg-primary-200 hover:bg-primary-300/70 disabled:bg-primary-100 text-primary-900; 
     }

@@ -43,6 +43,9 @@ class CPage(Component):
             breadcrumbs: Optional[
                 Union["jembeui.Breadcrumb", Sequence["jembeui.Breadcrumb"]]
             ] = None,
+            mobile_top_menu: Optional[
+                Union["jembeui.Menu", Sequence[Union["jembeui.Link", "jembeui.Menu"]]]
+            ] = None,
             enable_image_edit_support: bool = False,
             title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
             template: Optional[Union[str, Iterable[str]]] = None,
@@ -86,6 +89,14 @@ class CPage(Component):
                         template=CMenu.Config.template_variant("page_system"),
                     ),
                 )
+            if "_mobile_top_menu" not in components and mobile_top_menu is not None:
+                components["_mobile_top_menu"] = (
+                    CMenu,
+                    CMenu.Config(
+                        menu=mobile_top_menu,
+                        template=CMenu.Config.template_variant("page_mobile_top"),
+                    ),
+                )
             if "_breadcrumb" not in components and breadcrumbs is not None:
                 if isinstance(breadcrumbs, Breadcrumb):
                     breadcrumbs = [breadcrumbs]
@@ -110,7 +121,7 @@ class CPage(Component):
     _config: Config
 
     def redisplay_navigation(self):
-        self.emit("redisplay").to(("_main_menu", "_system_menu", "_breadcrumb"))
+        self.emit("redisplay").to(("_main_menu", "_system_menu", "_breadcrumb", "_mobile_top_menu"))
 
     @listener(event="redisplay_navigation")
     def on_event_redisplay_navigation(self, event: "jembe.Event"):

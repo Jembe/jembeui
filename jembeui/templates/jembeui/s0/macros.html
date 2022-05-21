@@ -112,6 +112,8 @@
             btn--success
         {%- elif 'white' in styling %}
             btn--white
+        {%- elif 'grey' in styling %}
+            btn--grey
         {%- endif %} 
         {%- if 'on' in styling %}
             btn--on
@@ -254,7 +256,7 @@
                                 jmb-on:focus="$scope().opened='{{mi.id}}'"
                                 jmb-bind:class="{'sm:!font-semibold': $scope().active === '{{mi.id}}'}"
                                 class="
-                                block mb-3 sm:mb-0 text-sm font-light tracking-wider uppercase focus-visible:outline-none text-grey-800
+                                block mb-3 sm:mb-0 text-sm font-light tracking-wider uppercase focus-visible:outline-none text-brand-900/80
                                 {%- if mi.icon or mi.icon_html %}
                                 sm:btn-ghost 
                                 {%- else %}
@@ -313,7 +315,7 @@
                             && ($scope().active = '{{ns.topMenuId}}')
                             {%- endif %}
                         }"
-                        class="block text-grey-600 hover:underline focus-visible:outline-none focus-visible:underline
+                        class="block text-grey-700 hover:underline focus-visible:outline-none focus-visible:underline
                         {%- if loop.depth == 1 and (mi.icon or mi.icon_html) %}
                         sm:btn-ghost
                         {%- else %}
