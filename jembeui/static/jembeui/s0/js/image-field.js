@@ -47,7 +47,7 @@ function juiGetImagesFromClipboard(pasteEvent) {
 }
 
 const juiSaveTuiImage = async (editor) => {
-  const image = editor.toDataURL();
+  const image = editor.toDataURL({format:"jpeg"});
 
   // this turns the base 64 string to a [File] object
   const res = await fetch(image)
