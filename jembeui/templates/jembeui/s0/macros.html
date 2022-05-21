@@ -346,9 +346,14 @@
         {% for mi in menu.items recursive %}
             {% if mi.is_accessible %}
                 {% if mi.is_menu %}
-                    {% if loop.depth == 1 %}
+                    {# {% if loop.depth == 1 %} #}
                         <div>
-                            <button class="flex items-center justify-between w-[calc(100%+0.5rem)] py-1 pl-2 mb-2 -ml-2 overflow-hidden text-sm tracking-wider uppercase rounded focus-visible:outline-none text-grey-700 bg-grey-100 hover:bg-grey-200"
+                            <button 
+                                {% if loop.depth == 1 %}
+                                class="flex items-center justify-between w-[calc(100%+0.5rem)] py-1 pl-2 mb-2 -ml-2 overflow-hidden text-sm tracking-wider uppercase rounded focus-visible:outline-none text-grey-700 bg-grey-100 hover:bg-grey-200"
+                                {% else %}
+                                class="font-medium flex items-center justify-between w-[calc(100%+0.5rem)] pt-1 mb-2 pl-2  -ml-2 overflow-hidden text-sm tracking-wide uppercase border-b border-grey-300 focus-visible:outline-none hover:bg-grey-200"
+                                {% endif %}
                                 {%- if mi.description %}title="{{mi.description}}"{% endif %}
                                 jmb-on:click.stop="if($scope().closed.includes('{{mi.id}}')) {$scope().closed = $scope().closed.filter(function(itm){return itm!=='{{mi.id}}'})} else {$scope().closed.push('{{mi.id}}')}">
                                 <div>{{mi.title}}</div>
@@ -361,14 +366,14 @@
                                 {{loop(mi.items)}}
                             </div>
                         </div>
-                    {% else %}
+                    {# {% else %}
                         <div class="pt-1 pl-2 -ml-2 text-sm font-medium tracking-wide uppercase border-b border-grey-300">
                             {{mi.title}}
                         </div>
                         <div class="flex flex-col gap-2 pl-6">
                             {{loop(mi.items)}}
                         </div>
-                    {% endif %}
+                    {% endif %} #}
                 {% else %}
                     {% if "as-button" in mi.styling %}
                     <div> 
@@ -377,13 +382,13 @@
                         mi,
                         attrs={
                             "jmb-bind:class": "{{
-                                'font-semibold': 
+                                'text-primary-900 bg-primary-100 rounded': 
                                     (   
                                         {}.some(function(en){{return $jmb.componentsOnPage().includes(en)}})
                                         || {}.some(function(pn){{return pn.endsWith('*')? (window.location.pathname === pn.slice(0,-1) || window.location.pathname.startsWith(pn.replace('*','/'))):window.location.pathname === pn}})
                                     ) 
                                 }}".format(mi.active_for_exec_names|tojson, mi.active_for_pathnames|tojson)|forceescape,
-                            "class":"block text-grey-600 hover:underline focus-visible:outline-none focus-visible:underline"
+                            "class":"block text-grey-600 hover:underline pl-2 -ml-2 focus-visible:outline-none focus-visible:underline whitespace-nowrap overflow-hidden text-ellipsis"
                         }
                     )}}
                     {% if "as-button" in mi.styling %}
