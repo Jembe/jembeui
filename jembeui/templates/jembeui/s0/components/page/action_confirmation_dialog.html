@@ -2,11 +2,15 @@
 {% if confirmation %}
     {% set menu %}
         <div class="flex flex-row-reverse flex-wrap gap-1">
-            <button jmb-on:click="confirm()" jmb-on:ready="$self.focus()" type="button" class="btn {% if confirmation.danger %}btn--danger{% else %}btn--primary{% endif %}">{{confirmation.confirm_title}}</button>
+            <button {%- if confirmation.danger_confirm_text is not none %}jmb-on:click="confirm($refs['ci'].value)"{% else %} jmb-on:click="confirm()" {%endif%}
+            jmb-on:ready="$self.focus()" type="button" class="btn {% if confirmation.danger %}btn--danger{% else %}btn--primary{% endif %}">{{confirmation.confirm_title}}</button>
             <button jmb-on:click="cancel()" type="button" class="btn">Cancel</button>
         </div>
     {%endset%}
     {% call display_modal(component, confirmation.title, menu, danger=confirmation.danger) %}
         {{confirmation.question}}
+        {%- if confirmation.danger_confirm_text is not none %}
+        <input class="my-4 form-input" type="text" jmb-ref="ci">
+        {%- endif %}
     {% endcall%}
 {% endif %}

@@ -375,7 +375,7 @@
                         mi,
                         attrs={
                             "jmb-bind:class": "{{
-                                'text-primary-900 bg-primary-100 rounded': 
+                                '!text-primary-900 bg-primary-100 rounded': 
                                     (   
                                         {}.some(function(en){{return $jmb.componentsOnPage().includes(en)}})
                                         || {}.some(function(pn){{return pn.endsWith('*')? (window.location.pathname === pn.slice(0,-1) || window.location.pathname.startsWith(pn.replace('*','/'))):window.location.pathname === pn}})

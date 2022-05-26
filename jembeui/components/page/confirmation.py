@@ -19,6 +19,7 @@ class Confirmation(JembeInitParamSupport):
     action_params: dict = field(default_factory=dict)
     confirm_title: str = "OK"
     danger: bool = False
+    danger_confirm_text: Optional[str] = None
 
     @classmethod
     def dump_init_param(cls, value: "Confirmation") -> Any:
@@ -34,6 +35,7 @@ class Confirmation(JembeInitParamSupport):
                 action_params=value.get("action_params"),
                 confirm_title=value.get("confirm_title"),
                 danger=value.get("danger"),
+                danger_confirm_text=value.get("danger_confirm_text"),
             )
             if value is not None
             else None
@@ -58,14 +60,20 @@ class CActionConfirmationDialog(Component):
         self.state.source = event.source_exec_name
 
     @action
-    def confirm(self):
-        self.emit(
-            "actionConfirmed",
-            action_name=self.state.confirmation.action_name,
-            action_params=self.state.confirmation.action_params,
-        ).to(self.state.source)
-        self.state.confirmation = None
-        self.state.source = None
+    def confirm(self, danger_confirm_text: Optional[str] = None):
+        if (
+            self.state.confirmation.danger_confirm_text is not None
+            and danger_confirm_text != self.state.confirmation.danger_confirm_text
+        ):
+            self.jui_push_notification("Invalid text entered for action confirmation!", "warn")
+        else:
+            self.emit(
+                "actionConfirmed",
+                action_name=self.state.confirmation.action_name,
+                action_params=self.state.confirmation.action_params,
+            ).to(self.state.source)
+            self.state.confirmation = None
+            self.state.source = None
 
     @action
     def cancel(self):

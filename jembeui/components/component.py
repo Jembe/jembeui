@@ -123,6 +123,7 @@ class Component(jembe.Component):
         action_params: Optional[dict] = None,
         confirm_title: str = "OK",
         danger: bool = False,
+        danger_confirm_text: Optional[str] = None,
     ):
         from .page.confirmation import Confirmation
 
@@ -138,6 +139,7 @@ class Component(jembe.Component):
                 action_params=action_params,
                 confirm_title=confirm_title,
                 danger=danger,
+                danger_confirm_text=danger_confirm_text,
             ),
         )
 
