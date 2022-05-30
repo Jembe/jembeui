@@ -776,7 +776,7 @@
     </div>
 {% endmacro %}
 
-{% macro display_list__bottom_pagination(ctx, extra_javascript="window.scroll(0,0)") %}
+{% macro display_list__bottom_pagination(ctx, extra_javascript="window.scroll(0,0);$self.blur()") %}
     <div class="relative"
         jmb-scope="{opened:false}"
          jmb-on:mouseleave="if ($scope().opened === true){$scope().opened=false}">
