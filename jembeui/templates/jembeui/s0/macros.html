@@ -317,7 +317,7 @@
                             && ($scope().active = '{{ns.topMenuId}}')
                             {%- endif %}
                         }"
-                        class="block text-brand-900/80 hover:underline focus-visible:outline-none focus-visible:underline
+                        class="block {% if loop.depth == 1 %}sm:text-brand-900/80{% else %}text-grey-700{% endif %} hover:underline focus-visible:outline-none focus-visible:underline
                         {%- if loop.depth == 1 and (mi.icon or mi.icon_html) %}
                         sm:btn-ghost
                         {%- else %}
