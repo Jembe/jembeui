@@ -304,6 +304,9 @@
                         {% set ns.topMenuId = mi.id %}
                    {% endif %} 
                         {# class="top-menu__link {% if loop.depth > 1 %}top-menu__link--indropdown{% endif %}"> #}
+                    {% if "as_button" in mi.styling %}
+                    {{display_link_as_button(mi)}} 
+                    {% else %}
                     <a href="{{mi.url}}" 
                         {% if mi.jrl %}jmb-on:click.prevent="{{mi.jrl}}"{% endif %} 
                         jmb-bind:class="{
@@ -334,6 +337,7 @@
                             {{mi.title}} 
                         {%- endif %}
                     </a>
+                    {% endif %}
                 {% endif %}
             {% endif %}
         {% endfor %}
