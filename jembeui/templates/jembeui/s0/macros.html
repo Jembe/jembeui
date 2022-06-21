@@ -130,6 +130,7 @@
         {%- endif %}
         {%- if attrs %}
             {%- for k,v in attrs.items() %}
+                {% if not k.endswith('+') %}
                 {%- if v is boolean %} 
                     {%- if v==true %}
                         {{k}} 
@@ -137,6 +138,7 @@
                 {%- elif k != "class" %}
                 {{k}}="{{v}}"
                 {%- endif %}
+                {% endif %}
             {%- endfor %}
         {%- endif %}>
         {%- if is_ghost %}
@@ -184,7 +186,7 @@
 {# M E N U S #}
 
 {# DISPLAY MENU DROP DOWN #}
-{% macro display_menu_dropdown(menu, from_link=false, align_left=false, open_styling=()) %}
+{% macro display_menu_dropdown(menu, from_link=false, align_left=false, align_bottom=false, open_styling=()) %}
     {% if menu.is_accessible %}
         <div class="relative {% if from_link %}inline{% else%}h-8{% endif %}" 
             jmb-on:click.away="if ($scope().opened === '{{menu.id}}'){$scope().opened=null}">
@@ -216,11 +218,12 @@
                 jmb-show="$scope().opened === '{{menu.id}}'"
                 jmb-on:click.prevent="if($event.target.tagName ==='A'){$scope().opened=null}"
                 {% if align_left %}
-                class="absolute left-0 z-50 -mt-1" 
+                class="absolute left-0 z-50 -mt-1 {% if align_bottom %} bottom-10 {% endif %}" 
                 {%- else %}
-                class="absolute right-0 z-50 -mt-1"
+                class="absolute right-0 z-50 -mt-1 {% if align_bottom %} bottom-10 {% endif %}"
                 {%- endif %}>
                 {# arrow on top of dropdown #}
+                {%- if not align_bottom %}
                 <div 
                 {% if align_left %}
                 class="flex justify-start ml-1"
@@ -231,10 +234,24 @@
                         <div class="w-4 h-4 origin-bottom-left transform rotate-45 bg-white border border-grey-300"></div>
                     </div>
                 </div>
+                {%- endif %}
                 {# dropdown #}
                 <div class="px-4 py-4 -mt-[1px] bg-white border rounded shadow shadow-grey-400 border-grey-300 whitespace-nowrap flex flex-col gap-2 min-w-[8rem]">
                     {{caller()}}
                 </div>
+                {# arrow at bottom of dropdown #}
+                {%- if align_bottom %}
+                <div 
+                {% if align_left %}
+                class="flex justify-start ml-1"
+                {%- else %}
+                class="flex justify-end mr-1"
+                {%- endif %}>
+                    <div class="w-6 overflow-hidden">
+                        <div class="h-4 origin-top-right transform rotate-45 bg-white border border-grey-400"></div>
+                    </div>
+                </div>
+                {%- endif %}
             </div>
         </div>
     {% endif %}
@@ -402,7 +419,7 @@
                 {% if mi.is_accessible %}
                     {% if mi.is_menu %}
                         {% if loop.depth == 1 %}
-                            {% call display_menu_dropdown(mi, align_left='align-right' in styling, open_styling=mi.styling + buttons_styling)%}
+                            {% call display_menu_dropdown(mi, align_left='align-right' in styling, align_bottom='align-bottom' in styling, open_styling=mi.styling + buttons_styling)%}
                                 {{loop(mi.items)}}
                             {% endcall %}
                         {% else %}
