@@ -1,0 +1,30 @@
+{{ '{%' }} extends _config.default_template {{ '%}' }}
+{{ '{%' }} block css {{ '%}' }}
+  <link rel="stylesheet"
+        href="{{'{{'}} url_for('static', filename='css/{{ project_name }}.css'){{'}}'}}"/>
+{{ '{%' }} endblock css {{ '%}' }}
+{{ '{%' }} block favicon {{ '%}' }}
+  <link rel="shortcut icon"
+        type="image/png"
+        href="{{'{{'}} url_for('static', filename='icons/favicon-32x32.png'){{'}}'}}"/>
+{{ '{%' }} endblock favicon {{ '%}' }}
+{{ '{%' }} block logo {{ '%}' }}
+  <div class="inline-flex text-lg transition-all duration-200 font-title text-primary md:text-3xl">
+    <span class="capitalize text-primary">{{ project_name[:-2] }}</span> <span class="uppercase text-base-content">{{ project_name[-2:] }}</span>
+  </div>
+{{ '{%' }} endblock logo {{ '%}' }}
+{# {{ '{%' }} block navbar_left {{ '%}' }}
+  {{'{{'}} super() {{'}}'}}
+{{ '{%' }} endblock navbar_left {{ '%}' }} #}
+{{ '{%' }} block navbar_right {{ '%}' }}
+  {{'{{'}} super() {{'}}'}}
+  {{'{{'}} component("navbar_menu") {{'}}'}}
+{{ '{%' }} endblock navbar_right {{ '%}' }}
+{{ '{%' }} block sidebar {{ '%}' }}
+  {{'{{'}} component("sidebar_menu") {{'}}'}}
+{{ '{%' }} endblock sidebar {{ '%}' }}
+{{ '{%' }} block content_padded {{ '%}' }}
+  {{ '{%' }} for component_name in SWAPS {{ '%}' }}
+    {{'{{'}} placeholder(component_name) {{'}}'}} 
+  {{ '{%' }} endfor {{ '%}' }}
+{{ '{%' }} endblock content_padded {{ '%}' }}

@@ -1,0 +1,37 @@
+{%- if htype == TITLE -%}
+    <title>{{ content }}</title>
+{%- elif htype == DESCRIPTION -%}
+    <meta name="description" content="{{ content }}">
+{%- elif htype == KEYWORDS -%}
+    <meta name="keywords" content="{{ content }}">
+{%- elif htype == AUTHOR -%}
+    <meta name="author" content="{{ content }}">
+{%- elif htype == OG_TYPE -%}
+    <meta name="og:type" content="{{ content }}">
+{%- elif htype == OG_TITLE -%}
+    <meta name="og:title" content="{{ content }}">
+{%- elif htype == OG_DESCRIPTION -%}
+    <meta name="og:description" content="{{ content }}">
+{%- elif htype == OG_URL -%}
+    <meta name="og:url" content="{{ content }}">
+{%- elif htype == OG_IMAGE -%}
+    <meta name="og:image" content="{{ content }}">
+{%- elif htype == OG_SITE_NAME -%}
+    <meta name="og:site_name" content="{{ content }}">
+{%- elif htype == TWITTER_TITLE -%}
+    <meta name="twitter:title" content="{{ content }}">
+{%- elif htype == TWITTER_TYPE -%}
+    <meta name="twitter:type" content="{{ content }}">
+{%- elif htype == TWITTER_URL -%}
+    <meta name="twitter:url" content="{{ content }}">
+{%- elif htype == TWITTER_IMAGE -%}
+    <meta name="twitter:url" content="{{ content }}">
+{%- elif htype == TWITTER_IMAGE_ALT -%}
+    <meta name="twitter:image:alt" content="{{ content }}">
+{%- elif htype == TWITTER_CARD -%}
+    <meta name="twitter:card" content="{{ content }}">
+{%- elif htype == TWITTER_SITE -%}
+    <meta name="twitter:site" content="{{ content }}">
+{%- elif htype == FB_APP_ID -%}
+    <meta name="fb:app_id" content="{{ content }}">
+{%- endif -%}

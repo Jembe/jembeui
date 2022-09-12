@@ -1,0 +1,41 @@
+from typing import TYPE_CHECKING
+from jembeui import Component, Menu, Link
+from jembe import config
+
+if TYPE_CHECKING:
+    import jembe
+
+
+__all__ = (
+    "CSidebarMenu",
+    "CNavbarMenu",
+)
+
+# menu displayed on the side bar of the page
+sidebar_menu = Menu(
+    style=Menu.Style(
+        display_as=Menu.Style.VERTICAL_COLLAPSIBLE, classes="p-2 menu-compact"
+    ),
+    items=[
+        Link("/main/dashboard"),
+        Link("/main/about"),
+    ],
+)
+
+# menu displayed at the top of the page in navigation bar
+navbar_menu = Menu(
+    style=Menu.Style(display_as=Menu.Style.DROPDOWNS),
+    items=[Link("/main/about", style="btn-ghost btn-square", icon="question-mark-circle")],
+)
+
+
+@config(Component.Config(changes_url=False))
+class CSidebarMenu(Component):
+    def hydrate(self):
+        self.menu = sidebar_menu.bind_to(self)
+
+
+@config(Component.Config(changes_url=False))
+class CNavbarMenu(Component):
+    def hydrate(self):
+        self.menu = navbar_menu.bind_to(self)

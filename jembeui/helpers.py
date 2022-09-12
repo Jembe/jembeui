@@ -4,7 +4,6 @@ from PIL import Image, ImageOps
 from flask import current_app
 from jembe import get_jembe
 from .exceptions import JembeUIError
-from .settings import settings
 
 if TYPE_CHECKING:
     import jembe
@@ -37,7 +36,6 @@ def get_widget_variants(templates_dir_list: List[str]) -> Dict[str, str]:
     template_variants = dict()
     for tname in current_app.jinja_env.list_templates():
         for tdir in templates_dir_list:
-            tdir = tdir.format(style=settings.default_style)
             tdir = tdir if tdir.endswith("/") else tdir + "/"
             if tname.startswith(tdir):
                 vname = tname[len(tdir) :].strip("/")
@@ -54,7 +52,7 @@ def get_component_template_variants(template_name: str) -> Dict[str, str]:
     """
     template_variants = dict()
     tname_start = template_name.split(".")[0]
-    reexp = re.compile("{}__([^\.]+)\.[^\.]+".format(tname_start))
+    reexp = re.compile(f"{tname_start}__([^\.]+)\.[^\.]+")
     for tname in current_app.jinja_env.list_templates():
         variant_match = reexp.match(tname)
         if variant_match is not None:
@@ -104,7 +102,7 @@ def convert_py_date_format_to_js(format_str, usefor: str = "datepicker"):
 def create_thumbnail(
     image: "jembe.File", thumbnail_size: Tuple[int, int]
 ) -> "jembe.File":
-    thumb = image.get_cache_version("thumbnail_{}_{}.jpg".format(*thumbnail_size))
+    thumb = image.get_cache_version(f"thumbnail_{thumbnail_size[0]}_{thumbnail_size[1]}.jpg")
     if not thumb.exists():
         try:
             with Image.open(image.open(mode="rb")) as img:

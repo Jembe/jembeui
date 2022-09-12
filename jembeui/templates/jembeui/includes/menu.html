@@ -1,0 +1,361 @@
+{%- from "jembeui/macros/icons.html" import display_icon %}
+
+{%- macro menuicon(icon, compact=false) %}
+    {%- if icon %}
+        {%- set default_class = "h-5 w-5 " if not compact else "h-4 w-4 " %}
+        {{ display_icon(
+                icon_name=icon.name,
+                icon_set=icon.icon_set,
+                class=icon.classes if icon.full_classes else default_class + icon.classes|default("",true)) }}
+    {%- endif %}
+{%- endmacro %}
+{%- macro btnicon(icon, btn_classes="") %}
+    {%- set default_classes = "h-6 w-6 " %}
+    {% if btn_classes %}
+        {%- if "btn-lg" in btn_classes %}
+            {%- set default_classes = "h-10 w-10 " %} 
+        {%- elif "btn-md" in btn_classes %}
+            {%- set default_classes = "h-6 w-6 " %} 
+        {%- elif "btn-sm" in btn_classes %}
+            {%- set default_classes = "h-5 w-5 " %} 
+        {%- elif "btn-xs" in btn_classes %}
+            {%- set default_classes = "h-4 w-4 " %} 
+        {%- endif %}
+    {%- endif %}
+    {%- if icon %}
+        {{ display_icon(
+                icon_name=icon.name,
+                icon_set=icon.icon_set,
+                class=icon.classes if icon.full_classes else default_classes + icon.classes|default("",true)) }}
+    {%- endif %}
+{%- endmacro %}
+{%- macro is_active_js(mi, topMenuId=none) %}
+    (   
+        {{ mi.active_for_exec_names|tojson|forceescape }}.some(function(en){return $jmb.componentsOnPage().includes(en)})
+        || {{ mi.active_for_path_names|tojson|forceescape }}.some(function(pn){return pn.endsWith('*')? (window.location.pathname === pn.slice(0,-1) || window.location.pathname.startsWith(pn.replace('*','/'))) :window.location.pathname === pn })
+    ) 
+    {# Add topMenuId to active #}
+    {%- if topMenuId is not none %}
+    && (($scope().activeMenuId === null && ($scope().activeMenuId = '{{ topMenuId }}')) || true)
+    {%- endif %}
+{%- endmacro %}
+
+{%- macro display_hv_menues(menues) %}
+    {# HORIZONTAL AND VERTICAL MENU #}
+
+    {%- set ns = namespace(topMenuId = none, ignoreActive = false) %}
+
+    {%- for menu in menues recursive %}
+        {% if menu.is_accessible %}
+
+            {%- set menu_loop = loop %}
+            {%- if menu_loop.depth0 == 0 %}
+                {%- set ns.ignoreActive = menu.style.ignore_active %}
+            {%- endif %}
+            {%- if menu_loop.depth0 == 1 %}
+                {%- set ns.topMenuId = menu.id %}
+            {%- endif %}
+
+            {%- set ul_attr %}
+                {%- if menu.style.classes and (menu.style.classes_full or menu_loop.depth0 > 0) -%} 
+                    class="{{ menu.style.classes|default('', true) }}"
+                {%- elif menu_loop.depth0 == 0 -%} 
+                    {% if menu.style.display_as == menu.style.HORIZONTAL %}
+                    class="menu menu-horizontal {{ menu.style.classes|default('', true) }}"
+                    {% else %}
+                    class="menu {{ menu.style.classes|default('', true) }}"
+                    {% endif %}
+                    jmb-scope="{activeMenuId:null}"
+                    {% if not ns.ignoreActive %}
+                        jmb-on:jembe-update-page.camel.window="$scope().activeMenuId = null;$updateDom()"
+                    {% endif %}
+                {%- endif %}
+            {%- endset %}
+
+            {%- if menu_loop.depth0 <= 1 %}
+            <ul {{ ul_attr }}>
+            {%- endif %}
+
+                {%- for mi in menu.items %}
+                    {%- if mi.is_link and mi.is_accessible %}
+                        <li>
+                            {# display link by menu not by link template #}
+                            {%- set a_attr %}
+                                {%- if mi.url %} href="{{ mi.url }}"{% else %} href="#"{% endif %}
+                                {%- if mi.jrl %} jmb-on:click.prevent="{{ mi.jrl }}"{% else %} target="_blank"{% endif %}
+                                {%- if mi.style.classes -%} 
+                                    class="{{ mi.style.classes|default('', true) }}"
+                                {%- endif %}
+                                {% if not ns.ignoreActive and ( mi.active_for_exec_names or mi.active_for_path_names ) %}
+                                    jmb-bind:class="{'active': {{ is_active_js(mi, ns.topMenuId) }} }"
+                                {% endif %}
+                                {%- if mi.description %} title="{{ mi.description }}"{% endif %}
+                            {%- endset %}
+                            <a {{ a_attr }}>{% if mi.icon and not mi.icon.display_last %}{{ menuicon(mi.icon) }}{% endif %}{{ mi.title }}{% if mi.icon and mi.icon.display_last %}{{ menuicon(mi.icon) }}{% endif %}</a>
+                        </li>
+                    {%- elif not mi.is_link %}
+                        {%- if menu_loop.depth0 == 0 %}
+                        <li>
+                            <span {% if not ns.ignoreActive %}jmb-bind:class="{'active': $scope().activeMenuId === '{{ mi.id }}'}"{% endif %}>{% if mi.icon and not mi.icon.display_last %}{{ menuicon(mi.icon) }}{% endif %}{{ mi.title }}{% if mi.icon and mi.icon.display_last %}{{ menuicon(mi.icon) }}{% endif %}</span>
+                            {{ menu_loop([mi]) }}
+                        </li>
+                        {%- else %}
+                        <li class="menu-title">
+                            <span {% if not ns.ignoreActive %}jmb-bind:class="{'active': $scope().activeMenuId === '{{ mi.id }}'}"{% endif %}>{% if mi.icon and not mi.icon.display_last %}{{ menuicon(mi.icon) }}{% endif %}{{ mi.title }}{% if mi.icon and mi.icon.display_last %}{{ menuicon(mi.icon) }}{% endif %}</span>
+                        </li>
+                        {{ menu_loop([mi]) }}
+                        {%- endif %}
+                    {%- endif %}
+                {%- endfor %}
+
+            {%- if menu_loop.depth0 <= 1 %}
+            </ul>
+            {%- endif %}
+        {%- endif %}
+    {%- endfor %}
+{%- endmacro %}
+
+{%- macro display_nested_menues(menues) %}
+    {# VERTICAL NESTED #}
+    {%- set ns = namespace(topMenuId = none, ignoreActive = false) %}
+
+    {%- for menu in menues recursive %}
+        {% if menu.is_accessible %}
+        
+            {%- set menu_loop = loop %}
+
+            {%- if menu_loop.depth0 == 0 %}
+            {%- set ns.ignoreActive = menu.style.ignore_active %}
+            {%- set ul_attr %}
+                {%- if menu.style.classes and menu.style.classes_full -%} 
+                    class="{{ menu.style.classes|default('', true) }}"
+                {%- else -%} 
+                    class="menu {{ menu.style.classes|default('', true) }}"
+                {%- endif %}
+                {% if not ns.ignoreActive %}
+                    jmb-on:jembe-update-page.camel.window="$scope().activeMenuId = null; $updateDom()"
+                {% endif %}
+            {%- endset %}
+            <ul {{ ul_attr }}>
+            {%- endif %}
+
+                {%- for mi in menu.items %}
+                    {%- if mi.is_link and mi.is_accessible %}
+                        <li {% if menu_loop.depth0 > 1 %}class="pl-6"{% endif %}>
+                            {# display link by menu not by link template #}
+                            {%- set a_attr %}
+                                {%- if mi.url %} href="{{ mi.url }}"{% else %} href="#"{% endif %}
+                                {%- if mi.jrl %} jmb-on:click.prevent="{{ mi.jrl }}"{% else %} target="_blank"{% endif %}
+                                {%- if mi.style.classes -%} 
+                                    class="{{ mi.style.classes|default('', true) }}"
+                                {%- endif %}
+                                {%- if not ns.ignoreActive and ( mi.active_for_exec_names or mi.active_for_path_names ) %}
+                                    jmb-bind:class="{'active': {{ is_active_js(mi) }} }"
+                                {%- endif %}
+                                {%- if mi.description %} title="{{ mi.description }}"{% endif %}
+                            {%- endset %}
+                            <a {{ a_attr }}>{% if mi.icon and not mi.icon.display_last %}{{ menuicon(mi.icon) }}{% endif %}{{ mi.title }}{% if mi.icon and mi.icon.display_last %}{{ menuicon(mi.icon) }}{% endif %}</a>
+                        </li>
+                    {%- elif not mi.is_link %}
+                        <li class="menu-title {% if menu_loop.depth0 > 0 %}pl-6{% endif %} border-t" style="border-color: hsl(var(--bc)/0.4);">
+                            <span {% if mi.icon and mi.icon.display_last %}class="flex justify-between"{% endif %}>{% if mi.icon and not mi.icon.display_last %}{{ menuicon(mi.icon) }}{% endif %}{{ mi.title }}{% if mi.icon and mi.icon.display_last %}{{ menuicon(mi.icon) }}{% endif %}</span>
+                        </li>
+                        {{ menu_loop([mi]) }}
+                    {%- endif %}
+                {%- endfor %}
+
+            {%- if menu_loop.depth0 == 0 %}
+            </ul>
+            {%- endif %}
+        {% endif %}
+    {%- endfor %}
+{%- endmacro %}
+
+{%- macro display_collapsible_menues(menues) %}
+    {# VERTICAL COLLAPSIBLE #}
+    {%- set ns = namespace(topMenuId = none, ignoreActive = false) %}
+
+    {%- for menu in menues recursive %}
+        {% if menu.is_accessible %}
+        
+            {%- set menu_loop = loop %}
+
+            {%- if menu_loop.depth0 == 0 %}
+            {%- set ns.ignoreActive = menu.style.ignore_active %}
+            {%- set ul_attr %}
+                {%- if menu.style.classes and menu.style.classes_full -%} 
+                    class="{{ menu.style.classes|default('', true) }}"
+                {%- else -%} 
+                    class="menu {{ menu.style.classes|default('', true) }}"
+                {%- endif %}
+                {% if not ns.ignoreActive %}
+                    jmb-on:jembe-update-page.camel.window="$updateDom()"
+                {% endif %}
+            {%- endset %}
+            <ul {{ ul_attr }} jmb-scope="{closed:[]}">
+            {%- endif %}
+
+                {%- for mi in menu.items %}
+                    {%- if mi.is_link and mi.is_accessible %}
+                        <li {% if menu_loop.depth0 == 2 %}class="ml-5"{% elif menu_loop.depth0 == 2 %}class="ml-10"{% elif menu_loop.depth0 >= 3 %}class="ml-16"{% endif %}>
+                            {# display link by menu not by link template #}
+                            {%- set a_attr %}
+                                {%- if mi.url %} href="{{ mi.url }}"{% else %} href="#"{% endif %}
+                                {%- if mi.jrl %} jmb-on:click.prevent="{{ mi.jrl }}"{% else %} target="_blank"{% endif %}
+                                {%- if mi.style.classes -%} 
+                                    class="{{ mi.style.classes|default('', true) }}"
+                                {%- endif %}
+                                {%- if not ns.ignoreActive and ( mi.active_for_exec_names or mi.active_for_path_names ) %}
+                                    jmb-bind:class="{'active': {{ is_active_js(mi) }} }"
+                                {%- endif %}
+                                {%- if mi.description %} title="{{ mi.description }}"{% endif %}
+                            {%- endset %}
+                            <a {{ a_attr }}>{% if mi.icon and not mi.icon.display_last %}{{ menuicon(mi.icon) }}{% endif %}{{ mi.title }}{% if mi.icon and mi.icon.display_last %}{{ menuicon(mi.icon) }}{% endif %}</a>
+                        </li>
+                    {%- elif not mi.is_link %}
+                        <li class="{% if menu_loop.depth0 == 1 %}ml-5{% elif menu_loop.depth0 == 2 %}ml-10{% elif menu_loop.depth0 == 3 %}ml-16{% endif %} border-t" style="border-color: hsl(var(--bc)/0.4);">
+                            <a href="#" 
+                                jmb-on:click.prevent="if($scope().closed.includes('{{ mi.id }}')){$scope().closed = $scope().closed.filter(function(i){return i !== '{{ mi.id }}'})}else{$scope().closed.push('{{ mi.id }}')}; $self.blur()" 
+                                style="color: hsl(var(--bc) / var(--tw-text-opacity));" 
+                                class="flex justify-between py-2 text-xs font-bold text-opacity-60 active:bg-transparent "
+                                >   
+                                    {{ mi.title }}
+                                    <div class="contents" jmb-bind:class="{hidden:!$scope().closed.includes('{{ mi.id }}')}">
+                                    {{ display_icon("chevron-down", class="w-4 h-4") }}
+                                    </div>
+                                    <div class="contents" jmb-bind:class="{hidden:$scope().closed.includes('{{ mi.id }}')}">
+                                    {{ display_icon("chevron-up", class="w-4 h-4") }}
+                                    </div>
+                                </a>
+                        </li>
+                        <div class="contents" jmb-bind:class="{hidden: $scope().closed.includes('{{ mi.id }}')}">
+                        {{ menu_loop([mi]) }}
+                        </div>
+                    {%- endif %}
+                {%- endfor %}
+
+            {%- if menu_loop.depth0 == 0 %}
+            </ul>
+            {%- endif %}
+        {% endif %}
+    {%- endfor %}
+{%- endmacro %}
+
+{%- macro display_dropdown_menues(menues) %}
+    {# DROPDOWN MENUES #}
+    {%- set ns = namespace(topMenuId = none, ignoreActive = false) %}
+
+    {%- for menu in menues recursive %}
+        {% if menu.is_accessible %}
+            {%- set menu_loop = loop %}
+
+            {%- if menu_loop.depth0 == 0 %}
+            {%- set ns.topMenuId = none %}
+            {%- set ns.ignoreActive = menu.style.ignore_active %}
+            {%- set menu_attr %}
+                {%- if menu.style.classes and menu.style.classes_full -%} 
+                    class="{{ menu.style.classes|default('', true) }}"
+                {%- else -%} 
+                    class="flex {{ menu.style.classes|default('', true) }}"
+                {%- endif %}
+                    jmb-scope="{activeMenuId:null}"
+                {% if not ns.ignoreActive %}
+                    jmb-on:jembe-update-page.camel.window="$scope().activeMenuId = null; $updateDom()"
+                {% endif %}
+            {%- endset %}
+            <div {{ menu_attr }}>
+            {%- endif %}
+
+            {%- for mi in menu.items %}
+                {%- if not mi.is_link and menu_loop.depth0 == 0 %}
+                    {%- set ns.topMenuId = mi.id %}
+                    <div class="dropdown {{ mi.style.dropdown_classes|default('', true) }}">
+                        {%- set btn_attrs %}
+                            {%- if mi.style.btn_classes_full and mi.style.btn_classes -%} 
+                                class="{{ mi.style.btn_classes|default('', true) }}"
+                            {%- elif mi.icon and not mi.style.title_hidden -%} 
+                                class="btn gap-2 {{ mi.style.btn_classes|default('', true) }}"
+                            {%- else -%} 
+                                class="btn {{ mi.style.btn_classes|default('', true) }}"
+                            {%- endif %}
+                            {% if not ns.ignoreActive %}
+                                jmb-bind:class="{'btn-active': $scope().activeMenuId === '{{ mi.id }}'}"
+                            {% endif %}
+                            {%- if mi.description %} title="{{ mi.description }}"{% endif %}
+                        {%- endset %}
+                        <label tabindex="0" {{ btn_attrs }}>{% if mi.icon and not mi.icon.display_last %}{{ btnicon(mi.icon, mi.style.classes) }}{% endif %}{% if mi.title is not none and not mi.style.title_hidden %}{{ mi.title }}{% endif %}{% if mi.icon and mi.icon.display_last %}{{ btnicon(mi.icon, mi.style.classes) }}{% endif %}</label>
+                        <ul tabindex="0" class="{% if not mi.style.full_clases %}dropdown-content menu {{ mi.style.classes|default('', true) }}{% else %}{{ mi.style.classes|default('',true) }}{% endif %}">
+                        {{ menu_loop([mi]) }}
+                        </ul>
+                    </div>
+                {%- elif mi.is_link and menu_loop.depth0 == 0 %}
+                    
+                    {%- set btn_attrs %}
+                        {%- if mi.url %} href="{{ mi.url }}"{% else %} href="#"{% endif %}
+                        {%- if mi.jrl %} jmb-on:click.prevent="{{ mi.jrl }}" {% else %} target="_blank"{% endif %}
+                        {%- if mi.style.classes_full and mi.style.classes -%} 
+                            class="{{ mi.style.classes|default('', true) }}"
+                        {%- elif mi.icon and not mi.style.title_hidden -%} 
+                            class="btn gap-2 {{ mi.style.classes|default('', true) }}"
+                        {%- else -%} 
+                            class="btn {{ mi.style.classes|default('', true) }}"
+                        {%- endif %}
+                        {%- if not ns.ignoreActive and ( mi.active_for_exec_names or mi.active_for_path_names ) %}
+                            {%- if mi.is_external %}
+                                jmb-bind:class="{'active': {{ is_active_js(mi, ns.topMenuId) }} }"
+                            {%- else %}
+                                jmb-bind:class="{'btn-active': {{ is_active_js(mi, ns.topMenuId) }} }"
+                            {%- endif %}
+                        {%- endif %}
+                        {%- if mi.description %} title="{{ mi.description }}"{% endif %}
+                    {%- endset %}
+                    {%- set btn_tag = "button" if not mi.is_external else "a" %}
+                    <{{ btn_tag }} {{ btn_attrs }}>
+                        {% if mi.icon and not mi.icon.display_last %}{{ btnicon(mi.icon, mi.style.classes) }}{% endif %}{% if mi.title is not none and not mi.style.title_hidden %}{{ mi.title }}{% endif %}{% if mi.icon and mi.icon.display_last %}{{ btnicon(mi.icon, mi.style.classes) }}{% endif %}
+                    </{{ btn_tag }}>
+                {%- elif not mi.is_link %}
+                    <li class="menu-title {% if menu_loop.depth0 == 2 %}ml-5{% elif menu_loop.depth0 == 3 %}ml-10{% elif menu_loop.depth0 >= 4 %}ml-16{% endif %} border-t" style="border-color: hsl(var(--bc)/0.4);">
+                        <span {% if mi.icon and mi.icon.display_last %}class="flex justify-between"{% endif %}>{% if mi.icon and not mi.icon.display_last %}{{ menuicon(mi.icon) }}{% endif %}{{ mi.title }}{% if mi.icon and mi.icon.display_last %}{{ menuicon(mi.icon) }}{% endif %}</span>
+                    </li>
+                    {{ menu_loop([mi]) }}
+                {%- else %}
+                    {# link inside dropdown #}
+                    <li {% if menu_loop.depth0 == 3 %}class="ml-5"{% elif menu_loop.depth0 == 4 %}class="ml-10"{% elif menu_loop.depth0 >= 5 %}class="ml-16"{% endif %}>
+                        {# display link by menu not by link template #}
+                        {%- set a_attr %}
+                            {%- if mi.url %} href="{{ mi.url }}"{% else %} href="#"{% endif %}
+                            {%- if mi.jrl %} jmb-on:click.prevent="{{ mi.jrl }}"{% else %} target="_blank"{% endif %}
+                            {%- if mi.style.classes -%} 
+                                class="{{ mi.style.classes|default('', true) }}"
+                            {%- endif %}
+                            {%- if not ns.ignoreActive and ( mi.active_for_exec_names or mi.active_for_path_names ) %}
+                                jmb-bind:class="{'active': {{ is_active_js(mi, ns.topMenuId) }} }"
+                            {%- endif %}
+                            {%- if mi.description %} title="{{ mi.description }}"{% endif %}
+                        {%- endset %}
+                        <a {{ a_attr }}>{% if mi.icon and not mi.icon.display_last %}{{ menuicon(mi.icon) }}{% endif %}{{ mi.title }}{% if mi.icon and mi.icon.display_last %}{{ menuicon(mi.icon) }}{% endif %}</a>
+                    </li>
+                {%- endif %}
+            {%- endfor %}
+
+            {%- if menu_loop.depth0 == 0 %}
+            </div>
+            {%- endif %}
+        {%- endif %}
+    {%- endfor %}
+{%- endmacro %}
+
+{%- macro display_button_group_menues(menues) %}
+{%- endmacro %}
+
+{%- if menu.style.display_as in (menu.style.HORIZONTAL, menu.style.VERTICAL) %}
+    {{ display_hv_menues([menu])}}
+{%- elif menu.style.display_as == menu.style.VERTICAL_NESTED %}
+    {{ display_nested_menues([menu])}}
+{%- elif menu.style.display_as == menu.style.VERTICAL_COLLAPSIBLE %}
+    {{ display_collapsible_menues([menu])}}
+{%- elif menu.style.display_as == menu.style.DROPDOWNS %}
+    {{ display_dropdown_menues([menu])}}
+{%- elif menu.style.display_as == menu.style.BUTTON_GROUP %}
+    {{ display_button_group_menues([menu])}}
+{%- endif %}

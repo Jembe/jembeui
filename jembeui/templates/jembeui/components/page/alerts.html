@@ -1,0 +1,27 @@
+{% from "jembeui/macros/icons.html" import display_icon %}
+<div class="contents">
+    {% for uid, alert in alerts.items() %}
+        <div class="w-auto shadow-lg pointer-events-auto alert {% if alert.level == 'info' %} alert-info {% elif alert.level == 'success' %} alert-success {% elif alert.level == 'warning' %} alert-warning {% elif alert.level == 'error' %} alert-error {% endif %}" {% if alert.level != "error" %} jmb-on:ready.delay-{{ uid }}.2000ms.defer="alerts['{{ uid }}'] = {};$self.remove();" {% endif %}>
+            <div>
+                {% if alert.level == ERROR %}
+                    {{ display_icon("x-circle", class="flex-shrink-0 w-6 h-6 stroke-current")}}
+                {% elif alert.level == WARNING %}
+                    {{ display_icon("exclamation-triangle", class="flex-shrink-0 w-6 h-6 stroke-current")}}
+                {% elif alert.level == INFO %}
+                    {{ display_icon("information-circle", class="flex-shrink-0 w-6 h-6 stroke-current")}}
+                {% elif alert.level == SUCCESS %}
+                    {{ display_icon("check-circle", class="flex-shrink-0 w-6 h-6 stroke-current")}}
+                {% endif %}
+                <span>{{ alert.message }}</span>
+            </div>
+            {% if alert.level == ERROR %}
+                <div class="flex-none">
+                    <a href="#"
+                       class="link"
+                       jmb-on:click.stop.prevent.defer="alerts['{{ uid }}'] = {}; $self.parentElement.parentElement.remove()">close
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    {% endfor %}
+</div>

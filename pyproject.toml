@@ -5,6 +5,9 @@ testpaths = ["tests"]
 source = ["jembe"]
 branch = true
 
+[tool.djlint]
+format_attribute_template_tags=true
+format_js=true
 
 [build-system]
 requires = ["setuptools","wheel"]

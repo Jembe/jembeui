@@ -1,0 +1,39 @@
+{% from "/jembeui/macros/icons.html" import display_icon %}
+<div jmb-local="{dcp:null, phraseIsValid:true}">
+    {% if confirmation %}
+        <div class="modal modal-open">
+            <div class="modal-box">
+                <h3 class="flex items-center gap-4 text-lg font-bold
+                           {% if confirmation.is_danger %}
+                               text-error
+                           {% endif %}">
+                    {{ display_icon("question-mark-circle", class="w-6 h-6 stroke-current")}} {{ confirmation.title }}
+                </h3>
+                {% if confirmation.question %}<p class="py-4">{{ confirmation.question }}</p>{% endif %}
+                {% if confirmation.danger_confirmation_phrase is not none and
+                    confirmation.is_danger %}
+                    <input type="text"
+                           placeholder="Type here"
+                           class="w-full input input-bordered input-error"
+                           jmb-model="$local.dcp"/>
+                    <label jmb-show="!$local.phraseIsValid" class="label text-error">
+                        <span class="label-text-alt text-error">Invalid phrase entered! Please enter '{{ confirmation.danger_confirmation_phrase }}' to confirm the action.</span>
+                    </label>
+                {% endif %}
+                <div class="modal-action">
+                    <button class="btn btn-outline"
+                            jmb-on:click.prevent="cancel(); $local.phraseIsValid = true;$local.dcp=null">
+                        Cancel
+                    </button>
+                    <button jmb-on:click.prevent="{% if confirmation.is_danger %} if ($local.dcp !== confirmation.danger_confirmation_phrase) { $local.phraseIsValid = false;$local.dcp=null } else { $local.phraseIsValid = true;$local.dcp=null; confirm() }
+                    {% else %}
+                        confirm(); $local.phraseIsValid = true; $local.dcp=null;
+                    {% endif %}
+                    " class="btn min-w-[6rem] {% if confirmation.is_danger %}btn-error{% else %}btn-primary{% endif %}">
+                    {{ confirmation.confirmation_title }}
+                </button>
+            </div>
+        </div>
+    </div>
+{% endif %}
+</div>

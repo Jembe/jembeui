@@ -1,0 +1,9 @@
+from jembeui import Component
+from jembe import config
+
+__all__ = ("CDashboard",)
+
+
+@config(Component.Config(changes_url=False))
+class CDashboard(Component):
+    pass

@@ -1,23 +1,12 @@
-from typing import (
-    TYPE_CHECKING,
-    Callable,
-    Dict,
-    Iterable,
-    Optional,
-    Tuple,
-    Union,
-    Sequence,
-)
+from typing import TYPE_CHECKING, Callable, Iterable, Optional, Union, Dict, Tuple
 from jembe import listener
 from ..component import Component
-from .title import CPageTitle
-from .notifications import CPageNotifications
-from .notice import CPageNotice
-from .syserror import CPageSystemError
-from .confirmation import CActionConfirmationDialog
-from .update_indicatior import CPageUpdateIndicator
-from .breadcrumb import Breadcrumb, CBreadcrumb
-from ..menu import CMenu
+from .alerts import CPageAlerts
+from .message import CPageMessage
+from .system_error import CPageSystemError
+from .head_tag import CPageHeadTag
+from .action_confirmation import CPageActionConfirmation
+
 
 if TYPE_CHECKING:
     import jembe
@@ -27,26 +16,23 @@ __all__ = ("CPage",)
 
 
 class CPage(Component):
-    """Page with navigation and layoute"""
+    """Default Page/Root Component
+
+    Provide basic functionalities excapted for every application including:
+
+    -  HTML HEAD tags display and update with (page_head_tag=CPageHeadTag).
+        Including title and description;
+    -  action progress bar;
+    -  alerts (toasts) with (page_alerts=CPageAlerts);
+    -  messages with (page_messages=CPageMessage);
+    -  system errors with (page_system_error=CPageSystemError);
+    """
 
     class Config(Component.Config):
-        default_template_exp = "jembeui/{style}/components/page/page.html"
+        default_template: str = "/jembeui/components/page.html"
 
         def __init__(
             self,
-            main_menu: Optional[
-                Union["jembeui.Menu", Sequence[Union["jembeui.Link", "jembeui.Menu"]]]
-            ] = None,
-            system_menu: Optional[
-                Union["jembeui.Menu", Sequence[Union["jembeui.Link", "jembeui.Menu"]]]
-            ] = None,
-            breadcrumbs: Optional[
-                Union["jembeui.Breadcrumb", Sequence["jembeui.Breadcrumb"]]
-            ] = None,
-            mobile_top_menu: Optional[
-                Union["jembeui.Menu", Sequence[Union["jembeui.Link", "jembeui.Menu"]]]
-            ] = None,
-            enable_image_edit_support: bool = False,
             title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
             template: Optional[Union[str, Iterable[str]]] = None,
             components: Optional[Dict[str, "jembe.ComponentRef"]] = None,
@@ -57,72 +43,110 @@ class CPage(Component):
             changes_url: bool = True,
             url_query_params: Optional[Dict[str, str]] = None,
         ):
-            components = components if components is not None else dict()
-            if "_title" not in components:
-                components["_title"] = (
-                    CPageTitle,
-                    CPageTitle.Config(title=title if title else self.default_title),
-                )
-            if "_notifications" not in components:
-                components["_notifications"] = CPageNotifications
-            if "_notice" not in components:
-                components["_notice"] = CPageNotice
-            if "_syserror" not in components:
-                components["_syserror"] = CPageSystemError
-            if "_action_confirmation" not in components:
-                components["_action_confirmation"] = CActionConfirmationDialog
-            if "_update_indicator" not in components:
-                components["_update_indicator"] = CPageUpdateIndicator
-            if "_main_menu" not in components and main_menu is not None:
-                components["_main_menu"] = (
-                    CMenu,
-                    CMenu.Config(
-                        menu=main_menu,
-                        template=CMenu.Config.template_variant("page_main"),
-                    ),
-                )
-            if "_system_menu" not in components and system_menu is not None:
-                components["_system_menu"] = (
-                    CMenu,
-                    CMenu.Config(
-                        menu=system_menu,
-                        template=CMenu.Config.template_variant("page_system"),
-                    ),
-                )
-            if "_mobile_top_menu" not in components and mobile_top_menu is not None:
-                components["_mobile_top_menu"] = (
-                    CMenu,
-                    CMenu.Config(
-                        menu=mobile_top_menu,
-                        template=CMenu.Config.template_variant("page_mobile_top"),
-                    ),
-                )
-            if "_breadcrumb" not in components and breadcrumbs is not None:
-                if isinstance(breadcrumbs, Breadcrumb):
-                    breadcrumbs = [breadcrumbs]
-
-                components["_breadcrumb"] = (
-                    CBreadcrumb,
-                    CBreadcrumb.Config(breadcrumbs=breadcrumbs),
-                )
-
-            # flags for css and js imports
-            self.enable_image_edit_support = enable_image_edit_support
+            # Add default page components
+            efective_components = dict(
+                page_head_tag=CPageHeadTag,
+                page_alerts=CPageAlerts,
+                page_message=CPageMessage,
+                page_system_error=CPageSystemError,
+                page_action_confirmation=CPageActionConfirmation,
+            )
+            if components:
+                efective_components.update(components)
             super().__init__(
-                title=title,
-                template=template,
-                components=components,
-                inject_into_components=inject_into_components,
-                redisplay=redisplay,
-                changes_url=changes_url,
-                url_query_params=url_query_params,
+                title,
+                template,
+                efective_components,
+                inject_into_components,
+                redisplay,
+                changes_url,
+                url_query_params,
             )
 
     _config: Config
 
-    def redisplay_navigation(self):
-        self.emit("redisplay").to(("_main_menu", "_system_menu", "_breadcrumb", "_mobile_top_menu"))
+    def __init__(self, head_tags: Dict[str, str] = {}):
+        """_summary_
 
-    @listener(event="redisplay_navigation")
-    def on_event_redisplay_navigation(self, event: "jembe.Event"):
-        self.redisplay_navigation()
+        Args:
+            head_tags (Dict[str, str], optional): Configure title and meta tags in HTML>HEAD.
+                Exp: {"title":"My Project", "description":"..."}. Defaults to {}.
+        """
+        if head_tags == {}:
+            self.state.head_tags = dict()
+
+        super().__init__()
+
+        # add title tag if does not exist
+        if CPageHeadTag.TITLE not in self.state.head_tags:
+            self.state.head_tags[CPageHeadTag.TITLE] = self.title
+        self._head_tags_level: Dict[str, int] = dict()
+
+    # listener for updating HTML tags in HEAD
+    @listener(event="pushPageHeadTag")
+    def on_push_page_head_tag(self, event: "jembe.Event"):
+        """Update values of Head Tags
+
+        Event Args:
+
+            htype (str): value from CPageHeadTag.TYPES defines tag type
+            content (str): content of the tag. Setting None for content will remove tag
+        """
+        self._update_head_tag(
+            event.params.get("htype", None),
+            event.params.get("content", None),
+            event.source._config.hiearchy_level,
+        )
+        return False
+
+    @listener(event="resetPageHeadTags")
+    def on_resetPageHeadTags(self, event: "jembe.Event"):
+        """Remove all current head tags and sets new values
+
+        Event Args:
+            tags (Dict[str,str]):Dict of new tags to set
+        """
+        level = event.source._config.hiearchy_level
+
+        # create new tags
+        new_tags: Dict[str, str] = event.params.get("tags", dict())
+        if CPageHeadTag.TITLE not in new_tags:
+            new_tags[CPageHeadTag.TITLE] = self.title
+
+        new_tags = {k: v for k, v in new_tags.items() if k in CPageHeadTag.TYPES}
+
+        # remove tag components
+        for htype in self.state.head_tags.keys():
+            if htype not in new_tags and level >= self._head_tags_level.get(htype, 0):
+                self.remove_component("page_head_tag", htype)
+                del self.state.head_tags[htype]
+                self._head_tags_level[htype] = level
+
+        for htype, content in new_tags.items():
+            if level >= self._head_tags_level.get(htype, 0):
+                self._update_head_tag(htype, content, level)
+
+        return False
+
+    def display(self) -> "jembe.DisplayResponse":
+        for htype, content in self.state.head_tags.items():
+            self.display_component("page_head_tag", htype, htype=htype, content=content)
+        return super().display()
+
+    def _update_head_tag(self, htype: str, content: str, level: int):
+        """Update head tag if request is made from higher level than existin tag
+
+        Using level, components deeper in hiearchy have priority on setting head tags.
+        """
+        if htype in CPageHeadTag.TYPES:
+            if level >= self._head_tags_level.get(htype, 0):
+                self._head_tags_level[htype] = level
+                if content is None:
+                    del self.state.head_tags[htype]
+                    self.remove_component("page_head_tag", htype)
+                else:
+                    self.state.head_tags[htype] = content
+                    self.display_component(
+                        "page_head_tag", htype, htype=htype, content=content
+                    )
+                self._head_tags_level[htype] = level

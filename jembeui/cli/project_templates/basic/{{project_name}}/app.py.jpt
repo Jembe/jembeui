@@ -1,0 +1,32 @@
+from typing import TYPE_CHECKING
+from jembe import Jembe
+from jembeui import JembeUI
+from flask_seasurf import SeaSurf
+from flask_session import Session
+from flask_babel import Babel
+from .error_handlers import register_error_hadlers
+
+if TYPE_CHECKING:
+    from flask import Flask
+
+__all__ = ("init_app", "jmb", "jui", "csrf", "session")
+
+csrf = SeaSurf()
+session = Session()
+
+babel = Babel()
+
+jmb = Jembe()
+jui = JembeUI()
+
+
+def init_app(app: "Flask"):
+    with app.app_context():
+        register_error_hadlers(app)
+        csrf.init_app(app)
+        session.init_app(app)
+
+        babel.init_app(app)
+
+        jui.init_jembe(jmb)
+        jmb.init_app(app)

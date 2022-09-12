@@ -1,0 +1,10 @@
+from flask import redirect, current_app as app
+from jembe import page_url
+
+
+"""Flask regular routes unrelated to Jembe pages"""
+
+@app.route("/")
+def index():
+    """Redirects to Main jembe page."""
+    return redirect(page_url("/main"))

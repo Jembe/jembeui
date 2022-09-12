@@ -2,7 +2,7 @@ from typing import Callable, Dict, Iterable, Optional, Tuple, Union
 from flask import current_app
 import jembe
 from jembe import listener
-from ..settings import settings
+from ._jui_utils import JuiUtils
 from ..helpers import get_component_template_variants, create_thumbnail
 from ..exceptions import JembeUIError
 
@@ -16,8 +16,7 @@ class Component(jembe.Component):
     """
 
     class Config(jembe.Component.Config):
-        default_template_exp = "jembeui/{style}/components/component.html"
-        default_template: str
+        default_template: str = "jembeui/components/component.html"
         TEMPLATE_VARIANTS: Dict[str, str]
 
         def __init__(
@@ -57,8 +56,8 @@ class Component(jembe.Component):
         def _init_class_based_config(cls):
             # Initialise default class level values here becouse we need app_context to do that
             if "default_template" not in cls.__dict__:
-                cls.default_template = cls.default_template_exp.format(
-                    style=settings.default_style
+                raise JembeUIError(
+                    "default_template class propert must be set for JembeUI components"
                 )
             if "TEMPLATE_VARIANTS" not in cls.__dict__:
                 cls.TEMPLATE_VARIANTS = get_component_template_variants(
@@ -75,10 +74,29 @@ class Component(jembe.Component):
             if variant_name in cls.TEMPLATE_VARIANTS:
                 return cls.TEMPLATE_VARIANTS[variant_name]
             raise JembeUIError(
-                "Template variant {} for {} does not exist".format(
-                    variant_name, cls.default_template_exp
-                )
+                f"Template variant {variant_name} for {cls.default_template_exp} does not exist"
             )
+
+        @property
+        def default_template_names(self) -> Tuple[str, ...]:
+            # use fullname to generate default tempalte name
+            tname = f"{self.full_name.strip('/')}.html"
+            templates = [tname, f"pages/{tname}"]
+
+            # if component is in components package use it to generate default
+            # template by package name
+            packages = self._component_class.__module__.split(".")
+            if len(packages) > 1 and packages[0] not in ("jembe", "jembeui"):
+                try:
+                    components_index = packages.index("components")
+                    templates.append(
+                        f"{'/'.join(packages[components_index])}.html"
+                    )
+                except ValueError:
+                    pass
+
+            # return template names
+            return tuple(templates)
 
     _config: Config
 
@@ -96,60 +114,24 @@ class Component(jembe.Component):
 
         return self._config.title(self)
 
+    _jui_utils: JuiUtils
+
     @property
-    def jui_style(self) -> str:
-        """Adds current JembeUI style to template context
+    def jui(self) -> JuiUtils:
+        try:
+            return self._jui_utils
+        except AttributeError:
+            self._jui_utils = JuiUtils(self)
+            return self._jui_utils
 
-        Returns:
-            str: JembeUI style configured by JEMBEUI_STYLE parameter in config.py
-        """
-        return settings.default_style
-
-    # JembeUI helper methods
-    def jui_set_page_title(self, title: Optional[str]):
-        self.emit("setPageTitle", title=title)
-
-    def jui_push_notification(self, message: str, level: str = "info"):
-        self.emit("pushPageNotification", message=message, level=level)
-
-    def jui_push_notice(self, message: str, title: Optional[str] = None):
-        self.emit("pushPageNotice", message=message, title=title)
-
-    def jui_confirm_action(
-        self,
-        action_name: str,
-        title: str,
-        question: str = "",
-        action_params: Optional[dict] = None,
-        confirm_title: str = "OK",
-        danger: bool = False,
-        danger_confirm_text: Optional[str] = None,
-    ):
-        from .page.confirmation import Confirmation
-
-        if action_params is None:
-            action_params = dict(confirmed=True)
-
-        self.emit(
-            "requestActionConfirmation",
-            confirmation=Confirmation(
-                title=title,
-                question=question,
-                action_name=action_name,
-                action_params=action_params,
-                confirm_title=confirm_title,
-                danger=danger,
-                danger_confirm_text=danger_confirm_text,
-            ),
-        )
-
-    @listener(event="actionConfirmed")
-    def jui_on_action_confirmed(self, event: "jembe.Event"):
+    @listener(event="userHasConfirmedTheAction")
+    def jui_user_has_confirmed_the_action(self, event: "jembe.Event"):
         if hasattr(self, event.action_name):
             return getattr(self, event.action_name)(**event.action_params)
 
     @listener(event="redisplay")
     def jui_on_redisplay(self, event: "jembe.Event"):
+        print("REDISPLAY ", self.exec_name, event.source_full_name, event.to)
         if event.params.get("update_ac", False) == True:
             try:
                 self.update_ac()
@@ -157,15 +139,21 @@ class Component(jembe.Component):
                 self.ac_deny()
                 if current_app.debug or current_app.testing:
                     current_app.logger.warning(
-                        "Exception in {}.update_ac. Access to compomonent {} is denied. "
-                        "(exceptation trackback below)".format(
-                            self.__class__.__name__, self.exec_name
-                        )
+                        f"Exception in {self.__class__.__name__}.update_ac. Access to compomonent {self.exec_name} is denied. "
+                        "(exceptation trackback below)"
                     )
                     import traceback
 
                     traceback.print_exc()
         return True
+
+    def redisplay(self, *component_names):
+        """Emit redisplay to named child components cousing them to redisplay itself
+        if they already exist on the page"""
+        if component_names:
+            self.emit("redisplay").to(component_names)
+        else:
+            self.emit("redisplay")
 
     @listener(event="update_ac")
     def jui_on_update_ac(self, event: "jembe.Event"):
@@ -176,10 +164,8 @@ class Component(jembe.Component):
             self.ac_deny()
             if current_app.debug or current_app.testing:
                 current_app.logger.warning(
-                    "Exception in {}.update_ac. Access to compomonent {} is denied. "
-                    "(exceptation trackback below)".format(
-                        self.__class__.__name__, self.exec_name
-                    )
+                    f"Exception in {self.__class__.__name__}.update_ac. Access to compomonent {self.exec_name} is denied. "
+                    "(exceptation trackback below)"
                 )
                 import traceback
 

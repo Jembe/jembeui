@@ -1,0 +1,49 @@
+{%- from "/jembeui/macros/icons.html" import display_icon %}
+<div
+  jmb-local="{showError: false, isNetworkError:false}"
+  jmb-cloak
+  jmb-ignore
+  jmb-on:jembe-update-page-error.camel.window=" 
+    $refs.title.innerText = ''; 
+    $refs.content.innerHTML = ''; 
+    $local.isNetworkError = $event.detail.networkError; 
+    if (!$local.isNetworkError){ 
+        if ($event.detail.response.status === 413) { 
+            $refs.title.innerText = 'File Upload Error'; 
+            $refs.content.innerHTML = '<p>File is bigger than server allows.</p>'
+        } else { 
+            $refs.title.innerText = 'Server error: ' + $event.detail.response.status; 
+            $event.detail.response.text().then( function(content) { 
+                $refs.content.innerHTML = '<iframe></iframe>'; 
+                $refs.content.children[0].classList.add('h-[70vh]','border-none','w-full'); 
+                $refs.content.children[0].contentDocument.write(content); 
+            })
+        } 
+    } else { 
+        $refs.title.innerText = 'Network error'; 
+        $refs.content.innerHTML = '<p>Application server unreachable.<br/><br/>Please check your internet connection and/or contact Support.</p>' 
+    } 
+    $local.showError = true; "
+  jmb-bind:class="{'modal-open': $local.showError}"
+  class="modal"
+>
+  <div
+    class="border-2 modal-box border-error"
+    jmb-bind:class="{'max-w-none ': !$local.isNetworkError }"
+  >
+    <h3 class="flex items-center gap-4 text-lg font-bold text-error">
+      {{ display_icon("x-circle", class="w-8 h-8 stroke-current")}}
+      <div jmb-ref="title"></div>
+    </h3>
+    <div jmb-ref="content" class="py-4"></div>
+    <div class="modal-action">
+      <button
+        type="button"
+        class="btn btn-error"
+        jmb-on:click.prevent="$local.showError=false;$refs.content.innerHTML=''"
+      >
+        Close
+      </button>
+    </div>
+  </div>
+</div>

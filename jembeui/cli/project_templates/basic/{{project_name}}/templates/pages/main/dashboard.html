@@ -1,0 +1,72 @@
+{{ '{%' }} from 'jembeui/macros/icons.html' import display_icon {{ '%}' }}
+<div class="p-8">
+    <h1 class="text-sm font-semibold tracking-wider">Dashboard</h1>
+    <div class="grid grid-cols-3 gap-8 mt-8">
+        {{ '{%' }} for _ in range(2) {{ '%}' }}
+            <div class="shadow card">
+                <div class="card-body">
+                    <h2 class="card-title">Stats</h2>
+                    <div class="flex items-center p-1">
+                        <span class="w-48 text-xs text-base-content/70">Search Engines</span> <progress max="100"
+           value="{{ '{{' }} range(1,101)|random {{ '}}' }}"
+           class="progress progress-success"></progress>
+                    </div>
+                    <div class="flex items-center p-1">
+                        <span class="w-48 text-xs text-base-content/70">Direct</span> <progress max="100"
+           value="{{ '{{' }} range(1,101)|random {{ '}}' }}"
+           class="progress progress-primary"></progress>
+                    </div>
+                    <div class="flex items-center p-1">
+                        <span class="w-48 text-xs text-base-content/70">Social Media</span> <progress max="100"
+           value="{{ '{{' }} range(1,101)|random {{ '}}' }}"
+           class="progress progress-secondary"></progress>
+                    </div>
+                    <div class="flex items-center p-1">
+                        <span class="w-48 text-xs text-base-content/70">Emails</span> <progress max="100"
+           value="{{ '{{' }} range(1,101)|random {{ '}}' }}"
+           class="progress progress-accent"></progress>
+                    </div>
+                    <div class="flex items-center p-1">
+                        <span class="w-48 text-xs text-base-content/70">Ad campaigns</span> <progress max="100"
+           value="{{ '{{' }} range(1,101)|random {{ '}}' }}"
+           class="progress progress-warning"></progress>
+                    </div>
+                </div>
+            </div>
+        {{ '{%' }} endfor {{ '%}' }}
+        <div class="shadow card bg-secondary text-secondary-content bg-opacity-60">
+            <div class="card-body">
+                <h2 class="card-title">Info</h2>
+                <div class="prose">
+                    <p>Feel free to change and adapt dashboard according to your needs.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-span-2 col-start-1 shadow stats">
+            <div class="stat">
+                <div class="stat-figure text-secondary">
+                    {{ '{{' }} display_icon("information-circle", class="inline-block w-8 h-8 stroke-current") {{ '}}' }}
+                </div>
+                <div class="stat-title">Downloads</div>
+                <div class="stat-value">31K</div>
+                <div class="stat-desc">Jan 1st - Feb 1st</div>
+            </div>
+            <div class="stat">
+                <div class="stat-figure text-secondary">
+                    {{ '{{' }} display_icon("adjustments-vertical", class="inline-block w-8 h-8 stroke-current") {{ '}}' }}
+                </div>
+                <div class="stat-title">New Users</div>
+                <div class="stat-value">4,200</div>
+                <div class="stat-desc">{{ '{{' }} display_icon("arrow-trending-up", class="inline-block w-4 h-4 stroke-success") {{ '}}' }}︎ 400 (22%)</div>
+            </div>
+            <div class="stat">
+                <div class="stat-figure text-secondary">
+                    {{ '{{' }} display_icon("archive-box", class="inline-block w-8 h-8 stroke-current") {{ '}}' }}
+                </div>
+                <div class="stat-title">New Registers</div>
+                <div class="stat-value">1,200</div>
+                <div class="stat-desc">{{ '{{' }} display_icon("arrow-trending-down", class="inline-block w-4 h-4 stroke-error") {{ '}}' }} 90 (14%)</div>
+            </div>
+        </div>
+    </div>
+</div>

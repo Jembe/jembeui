@@ -7,34 +7,36 @@ from flask_babel import get_locale
 
 from .exceptions import JembeUIError
 from .sqlalchemy import SaFile
-from .lib import (
-    Link,
-    ActionLink,
-    URLLink,
-    Menu,
-    Breadcrumb,
-    BreadcrumbList,
-    Form,
-    FormBase,
-    FileField,
-    ImageField,
-    SelectMultipleField,
-    JUIFieldMixin,
-)
+from .includes.link import Link
+from .includes.menu import Menu
+
+# from .lib import (
+#     ActionLink,
+#     URLLink,
+#     Menu,
+#     Breadcrumb,
+#     BreadcrumbList,
+#     Form,
+#     FormBase,
+#     FileField,
+#     ImageField,
+#     SelectMultipleField,
+#     JUIFieldMixin,
+# )
 from .components import (
     Component,
-    ComponentWithMenu,
+    # ComponentWithMenu,
     CPage,
-    CMenu,
-    CBreadcrumb,
-    CList,
-    CListRecords,
-    CFormBase,
-    CForm,
-    CUpdateRecord,
-    CCreateRecord,
-    CViewRecord,
-    CDeleteRecord,
+    # CMenu,
+    # CBreadcrumb,
+    # CList,
+    # CListRecords,
+    # CFormBase,
+    # CForm,
+    # CUpdateRecord,
+    # CCreateRecord,
+    # CViewRecord,
+    # CDeleteRecord,
 )
 from .helpers import convert_py_date_format_to_js, camel_to_snake, create_thumbnail
 
@@ -45,6 +47,7 @@ if TYPE_CHECKING:
 __all__ = (
     "JembeUI",
     "Link",
+    "Menu",
     "ActionLink",
     "URLLink",
     "Menu",
@@ -58,18 +61,18 @@ __all__ = (
     "SelectMultipleField",
     "JUIFieldMixin",
     "Component",
-    "ComponentWithMenu",
+    # "ComponentWithMenu",
     "CPage",
-    "CMenu",
-    "CBreadcrumb",
-    "CList",
-    "CListRecords",
-    "CFormBase",
-    "CForm",
-    "CUpdateRecord",
-    "CCreateRecord",
-    "CViewRecord",
-    "CDeleteRecord",
+    # "CMenu",
+    # "CBreadcrumb",
+    # "CList",
+    # "CListRecords",
+    # "CFormBase",
+    # "CForm",
+    # "CUpdateRecord",
+    # "CCreateRecord",
+    # "CViewRecord",
+    # "CDeleteRecord",
     "create_thumbnail",
 )
 
@@ -95,7 +98,7 @@ class JembeUI:
         self.__jembe = jembe
         if jembe.flask is not None:
             raise JembeUIError(
-                "Jembe UI must be initialised before initialising jembe extension"
+                "Jembe UI must be initialised before initialising jembe extension!"
             )
 
         self.__jembe.extensions["jembeui"] = _JembeUIState(self)
@@ -105,6 +108,11 @@ class JembeUI:
 
     def do_init_jembe(self):
         from .page import JembeUIPage
+
+        if "babel" not in self.__jembe.flask.extensions:
+            raise JembeUIError(
+                "FlaskBabel extension must be initialised before initialising Jembe with JembeUI extension!"
+            )
 
         self.__jembe.add_page(
             "jembeui", JembeUIPage

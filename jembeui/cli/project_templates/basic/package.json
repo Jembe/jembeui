@@ -1,0 +1,22 @@
+{
+  "scripts": {
+    "dev_js": "export NODE_PATH=./node_modules; parcel watch {{ project_name }}/src/js/{{ project_name }}.js --dist-dir {{ project_name }}/static/js/ --public-url ./",
+    "build_js": "export NODE_ENV=production;export NODE_PATH=./node_modules; parcel build {{ project_name }}/src/js/{{ project_name }}.js --dist-dir {{ project_name }}/static/js/ --public-url ./",
+    "dev_css": "export NODE_PATH=./node_modules;npx postcss {{ project_name }}/src/css/{{ project_name }}.css -o {{ project_name }}/static/css/{{ project_name }}.css --watch",
+    "build_css": "export NODE_ENV=production;export NODE_PATH=./node_modules;npx postcss {{ project_name }}/src/css/{{ project_name }}.css -o {{ project_name }}/static/css/{{ project_name }}.css",
+    "dev": "concurrently \"npm run dev_css\" \"npm run dev_js\"",
+    "build": "concurrently \"npm run build_css\" \"npm run build_js\""
+  },
+  "devDependencies": {
+    "@tailwindcss/forms": "^0.5.2",
+    "@tailwindcss/typography": "^0.5.4",
+    "autoprefixer": "^10.4.8",
+    "concurrently": "^7.4.0",
+    "cssnano": "^5.1.13",
+    "parcel": "^2.7.0",
+    "postcss": "^8.4.16",
+    "postcss-cli": "^10.0.0",
+    "postcss-import": "^14.1.0",
+    "tailwindcss": "^3.1.8"
+  }
+}

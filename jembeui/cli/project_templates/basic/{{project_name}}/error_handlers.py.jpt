@@ -1,0 +1,31 @@
+from typing import TYPE_CHECKING
+from flask import request, redirect
+from jembe import page_url
+
+if TYPE_CHECKING:
+    from flask import Flask
+
+__all__ = ("register_error_handlers",)
+
+
+def register_error_hadlers(app: "Flask"):
+    app.register_error_handler(404, on_http_404)
+
+
+def on_http_404(e):
+
+    if not (
+        request.path.startswith("/static")
+        or request.path.startswith("/jembe/static")
+        or request.path.startswith("/jembeui/static")
+        or request.path.startswith("/main/static")
+        or request.path.startswith("/jembe/file")
+        or request.path.startswith("/api/")
+        or request.path == ("/jembe/file")
+    ):
+        return redirect(page_url("/main/p404"))
+    else:
+        return (
+            """<div style="height:100vh; display:flex;"><div style="margin:auto; font-size:22px; display:flex; flex-direction:column; align-items: center; gap:8px; font-family:ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';"><div style="font-size:36px; color:red">404</div><div>File not found!</div></div>""",
+            404,
+        )

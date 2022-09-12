@@ -1,0 +1,10 @@
+{# Display icon #}
+{%- macro display_icon(icon_name=none, icon_set="outline", class="w-6 h-6", default_icon_name="tag") %}
+    {%- if icon_name %}
+        {%- set iname = icon_name.split(" ")[0] %}
+        {%- set class = class|default("", true) + " " +  icon_name.split(" ", 1)[1]|default("", true) %}
+        {%- include "jembeui/icons/{}/{}.svg".format(icon_set,iname) with context %}
+    {%- elif default_icon_name %}
+        {%- include "jembeui/icons/{}/{}.svg".format(icon_set,default_icon_name) with context %}
+    {%- endif %}
+{%- endmacro %}

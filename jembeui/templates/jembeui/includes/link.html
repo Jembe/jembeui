@@ -1,0 +1,57 @@
+{% from "jembeui/macros/icons.html" import display_icon %}
+{%- macro btnicon(icon, btn_classes="") %}
+    {%- set default_classes = "h-6 w-6 " %}
+    {% if btn_classes %}
+        {%- if "btn-lg" in btn_classes %}
+            {%- set default_classes = "h-10 w-10 " %} 
+        {%- elif "btn-md" in btn_classes %}
+            {%- set default_classes = "h-6 w-6 " %} 
+        {%- elif "btn-sm" in btn_classes %}
+            {%- set default_classes = "h-5 w-5 " %} 
+        {%- elif "btn-xs" in btn_classes %}
+            {%- set default_classes = "h-4 w-4 " %} 
+        {%- endif %}
+    {%- endif %}
+    {%- if icon %}
+        {{ display_icon(
+                icon_name=icon.name,
+                icon_set=icon.icon_set,
+                class=icon.classes if icon.full_classes else default_classes + icon.classes|default("",true)) }}
+    {%- endif %}
+{%- endmacro %}
+{%- macro hreficon(icon) %}
+    {%- if icon %}
+        {{ display_icon(
+                icon_name=icon.name,
+                icon_set=icon.icon_set,
+                class=icon.classes if icon.full_classes else "inline-block h-6 w-6 mx-2 " + icon.classes|default("",true)) }}
+    {%- endif %}
+{%- endmacro %}
+{%- if style.as_button %}
+    {# display button #}
+    {%- set btn_attrs %}
+        {%- if jrl %} jmb-on:click.prevent="{{ jrl }}"{% endif %}
+        {%- if style.classes_full and style.classes -%} 
+            class="{{ style.classes|default('', true) }}"
+        {%- elif icon and not style.title_hidden -%} 
+            class="btn gap-2 {{ style.classes|default('', true) }}"
+        {%- else -%} 
+            class="btn {{ style.classes|default('', true) }}"
+        {%- endif %}
+        {%- if description %} title="{{ description }}"{% endif %}
+    {%- endset %}
+    <button {{ btn_attrs }}>{% if icon and not icon.display_last %}{{ btnicon(icon, style.classes) }}{% endif %}{% if title is not none and not style.title_hidden %}{{ title }}{% endif %}{% if icon and icon.display_last %}{{ btnicon(icon, style.classes) }}{% endif %}</button>
+{%- else %}
+    {# display link #}
+    {%- set href_attrs %}
+        {%- if url %} href="{{ url }}"{% else %} href="#"{% endif %}
+        {%- if jrl %} jmb-on:click.prevent="{{ jrl }}"{% else %} target="_blank"{% endif %}
+        {%- if style.classes_full and style.classes -%} 
+            class="{{ style.classes|default('', true) }}"
+        {%- else -%} 
+            class="link {{ style.classes|default('', true) }}"
+        {%- endif %}
+        {%- if description %} title="{{ description }}"{% endif %}
+    {%- endset %}
+    <a {{ href_attrs }}>{% if icon and not icon.display_last %}{{ hreficon(icon) }}{% endif %}{{ title|default("", true) }}{% if icon and icon.display_last %}{{ hreficon(icon) }}{% endif %}</a>
+{% endif %}

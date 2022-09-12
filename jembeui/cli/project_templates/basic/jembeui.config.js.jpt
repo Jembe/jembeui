@@ -1,0 +1,6 @@
+resolve = require('path').resolve
+
+module.exports = {
+  // jembeUiDir is used by postccss and defines where JembeUI is installed
+  jembeUiDir: resolve("{{ jembeui_root }}"),
+};

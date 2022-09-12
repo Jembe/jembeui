@@ -1,16 +1,24 @@
 {
   "scripts": {
-    "s0-start": "npx tailwindcss -i ./jembeui/src/jembeui/s0/css/main.css -o ./jembeui/static/jembeui/s0/css/main.css --watch",
-    "s0-build": "npx tailwindcss -i ./jembeui/src/jembeui/s0/css/main.css -o ./jembeui/static/jembeui/s0/css/main.css --minify",
-    "s1-css-build": "node-sass --omit-source-map-url jembeui/src/jembeui/s1/sass/main.scss jembeui/static/jembeui/s1/css/main.css",
-    "s1-css-watch": "npm run s1-css-build -- -watch",
-    "s1-start": "npm run s1-css-watch"
+    "dev_js": "parcel watch jembeui/src/js/jembeui.js --dist-dir jembeui/static/js/ --public-url ./",
+    "build_js": "parcel build jembeui/src/js/jembeui.js --dist-dir jembeui/static/js/ --public-url ./",
+    "dev_css": "export NODE_PATH=./node_modules;npx postcss jembeui/src/css/main.css -o jembeui/static/css/main.css --watch",
+    "build_css": "export NODE_ENV=production;export NODE_PATH=./node_modules;npx postcss jembeui/src/css/main.css -o jembeui/static/css/main.css",
+    "dev": "concurrently \"npm run dev_css\" \"npm run dev_js\"",
+    "build": "concurrently \"npm run build_css\" \"npm run build_js\""
   },
   "devDependencies": {
-    "bulma": "^0.9.3",
-    "node-sass": "^7.0.1",
-    "tailwindcss": "^3.0.15",
-    "@tailwindcss/forms": "^0.4.0",
-    "@tailwindcss/typography": "^0.5.0"
+    "@tailwindcss/forms": "^0.5.2",
+    "@tailwindcss/typography": "^0.5.4",
+    "autoprefixer": "^10.4.8",
+    "concurrently": "^7.4.0",
+    "cssnano": "^5.1.13",
+    "daisyui": "^2.24.0",
+    "nprogress": "^0.2.0",
+    "parcel": "^2.7.0",
+    "postcss": "^8.4.16",
+    "postcss-cli": "^10.0.0",
+    "postcss-import": "^14.1.0",
+    "tailwindcss": "^3.1.8"
   }
 }
