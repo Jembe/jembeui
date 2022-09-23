@@ -45,6 +45,7 @@ def startproject(name, description):
     echo("To install required development dependencies execute:")
     secho("\t$ pip install -e .[dev]", bold=True)
     secho("\t$ npm install", bold=True)
+    secho("\t$ flask db init", bold=True)
     echo()
     echo("To start development execute (in separate terminals):")
     secho("\t$ flask run", bold=True)

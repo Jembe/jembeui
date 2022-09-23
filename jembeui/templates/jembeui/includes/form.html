@@ -1,0 +1,18 @@
+<div class="flex flex-col gap-2 {{ form_style.classes }}">
+    {%- for field_style in form_style.field_styles() %}
+        {# {%- if field_style.is_inline %}
+        {%- endif %}
+        {%- if field_style.starts_block %}
+        {%- endif %}
+        {%- if field_style.ends_block %}
+        {%- endif %} #}
+        {# row #}
+        <div>
+            {# column #}
+            <div>
+                {# field #}
+                {{ field_style() }}
+            </div>
+        </div>
+    {%- endfor %}
+</div>

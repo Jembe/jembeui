@@ -20,6 +20,8 @@ const defaultPreset = {
 };
 function contentAll(rootDir = "./jembeui") {
   const content = [
+    `${rootDir}/components/**/*.py`,
+    `${rootDir}/includes/**/*.py`,
     `${rootDir}/templates/jembeui/components/**/*.html`,
     `${rootDir}/templates/jembeui/jembeui.html`,
     `${rootDir}/templates/jembeui/includes/**/*.html`,

@@ -27,6 +27,8 @@ class Menu:
 
     @dataclass
     class Style:
+        """Menu.Style defines how menu should be render itself"""
+
         HORIZONTAL = "horizontal"
         VERTICAL = "vertical"
         VERTICAL_NESTED = "vertical_nested"
@@ -44,7 +46,7 @@ class Menu:
         classes: Optional[str] = None
         full_classes: bool = False
         title_hidden: bool = False
-        # btn_classes  are used for dropdowns 
+        # btn_classes  are used for dropdowns
         # to style dropdown button
         btn_classes: Optional[str] = None
         btn_full_classes: bool = False
@@ -55,6 +57,35 @@ class Menu:
         def __post_init__(self):
             if self.display_as not in self.VARIANTS:
                 raise ValueError("Invalid Menu style")
+
+        def update_with_dict(self, **kwargs) -> "jembeui.Menu.Style":
+            """Create new style with updated settings from dict"""
+
+            def update_str(k, check_value=lambda x: len(x) > 0):
+                if k in kwargs and check_value(v := kwargs[k]):
+                    setattr(new_style, k, str(v))
+
+            def update_ostr(k, check_value=lambda x: len(x) > 0):
+                if k in kwargs and check_value(v := kwargs[k]):
+                    if getattr(new_style, k) is None:
+                        setattr(new_style, k, str(v))
+                    else:
+                        setattr(new_style, k, " ".join((getattr(new_style, k), str(v))))
+
+            def update_bool(k, check_value=lambda x: True):
+                if k in kwargs and check_value(v := kwargs[k]):
+                    setattr(new_style, k, bool(v))
+
+            new_style = copy(self)
+            update_str("display_as", lambda x: x in self.VARIANTS)
+            update_ostr("classes")
+            update_bool("full_classes")
+            update_bool("title_hidden")
+            update_ostr("btn_classes")
+            update_bool("btn_full_classes")
+            update_ostr("dropdown_classes")
+            update_bool("is_active")
+            return new_style
 
     @dataclass
     class Icon:
@@ -82,6 +113,7 @@ class Menu:
         ],
         title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
         description: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
+        header: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
         style: Optional[
             Union[
                 str,
@@ -100,6 +132,7 @@ class Menu:
         self._id = str(uuid4())
         self._items = items
         self._title = title
+        self._header = header
         self._description = description
         self._style = style
         self._icon = icon
@@ -107,11 +140,15 @@ class Menu:
         self._binded_items: Sequence[Union["jembeui.Menu", "jembeui.Link"]]
         self._component: Optional["jembe.Component"] = None
 
+        self._cached_style: Optional["jembeui.Menu.Style"] = None
+
     def bind_to(self, component: "jembe.Component") -> "Menu":
         """Binds menu to component instance
 
         Menu must be binded before it's used in template"""
-        bmenu = Menu([], title=self._title, description=self._description)
+        bmenu = Menu(
+            [], title=self._title, description=self._description, header=self._header
+        )
         bmenu._id = self._id
         bmenu._component = component
         bmenu._binded_items = [
@@ -133,10 +170,14 @@ class Menu:
 
     @property
     def is_binded(self) -> bool:
+        """Is menu binded to component"""
         return self._component is not None
 
     @property
     def is_accessible(self) -> bool:
+        """Is Menu accessible
+
+        Menu is accessible if at least one of its items is accessible"""
         if not self.is_binded:
             raise ValueError("Menu must be binded to component")
         for item in self.items:  # type:ignore
@@ -144,18 +185,26 @@ class Menu:
                 return True
         return False
 
-    def render(self) -> str:
+    def render(self, **kwargs) -> str:
+        """Generate HTML that renders Menu"""
+
         if not self.is_binded:
             raise ValueError("Menu is not binded to component")
 
         if not self.is_accessible:
             return ""
 
-        context: dict = dict(menu=self)
-        return Markup(render_template(self.MENU_TEMPLATE, **context))  # type:ignore
+        original_style = self.style
+        self._cached_style = self.style.update_with_dict(**kwargs)
 
-    def __call__(self, *args: Any, **kwds: Any) -> Any:
-        return self.render()
+        context: dict = dict(menu=self)
+        result = Markup(render_template(self.MENU_TEMPLATE, **context))  # type:ignore
+        self._cached_style = original_style
+
+        return result
+
+    def __call__(self, *args: Any, **kwargs: Any) -> Any:
+        return self.render(**kwargs)
 
     @property
     def items(self) -> Sequence[Union["jembeui.Link", "jembeui.Menu"]]:
@@ -191,22 +240,37 @@ class Menu:
         )
 
     @property
-    def style(self) -> Optional["jembeui.Menu.Style"]:
+    def header(self) -> Optional[str]:
         if not self.is_binded:
             raise ValueError("Menu must be binded to component")
 
-        style: "jembeui.Menu.Style"
-        if self._style is None:
-            style = self.Style()
-        elif isinstance(self._style, str):
-            style = self.Style(classes=self._style)
-        elif isinstance(self._style, self.Style):
-            style = self._style
-        else:
-            # callable
-            res = self._style(self._component)
-            style = res if isinstance(res, self.Style) else self.Style(classes=res)
-        return style
+        return (
+            self._header
+            if self._header is None or isinstance(self._header, str)
+            else self._header(self._component)
+        )
+
+    @property
+    def style(self) -> "jembeui.Menu.Style":
+        """Return Menu Style for rendering"""
+        if not self.is_binded:
+            raise ValueError("Menu must be binded to component")
+
+        if self._cached_style is None:
+            if self._style is None:
+                self._cached_style = self.Style()
+            elif isinstance(self._style, str):
+                self._cached_style = self.Style(classes=self._style)
+            elif isinstance(self._style, self.Style):
+                self._cached_style = self._style
+            else:
+                # callable
+                res = self._style(self._component)
+                self._cached_style = (
+                    res if isinstance(res, self.Style) else self.Style(classes=res)
+                )
+
+        return self._cached_style
 
     @property
     def icon(self) -> Optional["jembeui.Menu.Icon"]:

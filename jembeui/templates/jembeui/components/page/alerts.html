@@ -11,6 +11,8 @@
                     {{ display_icon("information-circle", class="flex-shrink-0 w-6 h-6 stroke-current")}}
                 {% elif alert.level == SUCCESS %}
                     {{ display_icon("check-circle", class="flex-shrink-0 w-6 h-6 stroke-current")}}
+                {% elif alert.level == BASE %}
+                    {{ display_icon("information-circle", class="flex-shrink-0 w-6 h-6 stroke-info")}}
                 {% endif %}
                 <span>{{ alert.message }}</span>
             </div>

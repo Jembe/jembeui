@@ -2,4 +2,4 @@ __all__ = ("JembeUIError",)
 
 
 class JembeUIError(Exception):
-    pass
+    """Exception raised when JembeUi componet is misused or not configured corectly"""

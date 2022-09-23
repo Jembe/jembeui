@@ -1,8 +1,8 @@
 from typing import TYPE_CHECKING, Any, Callable, List, Optional, Sequence, Union, Dict
 from functools import cached_property
 from copy import copy
-from markupsafe import Markup
 from dataclasses import dataclass
+from markupsafe import Markup
 from flask import render_template
 from jembe import ComponentReference, ComponentConfig
 from ..exceptions import JembeUIError
@@ -87,13 +87,15 @@ class Link:
         ] = None,
         as_button: bool = False,
     ):
-        """Creates url or action/component link for use in menues that can render itself as HTML element
+        """Creates url or action/component link that can render itself as HTML
 
-        Link element must be binded to its component before it can be used in jinja2 template
-
+        Link element must be binded to its component before it can be used 
+        in jinja2 template
 
         Args:
-            to (Union[ str, &quot;jembe.ComponentReference&quot;, Callable[[&quot;jembe.Component&quot;], &quot;jembe.ComponentReference&quot;], ]):
+            to (Union[ str, &quot;jembe.ComponentReference&quot;, 
+                Callable[[&quot;jembe.Component&quot;], 
+                &quot;jembe.ComponentReference&quot;], ]):
                 Determine what should help when user clicks the link. It can be:
 
                 - URL address,
@@ -176,6 +178,7 @@ class Link:
 
     @property
     def is_accessible(self) -> bool:
+        """Check if link is accessible by current user"""
         if self.is_external:
             if not self.is_binded:
                 raise ValueError("Link must be binded to component")

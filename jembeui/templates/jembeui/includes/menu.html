@@ -76,6 +76,8 @@
             <ul {{ ul_attr }}>
             {%- endif %}
 
+            {%- if menu_loop.depth0 == 0 and menu.header %}{{ menu.header }}{% endif %}
+
                 {%- for mi in menu.items %}
                     {%- if mi.is_link and mi.is_accessible %}
                         <li>
@@ -97,12 +99,14 @@
                         {%- if menu_loop.depth0 == 0 %}
                         <li>
                             <span {% if not ns.ignoreActive %}jmb-bind:class="{'active': $scope().activeMenuId === '{{ mi.id }}'}"{% endif %}>{% if mi.icon and not mi.icon.display_last %}{{ menuicon(mi.icon) }}{% endif %}{{ mi.title }}{% if mi.icon and mi.icon.display_last %}{{ menuicon(mi.icon) }}{% endif %}</span>
+                            {%- if mi.header %}{{ mi.header }}{% endif %}
                             {{ menu_loop([mi]) }}
                         </li>
                         {%- else %}
                         <li class="menu-title">
                             <span {% if not ns.ignoreActive %}jmb-bind:class="{'active': $scope().activeMenuId === '{{ mi.id }}'}"{% endif %}>{% if mi.icon and not mi.icon.display_last %}{{ menuicon(mi.icon) }}{% endif %}{{ mi.title }}{% if mi.icon and mi.icon.display_last %}{{ menuicon(mi.icon) }}{% endif %}</span>
                         </li>
+                        {%- if mi.header %}{{ mi.header }}{% endif %}
                         {{ menu_loop([mi]) }}
                         {%- endif %}
                     {%- endif %}
@@ -137,6 +141,7 @@
                 {% endif %}
             {%- endset %}
             <ul {{ ul_attr }}>
+            {%- if menu.header %}{{ menu.header }}{% endif %}
             {%- endif %}
 
                 {%- for mi in menu.items %}
@@ -160,6 +165,7 @@
                         <li class="menu-title {% if menu_loop.depth0 > 0 %}pl-6{% endif %} border-t" style="border-color: hsl(var(--bc)/0.4);">
                             <span {% if mi.icon and mi.icon.display_last %}class="flex justify-between"{% endif %}>{% if mi.icon and not mi.icon.display_last %}{{ menuicon(mi.icon) }}{% endif %}{{ mi.title }}{% if mi.icon and mi.icon.display_last %}{{ menuicon(mi.icon) }}{% endif %}</span>
                         </li>
+                        {%- if mi.header %}{{ mi.header }}{% endif %}
                         {{ menu_loop([mi]) }}
                     {%- endif %}
                 {%- endfor %}
@@ -193,6 +199,7 @@
                 {% endif %}
             {%- endset %}
             <ul {{ ul_attr }} jmb-scope="{closed:[]}">
+            {%- if menu.header %}{{ menu.header }}{% endif %}
             {%- endif %}
 
                 {%- for mi in menu.items %}
@@ -229,6 +236,7 @@
                                 </a>
                         </li>
                         <div class="contents" jmb-bind:class="{hidden: $scope().closed.includes('{{ mi.id }}')}">
+                        {%- if mi.header %}{{ mi.header }}{% endif %}
                         {{ menu_loop([mi]) }}
                         </div>
                     {%- endif %}
@@ -264,77 +272,83 @@
                 {% endif %}
             {%- endset %}
             <div {{ menu_attr }}>
+            {%- if menu.header %}{{ menu.header }} {{menu}}{% endif %}
             {%- endif %}
 
+
             {%- for mi in menu.items %}
-                {%- if not mi.is_link and menu_loop.depth0 == 0 %}
-                    {%- set ns.topMenuId = mi.id %}
-                    <div class="dropdown {{ mi.style.dropdown_classes|default('', true) }}">
+                {%- if mi.is_accessible %}
+                    {%- if not mi.is_link and menu_loop.depth0 == 0 %}
+                        {%- set ns.topMenuId = mi.id %}
+                        <div class="dropdown {{ mi.style.dropdown_classes|default('', true) }}">
+                            {%- set btn_attrs %}
+                                {%- if mi.style.btn_classes_full and mi.style.btn_classes -%} 
+                                    class="{{ mi.style.btn_classes|default('', true) }}"
+                                {%- elif mi.icon and not mi.style.title_hidden -%} 
+                                    class="btn gap-2 {{ mi.style.btn_classes|default('', true) }}"
+                                {%- else -%} 
+                                    class="btn {{ mi.style.btn_classes|default('', true) }}"
+                                {%- endif %}
+                                {% if not ns.ignoreActive %}
+                                    jmb-bind:class="{'btn-active': $scope().activeMenuId === '{{ mi.id }}'}"
+                                {% endif %}
+                                {%- if mi.description %} title="{{ mi.description }}"{% endif %}
+                            {%- endset %}
+                            <label tabindex="0" {{ btn_attrs }}>{% if mi.icon and not mi.icon.display_last %}{{ btnicon(mi.icon, mi.style.classes) }}{% endif %}{% if mi.title is not none and not mi.style.title_hidden %}{{ mi.title }}{% endif %}{% if mi.icon and mi.icon.display_last %}{{ btnicon(mi.icon, mi.style.classes) }}{% endif %}</label>
+                            <ul tabindex="0" class="{% if not mi.style.full_clases %}dropdown-content menu {{ mi.style.classes|default('', true) }}{% else %}{{ mi.style.classes|default('',true) }}{% endif %}">
+                            {%- if mi.header %}{{ mi.header }}{% endif %}
+                            {{ menu_loop([mi]) }}
+                            </ul>
+                        </div>
+                    {%- elif mi.is_link and menu_loop.depth0 == 0 %}
+                        
                         {%- set btn_attrs %}
-                            {%- if mi.style.btn_classes_full and mi.style.btn_classes -%} 
-                                class="{{ mi.style.btn_classes|default('', true) }}"
-                            {%- elif mi.icon and not mi.style.title_hidden -%} 
-                                class="btn gap-2 {{ mi.style.btn_classes|default('', true) }}"
-                            {%- else -%} 
-                                class="btn {{ mi.style.btn_classes|default('', true) }}"
-                            {%- endif %}
-                            {% if not ns.ignoreActive %}
-                                jmb-bind:class="{'btn-active': $scope().activeMenuId === '{{ mi.id }}'}"
-                            {% endif %}
-                            {%- if mi.description %} title="{{ mi.description }}"{% endif %}
-                        {%- endset %}
-                        <label tabindex="0" {{ btn_attrs }}>{% if mi.icon and not mi.icon.display_last %}{{ btnicon(mi.icon, mi.style.classes) }}{% endif %}{% if mi.title is not none and not mi.style.title_hidden %}{{ mi.title }}{% endif %}{% if mi.icon and mi.icon.display_last %}{{ btnicon(mi.icon, mi.style.classes) }}{% endif %}</label>
-                        <ul tabindex="0" class="{% if not mi.style.full_clases %}dropdown-content menu {{ mi.style.classes|default('', true) }}{% else %}{{ mi.style.classes|default('',true) }}{% endif %}">
-                        {{ menu_loop([mi]) }}
-                        </ul>
-                    </div>
-                {%- elif mi.is_link and menu_loop.depth0 == 0 %}
-                    
-                    {%- set btn_attrs %}
-                        {%- if mi.url %} href="{{ mi.url }}"{% else %} href="#"{% endif %}
-                        {%- if mi.jrl %} jmb-on:click.prevent="{{ mi.jrl }}" {% else %} target="_blank"{% endif %}
-                        {%- if mi.style.classes_full and mi.style.classes -%} 
-                            class="{{ mi.style.classes|default('', true) }}"
-                        {%- elif mi.icon and not mi.style.title_hidden -%} 
-                            class="btn gap-2 {{ mi.style.classes|default('', true) }}"
-                        {%- else -%} 
-                            class="btn {{ mi.style.classes|default('', true) }}"
-                        {%- endif %}
-                        {%- if not ns.ignoreActive and ( mi.active_for_exec_names or mi.active_for_path_names ) %}
-                            {%- if mi.is_external %}
-                                jmb-bind:class="{'active': {{ is_active_js(mi, ns.topMenuId) }} }"
-                            {%- else %}
-                                jmb-bind:class="{'btn-active': {{ is_active_js(mi, ns.topMenuId) }} }"
-                            {%- endif %}
-                        {%- endif %}
-                        {%- if mi.description %} title="{{ mi.description }}"{% endif %}
-                    {%- endset %}
-                    {%- set btn_tag = "button" if not mi.is_external else "a" %}
-                    <{{ btn_tag }} {{ btn_attrs }}>
-                        {% if mi.icon and not mi.icon.display_last %}{{ btnicon(mi.icon, mi.style.classes) }}{% endif %}{% if mi.title is not none and not mi.style.title_hidden %}{{ mi.title }}{% endif %}{% if mi.icon and mi.icon.display_last %}{{ btnicon(mi.icon, mi.style.classes) }}{% endif %}
-                    </{{ btn_tag }}>
-                {%- elif not mi.is_link %}
-                    <li class="menu-title {% if menu_loop.depth0 == 2 %}ml-5{% elif menu_loop.depth0 == 3 %}ml-10{% elif menu_loop.depth0 >= 4 %}ml-16{% endif %} border-t" style="border-color: hsl(var(--bc)/0.4);">
-                        <span {% if mi.icon and mi.icon.display_last %}class="flex justify-between"{% endif %}>{% if mi.icon and not mi.icon.display_last %}{{ menuicon(mi.icon) }}{% endif %}{{ mi.title }}{% if mi.icon and mi.icon.display_last %}{{ menuicon(mi.icon) }}{% endif %}</span>
-                    </li>
-                    {{ menu_loop([mi]) }}
-                {%- else %}
-                    {# link inside dropdown #}
-                    <li {% if menu_loop.depth0 == 3 %}class="ml-5"{% elif menu_loop.depth0 == 4 %}class="ml-10"{% elif menu_loop.depth0 >= 5 %}class="ml-16"{% endif %}>
-                        {# display link by menu not by link template #}
-                        {%- set a_attr %}
                             {%- if mi.url %} href="{{ mi.url }}"{% else %} href="#"{% endif %}
-                            {%- if mi.jrl %} jmb-on:click.prevent="{{ mi.jrl }}"{% else %} target="_blank"{% endif %}
-                            {%- if mi.style.classes -%} 
+                            {%- if mi.jrl %} jmb-on:click.prevent="{{ mi.jrl }}" {% else %} target="_blank"{% endif %}
+                            {%- if mi.style.classes_full and mi.style.classes -%} 
                                 class="{{ mi.style.classes|default('', true) }}"
+                            {%- elif mi.icon and not mi.style.title_hidden -%} 
+                                class="btn gap-2 {{ mi.style.classes|default('', true) }}"
+                            {%- else -%} 
+                                class="btn {{ mi.style.classes|default('', true) }}"
                             {%- endif %}
                             {%- if not ns.ignoreActive and ( mi.active_for_exec_names or mi.active_for_path_names ) %}
-                                jmb-bind:class="{'active': {{ is_active_js(mi, ns.topMenuId) }} }"
+                                {%- if mi.is_external %}
+                                    jmb-bind:class="{'active': {{ is_active_js(mi, ns.topMenuId) }} }"
+                                {%- else %}
+                                    jmb-bind:class="{'btn-active': {{ is_active_js(mi, ns.topMenuId) }} }"
+                                {%- endif %}
                             {%- endif %}
                             {%- if mi.description %} title="{{ mi.description }}"{% endif %}
                         {%- endset %}
-                        <a {{ a_attr }}>{% if mi.icon and not mi.icon.display_last %}{{ menuicon(mi.icon) }}{% endif %}{{ mi.title }}{% if mi.icon and mi.icon.display_last %}{{ menuicon(mi.icon) }}{% endif %}</a>
-                    </li>
+                        {%- set btn_tag = "button" if not mi.is_external else "a" %}
+                        <{{ btn_tag }} {{ btn_attrs }}>
+                            {% if mi.icon and not mi.icon.display_last %}{{ btnicon(mi.icon, mi.style.classes) }}{% endif %}{% if mi.title is not none and not mi.style.title_hidden %}{{ mi.title }}{% endif %}{% if mi.icon and mi.icon.display_last %}{{ btnicon(mi.icon, mi.style.classes) }}{% endif %}
+                        </{{ btn_tag }}>
+                    {%- elif not mi.is_link %}
+                        <li class="menu-title {% if menu_loop.depth0 == 2 %}ml-5{% elif menu_loop.depth0 == 3 %}ml-10{% elif menu_loop.depth0 >= 4 %}ml-16{% endif %} border-t" style="border-color: hsl(var(--bc)/0.4);">
+                            <span {% if mi.icon and mi.icon.display_last %}class="flex justify-between"{% endif %}>{% if mi.icon and not mi.icon.display_last %}{{ menuicon(mi.icon) }}{% endif %}{{ mi.title }}{% if mi.icon and mi.icon.display_last %}{{ menuicon(mi.icon) }}{% endif %}</span>
+                        </li>
+                        {%- if mi.header %}{{ mi.header }}{% endif %}
+                        {{ menu_loop([mi]) }}
+                    {%- else %}
+                        {# link inside dropdown #}
+                        <li {% if menu_loop.depth0 == 3 %}class="ml-5"{% elif menu_loop.depth0 == 4 %}class="ml-10"{% elif menu_loop.depth0 >= 5 %}class="ml-16"{% endif %}>
+                            {# display link by menu not by link template #}
+                            {%- set a_attr %}
+                                {%- if mi.url %} href="{{ mi.url }}"{% else %} href="#"{% endif %}
+                                {%- if mi.jrl %} jmb-on:click.prevent="{{ mi.jrl }}"{% else %} target="_blank"{% endif %}
+                                {%- if mi.style.classes -%} 
+                                    class="{{ mi.style.classes|default('', true) }}"
+                                {%- endif %}
+                                {%- if not ns.ignoreActive and ( mi.active_for_exec_names or mi.active_for_path_names ) %}
+                                    jmb-bind:class="{'active': {{ is_active_js(mi, ns.topMenuId) }} }"
+                                {%- endif %}
+                                {%- if mi.description %} title="{{ mi.description }}"{% endif %}
+                            {%- endset %}
+                            <a {{ a_attr }}>{% if mi.icon and not mi.icon.display_last %}{{ menuicon(mi.icon) }}{% endif %}{{ mi.title }}{% if mi.icon and mi.icon.display_last %}{{ menuicon(mi.icon) }}{% endif %}</a>
+                        </li>
+                    {%- endif %}
                 {%- endif %}
             {%- endfor %}
 

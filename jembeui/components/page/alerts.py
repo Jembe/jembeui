@@ -14,7 +14,7 @@ __all__ = ("CPageAlerts",)
 @dataclass
 class Alert(JembeInitParamSupport):
     message: str
-    level: str = "info"
+    level: str = "base"
 
     def __post_init__(self):
         if self.level not in CPageAlerts.LEVELS:
@@ -55,13 +55,19 @@ class CPageAlerts(Component):
 
     _config: Config
 
+    BASE = "base"
     INFO = "info"
     WARNING = "warning"
     ERROR = "error"
     SUCCESS = "success"
-    LEVELS = [INFO, WARNING, ERROR, SUCCESS]
+    LEVELS = [BASE, INFO, WARNING, ERROR, SUCCESS]
 
     def __init__(self, alerts: Dict[str, Optional[Alert]] = {}):
+        """Adds alerts state param
+
+        Args:
+            alerts (Dict[str, Optional[Alert]], optional): List of alerts to be displayed. Defaults to {}.
+        """
         if not alerts:
             self.state.alerts = {}
         else:
@@ -73,6 +79,7 @@ class CPageAlerts(Component):
 
     @listener(event="pushPageAlert")
     def on_push_page_alert(self, event: "jembe.Event"):
+        """on event pushPageAlert display new alert"""
         level = event.params.get("level", self.INFO)
         message = event.params.get(
             "message", "Developer forgot to specify alert message."

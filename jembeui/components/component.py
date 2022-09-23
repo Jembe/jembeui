@@ -54,17 +54,22 @@ class Component(jembe.Component):
 
         @classmethod
         def _init_class_based_config(cls):
-            # Initialise default class level values here becouse we need app_context to do that
+            # Initialise default class level values here because we need app_context to do that
             if "default_template" not in cls.__dict__:
-                raise JembeUIError(
-                    "default_template class propert must be set for JembeUI components"
-                )
+                if cls.default_template:
+                    # copy defalult template to class property
+                    cls.default_template = cls.default_template
+                else:
+                    raise JembeUIError(
+                        f"Default_template class propert must be set for JembeUI components: {cls}"
+                    )
             if "TEMPLATE_VARIANTS" not in cls.__dict__:
                 cls.TEMPLATE_VARIANTS = get_component_template_variants(
                     cls.default_template
                 )
 
         def default_title(self, component: "jembe.Component") -> str:
+            """Get default component title"""
             return self.name.replace("_", " ").title()
 
         @classmethod
@@ -118,6 +123,7 @@ class Component(jembe.Component):
 
     @property
     def jui(self) -> JuiUtils:
+        """JembeUi Component Utils instance"""
         try:
             return self._jui_utils
         except AttributeError:
@@ -131,7 +137,6 @@ class Component(jembe.Component):
 
     @listener(event="redisplay")
     def jui_on_redisplay(self, event: "jembe.Event"):
-        print("REDISPLAY ", self.exec_name, event.source_full_name, event.to)
         if event.params.get("update_ac", False) == True:
             try:
                 self.update_ac()
@@ -170,7 +175,7 @@ class Component(jembe.Component):
                 import traceback
 
                 traceback.print_exc()
-        return avaiable != self.ac_check() and avaiable == False
+        return avaiable != self.ac_check() and avaiable is False
 
     def update_ac(self):
         pass

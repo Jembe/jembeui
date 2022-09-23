@@ -1,0 +1,16 @@
+<div class="p-8">
+    <h2 class="text-sm font-semibold tracking-wider">{{ title }}</h2>
+    {{ form(classes="p-8") }}
+    {%- if menu %}
+        {{ menu(classes="px-8") }}
+    {%- else %}
+        <div class="flex flex-row-reverse gap-2 px-8">
+            {%- if component("submit()").is_accessible %}
+                <button class="btn btn-primary" jmb-on:click="submit()">Submit</button> 
+            {%- endif %}
+            {%- if component("cancel()").is_accessible %}
+                <button class="btn btn-ghost" jmb-on:click="cancel()">Cancel</button> 
+            {%- endif %}
+        </div>
+    {%- endif %}
+</div>

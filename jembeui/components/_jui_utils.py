@@ -15,7 +15,7 @@ class JuiUtils:
     def push_page_message(self, title: str, message: str):
         self._component.emit("pushPageMessage", title=title, message=message)
 
-    def push_page_alert(self, message: str, level: str = "info"):
+    def push_page_alert(self, message: str, level: str = "base"):
         from .page.alerts import CPageAlerts
 
         if level not in CPageAlerts.LEVELS:

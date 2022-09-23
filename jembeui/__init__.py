@@ -9,6 +9,9 @@ from .exceptions import JembeUIError
 from .sqlalchemy import SaFile
 from .includes.link import Link
 from .includes.menu import Menu
+from .includes.form import Form
+from .includes.field import FieldMixin
+from .includes.file_field import FileField
 
 # from .lib import (
 #     ActionLink,
@@ -17,7 +20,6 @@ from .includes.menu import Menu
 #     Breadcrumb,
 #     BreadcrumbList,
 #     Form,
-#     FormBase,
 #     FileField,
 #     ImageField,
 #     SelectMultipleField,
@@ -25,14 +27,14 @@ from .includes.menu import Menu
 # )
 from .components import (
     Component,
-    # ComponentWithMenu,
     CPage,
+    CForm,
+    CCreateRecord,
+    # ComponentWithMenu,
     # CMenu,
     # CBreadcrumb,
     # CList,
     # CListRecords,
-    # CFormBase,
-    # CForm,
     # CUpdateRecord,
     # CCreateRecord,
     # CViewRecord,
@@ -48,18 +50,17 @@ __all__ = (
     "JembeUI",
     "Link",
     "Menu",
-    "ActionLink",
-    "URLLink",
-    "Menu",
-    "Breadcrumb",
-    "BreadcrumbList",
-    "FormBase",
     "Form",
+    "CForm",
+    "CCreateRecord",
+    # "Breadcrumb",
+    # "BreadcrumbList",
+    # "Form",
     "SaFile",
+    "FieldMixin",
     "FileField",
-    "ImageField",
-    "SelectMultipleField",
-    "JUIFieldMixin",
+    # "ImageField",
+    # "SelectMultipleField",
     "Component",
     # "ComponentWithMenu",
     "CPage",
@@ -67,10 +68,8 @@ __all__ = (
     # "CBreadcrumb",
     # "CList",
     # "CListRecords",
-    # "CFormBase",
     # "CForm",
     # "CUpdateRecord",
-    # "CCreateRecord",
     # "CViewRecord",
     # "CDeleteRecord",
     "create_thumbnail",

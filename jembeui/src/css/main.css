@@ -1,2 +1,6 @@
 @import url(includes/tailwind.css);
 @import url(includes/nprogress.css);
+
+input::placeholder{
+    @apply text-base-content/60;
+}

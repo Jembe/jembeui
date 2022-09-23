@@ -87,7 +87,7 @@
               <!-- Right side of Navbar -->
               {%- block navbar_right %}
               <!-- Change theme button -->
-              <label class="items-center flex-none swap btn btn-ghost"
+              <label class="items-center flex-none swap btn btn-ghost btn-circle"
                      title="Change Theme">
                 <input type="checkbox" jmb-bind:checked="$local.theme === 'dark'"
                        jmb-on:change="$local.theme=$local.theme === 'dark'? 'light': 'dark'; localStorage.setItem('jui_page_theme', $local.theme); $nextTick(() =>{$updateDom()})"/>

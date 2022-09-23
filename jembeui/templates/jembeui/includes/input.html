@@ -1,0 +1,63 @@
+{% from "jembeui/macros/icons.html" import display_icon %}
+
+{% macro display_widget(field, field_style) %}
+    {%- set jmb_on_action = false %}
+    {%- if not field_style.disabled %}
+        {%- set jmb_on_action %}
+            {{ cform._config.form_state_name }}.{{ field.name }} = $self.value;
+            {%- if "modified_fields" in cform.state %}
+            if (modified_fields.indexOf('{{ field.name }}') === -1 ) { modified_fields.push('{{ field.name }}')}
+            {%- endif %}
+        {%- endset %}
+    {%- endif %}
+    {%- set field_attrs = {
+        "disabled": field_style.disabled,
+        "placeholder": field.label.text if field_style.is_compact else false,
+        "class": " ".join([
+            "input input-bordered",
+            "input-error" if field.errors else ""
+        ]),
+        "jmb-on:change.defer": jmb_on_action,
+        "jmb-on:keydown.enter": "$self.blur();$self.focus();submit()" if not field_style.disabled  and "submit" in cform._config.component_actions else false
+    } %}
+    {{ field(**field_attrs) }}
+{% endmacro %}
+
+{%- if field_style.is_compact %}
+{# field label in placeholder #}
+<div class="w-full form-control">
+    {{ display_widget(field, field_style)}}
+    {%- if field.errors %}
+    <label class="label">
+        <span class="text-red-700 label-text-alt">
+            {%- for error in field.errors %}{{ error }}{% endfor %}
+        </span>
+    </label>
+    {%- endif %}
+</div>
+{%- else %}
+{# field label on top #}
+<div class="w-full form-control">
+    <label class="label">
+        <span class="label-text">{{ field.label.text }}</span>
+        {%- if field.description or not field.flags.required %}
+        <span class="flex items-center gap-2 label-text-alt">
+            {%- if not field.flags.required %}<span class="text-opacity-70">Optional</span>{% endif %}
+            {%- if field.description %}
+            <div class="tooltip tooltip-left" data-tip="{{ field.description }}">
+                {{ display_icon("question-mark-circle", class="w-5 h-5")}} 
+            </div>
+            {% endif %}
+        </span>
+        {%- endif %}
+    </label>
+    {{ display_widget(field, field_style)}}
+    {%- if field.errors %}
+    <label class="label">
+        <span class="text-red-700 label-text-alt">
+            {%- for error in field.errors %}{{ error }}{% endfor %}
+        </span>
+    </label>
+    {%- endif %}
+</div>
+{%- endif %}
