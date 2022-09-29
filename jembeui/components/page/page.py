@@ -1,4 +1,13 @@
-from typing import TYPE_CHECKING, Callable, Iterable, Optional, Union, Dict, Tuple
+from typing import (
+    TYPE_CHECKING,
+    Callable,
+    Iterable,
+    Optional,
+    Sequence,
+    Union,
+    Dict,
+    Tuple,
+)
 from jembe import listener
 from ..component import Component
 from .alerts import CPageAlerts
@@ -29,11 +38,23 @@ class CPage(Component):
     """
 
     class Config(Component.Config):
+        """Adds deafult components if not overriden
+
+        Default components:
+        - page_haed_tag (CPageHeadTag): Modifes html.head.meta tags,
+        - page_alerts (CPageAlerts): Display alerts in page corner,
+        - page_message (CPageMessage): Display message in popup,
+        - page_system_error (CPageSystemError): Display popup with error on network or server error,
+        - page_action_confirmation (CPageActionConfirmation): Display confirmation dialog to user:w
+
+        """
+
         default_template: str = "/jembeui/components/page.html"
 
         def __init__(
             self,
             title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
+            display_without_navigation: Sequence[str] = (),
             template: Optional[Union[str, Iterable[str]]] = None,
             components: Optional[Dict[str, "jembe.ComponentRef"]] = None,
             inject_into_components: Optional[
@@ -53,6 +74,9 @@ class CPage(Component):
             )
             if components:
                 efective_components.update(components)
+            self.display_without_navigation = [
+                f"{self.full_name}/{cn}" for cn in display_without_navigation
+            ]
             super().__init__(
                 title,
                 template,
@@ -65,22 +89,20 @@ class CPage(Component):
 
     _config: Config
 
-    def __init__(self, head_tags: Dict[str, str] = {}):
+    def __init__(self):
         """_summary_
 
         Args:
             head_tags (Dict[str, str], optional): Configure title and meta tags in HTML>HEAD.
                 Exp: {"title":"My Project", "description":"..."}. Defaults to {}.
         """
-        if head_tags == {}:
-            self.state.head_tags = dict()
 
         super().__init__()
 
-        # add title tag if does not exist
-        if CPageHeadTag.TITLE not in self.state.head_tags:
-            self.state.head_tags[CPageHeadTag.TITLE] = self.title
+        # create head_tags var and add title tag
+        self.head_tags: Dict[str, str] = dict()
         self._head_tags_level: Dict[str, int] = dict()
+        self.set_page_head_tag(CPageHeadTag.TITLE, self.title)
 
     # listener for updating HTML tags in HEAD
     @listener(event="pushPageHeadTag")
@@ -99,8 +121,11 @@ class CPage(Component):
         )
         return False
 
+    def set_page_head_tag(self, htype: str, content: str):
+        self._update_head_tag(htype, content, self._config.hiearchy_level)
+
     @listener(event="resetPageHeadTags")
-    def on_resetPageHeadTags(self, event: "jembe.Event"):
+    def on_reset_page_head_tags(self, event: "jembe.Event"):
         """Remove all current head tags and sets new values
 
         Event Args:
@@ -116,10 +141,10 @@ class CPage(Component):
         new_tags = {k: v for k, v in new_tags.items() if k in CPageHeadTag.TYPES}
 
         # remove tag components
-        for htype in self.state.head_tags.keys():
+        for htype in self.head_tags.keys():
             if htype not in new_tags and level >= self._head_tags_level.get(htype, 0):
                 self.remove_component("page_head_tag", htype)
-                del self.state.head_tags[htype]
+                del self.head_tags[htype]
                 self._head_tags_level[htype] = level
 
         for htype, content in new_tags.items():
@@ -129,7 +154,7 @@ class CPage(Component):
         return False
 
     def display(self) -> "jembe.DisplayResponse":
-        for htype, content in self.state.head_tags.items():
+        for htype, content in self.head_tags.items():
             self.display_component("page_head_tag", htype, htype=htype, content=content)
         return super().display()
 
@@ -142,10 +167,10 @@ class CPage(Component):
             if level >= self._head_tags_level.get(htype, 0):
                 self._head_tags_level[htype] = level
                 if content is None:
-                    del self.state.head_tags[htype]
+                    del self.head_tags[htype]
                     self.remove_component("page_head_tag", htype)
                 else:
-                    self.state.head_tags[htype] = content
+                    self.head_tags[htype] = content
                     self.display_component(
                         "page_head_tag", htype, htype=htype, content=content
                     )

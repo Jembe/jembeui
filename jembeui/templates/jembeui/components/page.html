@@ -1,7 +1,7 @@
 {% from "/jembeui/macros/icons.html" import display_icon %}
 <!DOCTYPE html>
 <html lang="en"
-      jmb-local="{theme: localStorage.getItem('jui_page_theme')?localStorage.getItem('jui_page_theme'):'light', drawerOpen: localStorage.getItem('jui_page_drawer_open') === 'true' }"
+      jmb-local="{theme: localStorage.getItem('jui_page_theme')?localStorage.getItem('jui_page_theme'):'light', drawerOpen: localStorage.getItem('jui_page_drawer_open') === 'true', hideAllNavigation:false}"
       jmb-init="$nextTick(()=>{$dispatch('is-page-drawer-open', {isOpen:$local.drawerOpen})});$watch('$local.drawerOpen', ()=> {$dispatch('is-page-drawer-open', {isOpen:$local.drawerOpen})})"
       jmb-bind:data-theme="$local.theme">
   <head>
@@ -36,7 +36,10 @@
             href="{{ url_for('jembeui.static', filename='/icons/favicon-32x32.png')}}"/>
     {% endblock favicon %}
   </head>
-  <body class="box-border m-0 text-base bg-base-200 [font-kerning:normal] min-h-screen">
+  <body class="box-border m-0 text-base bg-base-200 [font-kerning:normal] min-h-screen"
+      {%- if _config and _config.display_without_navigation %}
+      jmb-on:jembe-update-page.camel.window="$local.hideAllNavigation = {{ _config.display_without_navigation|tojson|forceescape }}.filter(x => $jmb.componentsOnPage().includes(x)).length > 0 "
+      {%- endif %}>
     <!-- Application Layout -->
     <div class="drawer"
          jmb-bind:class="{'drawer-mobile': $local.drawerOpen}">
@@ -46,7 +49,7 @@
         <!-- Sticky on top for navigation -->
         <div class="sticky top-0 z-30 w-full transition-all duration-100 shadow-sm bg-opacity-60 bg-base-100 text-base-content backdrop-blur ">
           <!-- Navbar -->
-          <nav class="navbar">
+          <nav class="navbar" jmb-show="!$local.hideAllNavigation">
             <div class="flex flex-1 md:gap-1 lg:gap-2">
               <!-- Left side of Navbar -->
               <!-- Open/Close Drawer -->
@@ -110,7 +113,7 @@
           <div class="box-border flex flex-col justify-end h-full gap-4 p-8 sm:max-w-1/3">{{ component("page_alerts") }}</div>
         </div>
       </div>
-      <div class="drawer-side scroll-pt-20 scroll-smooth">
+      <div class="drawer-side scroll-pt-20 scroll-smooth" jmb-show="!$local.hideAllNavigation">
         <label for="page-drawer" class="drawer-overlay"></label>
         <!-- Side Bar Content -->
         <aside class="bg-base-300 w-60 md:w-80">

@@ -16,6 +16,8 @@ class Component(jembe.Component):
     """
 
     class Config(jembe.Component.Config):
+        """Adds support for title and template variants"""
+
         default_template: str = "jembeui/components/component.html"
         TEMPLATE_VARIANTS: Dict[str, str]
 
@@ -84,6 +86,7 @@ class Component(jembe.Component):
 
         @property
         def default_template_names(self) -> Tuple[str, ...]:
+            """REturns names of default templates"""
             # use fullname to generate default tempalte name
             tname = f"{self.full_name.strip('/')}.html"
             templates = [tname, f"pages/{tname}"]
@@ -94,9 +97,7 @@ class Component(jembe.Component):
             if len(packages) > 1 and packages[0] not in ("jembe", "jembeui"):
                 try:
                     components_index = packages.index("components")
-                    templates.append(
-                        f"{'/'.join(packages[components_index])}.html"
-                    )
+                    templates.append(f"{'/'.join(packages[components_index])}.html")
                 except ValueError:
                     pass
 
@@ -181,9 +182,12 @@ class Component(jembe.Component):
         pass
 
     def hydrate(self):
-        pass
+        """Hydrate is called by display
+        to allow separtaion of control logic/calculations and display logic
+        useful when extending class behavior"""
 
     def display(self) -> "jembe.DisplayResponse":
         self.hydrate()
+        # Add create_thumbnail function in template context
         self.create_thumbnail = create_thumbnail
         return super().display()

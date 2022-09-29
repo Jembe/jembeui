@@ -267,6 +267,7 @@
                     class="flex {{ menu.style.classes|default('', true) }}"
                 {%- endif %}
                     jmb-scope="{activeMenuId:null}"
+                    jmb-on:click.prevent="if($event.target.tagName==='A'){$event.target.blur()}"
                 {% if not ns.ignoreActive %}
                     jmb-on:jembe-update-page.camel.window="$scope().activeMenuId = null; $updateDom()"
                 {% endif %}
