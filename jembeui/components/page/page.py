@@ -54,7 +54,8 @@ class CPage(Component):
         def __init__(
             self,
             title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
-            display_without_navigation: Sequence[str] = (),
+            display_without_navbar: Sequence[str] = (),
+            display_without_sidebar: Sequence[str] = (),
             template: Optional[Union[str, Iterable[str]]] = None,
             components: Optional[Dict[str, "jembe.ComponentRef"]] = None,
             inject_into_components: Optional[
@@ -74,8 +75,11 @@ class CPage(Component):
             )
             if components:
                 efective_components.update(components)
-            self.display_without_navigation = [
-                f"{self.full_name}/{cn}" for cn in display_without_navigation
+            self.display_without_navbar = [
+                f"{self.full_name}/{cn}" for cn in display_without_navbar
+            ]
+            self.display_without_sidebar = [
+                f"{self.full_name}/{cn}" for cn in display_without_sidebar
             ]
             super().__init__(
                 title,
