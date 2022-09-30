@@ -28,7 +28,7 @@
     {{ placeholder('page_head_tag.fb_app_id') }}
     {% block css %}
       <link rel="stylesheet"
-            href="{{ url_for('jembeui.static', filename='/css/jembeui.css')}}"/>
+            href="{{ url_for('jembeui.static', filename='/css/jembeui' + get_package_version('jembeui') + '.css')}}"/>
     {% endblock css %}
     {% block favicon %}
       <link rel="shortcut icon"
@@ -155,7 +155,11 @@
     {{ component("page_system_error") }}
     {%- block scripts %}
     <script src="{{ url_for('jembe.static', filename='js/jembe.js') }}" defer></script>
+    {% if config["DEBUG"] %}
     <script src="{{ url_for('jembeui.static', filename='js/jembeui.js') }}" defer></script>
+    {% else %}
+    <script src="{{ url_for('jembeui.static', filename='js/jembeui' + get_package_version('jembeui') + '.js') }}" defer></script>
+    {% endif %}
     <script defer>
       window.addEventListener("DOMContentLoaded", function(event) {
           window.jembeClient.addXRequestHeaderGenerator(function() {

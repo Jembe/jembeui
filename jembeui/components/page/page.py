@@ -8,6 +8,7 @@ from typing import (
     Dict,
     Tuple,
 )
+from importlib.metadata import version
 from jembe import listener
 from ..component import Component
 from .alerts import CPageAlerts
@@ -158,6 +159,9 @@ class CPage(Component):
         return False
 
     def display(self) -> "jembe.DisplayResponse":
+        # add get_package_version into context
+        self.get_package_version = lambda pname: version(pname) 
+        # update head tags
         for htype, content in self.head_tags.items():
             self.display_component("page_head_tag", htype, htype=htype, content=content)
         return super().display()
