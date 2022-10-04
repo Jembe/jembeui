@@ -1,7 +1,7 @@
 {
   "scripts": {
     "dev_js": "parcel watch jembeui/src/js/jembeui.js --dist-dir jembeui/static/js/ --public-url ./",
-    "build_js": "export VERSION=`node get_version.js`; npx del-cli jembeui/static/js/jembeui*.js; parcel build jembeui/src/js/jembeui.js --dist-dir jembeui/static/js/ --public-url ./;npx cp-cli jembeui/static/js/jembeui.js jembeui/static/js/jembeui${VERSION}.js;npx cp-cli jembeui/static/js/jembeui.js.map jembeui/static/js/jembeui${VERSION}.js.map",
+    "build_js": "export VERSION=`node get_version.js`; npx del-cli jembeui/static/js/jembeui*.js*; parcel build jembeui/src/js/jembeui.js --dist-dir jembeui/static/js/ --public-url ./;npx cp-cli jembeui/static/js/jembeui.js jembeui/static/js/jembeui${VERSION}.js;npx cp-cli jembeui/static/js/jembeui.js.map jembeui/static/js/jembeui${VERSION}.js.map",
     "dev_css": "export NODE_PATH=./node_modules; export VERSION=`node get_version.js`; npx postcss jembeui/src/css/main.css -o jembeui/static/css/main${VERSION}.css --watch",
     "build_css": "export NODE_ENV=production;export NODE_PATH=./node_modules; export VERSION=`node get_version.js`; npx del-cli jembeui/static/css/main*.css; npx postcss jembeui/src/css/main.css -o jembeui/static/css/main${VERSION}.css",
     "dev": "concurrently \"npm run dev_css\" \"npm run dev_js\"",

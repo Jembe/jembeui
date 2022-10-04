@@ -1,0 +1,46 @@
+from sqlalchemy import event
+from sqlalchemy.orm import Session, UOWTransaction
+
+__all__ = ("register_db_listeners",)
+
+
+def register_db_listeners():
+    """Defines and register sqlalchemy listeners"""
+
+    @event.listens_for(Session, "after_flush")
+    def after_flush(session: Session, flush_context: UOWTransaction):
+        """
+        Check if ORM items in session has on_update, on_insert, or on_delete method
+        and execute it when model is changed, added or deleted retrospectivly
+        """
+        for dirty_item in session.dirty:
+            if hasattr(dirty_item, "on_update"):
+                session.enable_relationship_loading(dirty_item)
+                dirty_item.on_update(session)
+        for new_item in session.new:
+            if hasattr(new_item, "on_insert"):
+                session.enable_relationship_loading(new_item)
+                new_item.on_insert(session)
+        for deleted_item in session.deleted:
+            if hasattr(deleted_item, "on_delete"):
+                session.enable_relationship_loading(deleted_item)
+                deleted_item.on_delete(session)
+
+    @event.listens_for(Session, "before_flush")
+    def before_flush(session: Session, flush_context: UOWTransaction, instances):
+        """
+        Check if ORM items in session has before_update, before_insert, or before_delete method
+        and execute it when model is changed, added or deleted retrospectivly
+        """
+        for dirty_item in session.dirty:
+            if hasattr(dirty_item, "before_update"):
+                session.enable_relationship_loadirty_itemng(dirty_item)
+                dirty_item.before_update(session)
+        for new_item in session.new:
+            if hasattr(new_item, "before_insert"):
+                session.enable_relationship_loading(new_item)
+                new_item.before_insert(session)
+        for deleted_item in session.deleted:
+            if hasattr(deleted_item, "before_delete"):
+                session.enable_relationship_loading(deleted_item)
+                deleted_item.before_delete(session)

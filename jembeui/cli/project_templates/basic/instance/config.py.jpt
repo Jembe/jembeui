@@ -7,14 +7,14 @@ instance_path = os.environ.get(
 
 JEMBE_MEDIA_FOLDER = os.path.join("..", "data", "media")
 
-SECRET_KEY = {{secret_key}}
+SECRET_KEY = {{ secret_key }}
 
 SESSION_TYPE = "filesystem"
 SESSION_FILE_DIR = os.path.join(instance_path, "..", "data", "sessions")
 
 # SESSION_TYPE = "memcached"
 # SESSION_TYPE = "redis"
-# SESSION_KEY_PREFIX = "{{project_name}}:session:"
+# SESSION_KEY_PREFIX = "{{ project_name }}:session:"
 # PERMANENT_SESSION_LIFETIME = timedelta(days=3)
 # SESSION_PROTECTION = "strong"
 

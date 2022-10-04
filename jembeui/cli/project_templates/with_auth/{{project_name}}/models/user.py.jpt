@@ -1,0 +1,76 @@
+from uuid import uuid4
+import sqlalchemy as sa
+from sqlalchemy.orm import object_session
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import UserMixin
+from {{ project_name }}.app import db
+
+
+__all__ = ("User",)
+
+
+class User(UserMixin, db.Model):  # type:ignore
+    """User Authentication Credential"""
+
+    __tablename__ = "users"
+
+    id = sa.Column(sa.Integer(), primary_key=True)
+
+    name = sa.Column(sa.String(150), nullable=False)
+
+    # global flags
+    is_active = sa.Column(
+        sa.Boolean(), nullable=False, default=True, server_default=sa.true()
+    )
+    is_superadmin = sa.Column(
+        sa.Boolean(), nullable=False, default=False, server_default=sa.false()
+    )
+
+    # Email/Password credentials
+    email = sa.Column(sa.String(150), nullable=False, unique=True)
+    password = sa.Column(sa.String(255), nullable=False, server_default="", default="")
+
+    __table_args__ = (
+        sa.Index("idx_users_unique_email", sa.func.lower(email), unique=True),
+    )
+
+    @sa.orm.validates("email")
+    def validate_email(self, key, value):
+        """Validates that user with same email doesn't exist"""
+        sess: "sa.orm.Session" = object_session(self)
+        if sess is None:
+            sess = db.session
+        if sess.query(
+            sess.query(User).filter(User.email == value, User.id != self.id).exists()
+        ).scalar():
+            return ValueError("User with the same email already exists.")
+        return value
+
+    def set_password(self, password: str):
+        """Encripts and updates password"""
+        self.password = generate_password_hash(password)
+
+    def check_password(self, password: str) -> bool:
+        """Chekcs if password is valid"""
+        return check_password_hash(self.password, password)
+
+    @classmethod
+    def get_user_from_oauth_login(
+        cls, unique_id, email: str, name: str, picture=None
+    ) -> "User":
+        """Get current user or create new one on successfull authentication over google"""
+        existing_user = (
+            db.session.query(User).filter(User.email == email.lower()).first()
+        )
+        if existing_user:
+            user = existing_user
+            if name != user.name:
+                user.name = name
+                db.session.add(user)
+                db.session.commit()
+        else:
+            user = User(name=name, email=email, password=uuid4())
+            db.session.add(user)
+            db.session.commit()
+
+        return user

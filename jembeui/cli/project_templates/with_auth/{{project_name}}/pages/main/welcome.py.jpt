@@ -1,0 +1,17 @@
+from flask_login import current_user
+from jembe import config
+from jembeui import Component
+
+__all__ = ("CWelcome",)
+
+
+@config(Component.Config(changes_url=False))
+class CWelcome(Component):
+    """Welcome the visitor"""
+
+    def update_ac(self):
+        """avaiable to guest user only"""
+        if current_user.is_authenticated:
+            self.ac_deny()
+        else:
+            self.ac_allow()

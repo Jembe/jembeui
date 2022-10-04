@@ -6,7 +6,9 @@ from .app import jmb
 
 
 @app.cli.command("create-tw-content")
-@click.option("--save", is_flag=True, help="Save list of files in tailwind.content.json")
+@click.option(
+    "--save", is_flag=True, help="Save list of files in tailwind.content.json"
+)
 def build_tailwind_content_json(save):
     """Create list of JembeUI templates used by the application"""
 
@@ -14,7 +16,7 @@ def build_tailwind_content_json(save):
 
     if save:
         # save list in file
-        with open("tailwind.content.json", "w") as f:
+        with open("tailwind.content.json", "w", encoding="UTF-8") as f:
             f.write(json.dumps(templates, indent=2))
         click.echo("Success! tailwind.content.json is created.")
     else:

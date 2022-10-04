@@ -1,0 +1,33 @@
+from flask_login import current_user, logout_user
+from jembe import action
+from jembeui import Component
+
+
+__all__ = ("CLogout",)
+
+
+class CLogout(Component):
+    """Displays logout page with button to logout current user"""
+
+    def update_ac(self):
+        """Only authenticated user can access this component"""
+        if current_user.is_authenticated:
+            self.ac_allow()
+        else:
+            self.ac_deny()
+
+    @action
+    def logout(self):
+        """Logout current user from app"""
+        user_name = current_user.name
+
+        logout_user()
+
+        self.jui.push_page_alert(f"{user_name} logged out!")
+        self.emit("logout")
+        self.emit("update_ac")
+
+    @action
+    def cancel(self):
+        """Cancels logout"""
+        self.emit("cancel")

@@ -1,9 +1,5 @@
-from typing import TYPE_CHECKING
-from jembeui import Component, Menu, Link
 from jembe import config
-
-if TYPE_CHECKING:
-    import jembe
+from jembeui import Component, Menu, Link
 
 
 __all__ = (
@@ -17,25 +13,33 @@ sidebar_menu = Menu(
         display_as=Menu.Style.VERTICAL_COLLAPSIBLE, classes="p-2 menu-compact"
     ),
     items=[
-        Link("/main/dashboard"),
-        Link("/main/about"),
+        Link("/main/welcome"),
     ],
 )
 
 # menu displayed at the top of the page in navigation bar
 navbar_menu = Menu(
+    items=[
+        Link(
+            "/main/demo",
+            style="btn-ghost",
+        ),
+    ],
     style=Menu.Style(display_as=Menu.Style.DROPDOWNS),
-    items=[Link("/main/about", style="btn-ghost btn-square", icon="question-mark-circle")],
 )
 
 
 @config(Component.Config(changes_url=False))
 class CSidebarMenu(Component):
+    """Display sidebar menu in drawer"""
+
     def hydrate(self):
         self.menu = sidebar_menu.bind_to(self)
 
 
 @config(Component.Config(changes_url=False))
 class CNavbarMenu(Component):
+    """Display menu in NavBar"""
+
     def hydrate(self):
         self.menu = navbar_menu.bind_to(self)

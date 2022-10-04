@@ -1,0 +1,70 @@
+from typing import TYPE_CHECKING
+import os
+from flask_login import LoginManager
+from flask_mail import Mail
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+from flask_seasurf import SeaSurf
+from flask_session import Session
+from flask_babel import Babel
+from jembe import Jembe
+from jembeui import JembeUI
+from .includes.error_handlers import register_error_handlers
+from .includes.db_listeners import register_db_listeners
+from .includes.rq_setup import get_redis, get_rq
+
+if TYPE_CHECKING:
+    from flask import Flask
+
+__all__ = ("init_app", "jmb", "jui", "csrf", "session", "get_rq", "get_redis")
+
+csrf = SeaSurf()
+session = Session()
+
+db = SQLAlchemy()
+migrate = Migrate()
+
+register_db_listeners()
+
+login_manager = LoginManager()
+
+mail = Mail()
+
+babel = Babel()
+
+jmb = Jembe()
+jui = JembeUI()
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    """Callback for reloading user from session"""
+    if user_id is not None:
+        from .models import User
+
+        return db.session.query(User).get(user_id)
+    return None
+
+
+def init_app(app: "Flask"):
+    """Initialize the Flask Application"""
+    with app.app_context():
+        register_error_handlers(app)
+        csrf.init_app(app)
+        session.init_app(app)
+
+        db.init_app(app)
+        migrate.init_app(
+            app=app,
+            db=db,
+            directory=os.path.join(os.path.dirname(__file__), "migrations"),
+        )
+
+        login_manager.init_app(app)
+
+        mail.init_app(app)
+
+        babel.init_app(app)
+
+        jui.init_jembe(jmb, default_db=db)
+        jmb.init_app(app)

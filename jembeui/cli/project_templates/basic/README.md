@@ -2,7 +2,6 @@
 
 {{project_description}}
 
-
 ## Development
 
 To install required development dependencies and prepare development enviroment execute:
@@ -11,6 +10,8 @@ To install required development dependencies and prepare development enviroment 
 $ pip install -e .[dev]
 $ npm install
 ```
+
+### Start development enviroment
     
 To start development web server execute:
 ```bash
@@ -23,6 +24,7 @@ $ npm run dev
 ```
 
 ## Production 
+
 To package project for deployment run:
 ```bash
 $ npm run build

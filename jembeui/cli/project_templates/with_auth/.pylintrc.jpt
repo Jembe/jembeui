@@ -1,0 +1,4 @@
+[MASTER]
+disable = missing-module-docstring
+load-plugins= pylint_flask, pylint_flask_sqlalchemy
+ignored-classes=scoped_session

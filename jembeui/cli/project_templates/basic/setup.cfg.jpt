@@ -1,13 +1,13 @@
 [metadata]
-name = {{project_name}}
+name = {{ project_name }}
 version = 0.0.1
-description = {{project_description}}
+description = {{ project_description }} 
 # Look at https://spdx.org/licenses/ for license indetifier or use "proprietary"
 # license = MIT
 license_files = LICENSE
 
 # Enter your full name or the name of your company
-author = {{project_author}}
+author = {{ project_author }}
 # Enter your email or email of your company
 # author_email = 
 
@@ -37,7 +37,8 @@ packages = find:
 include_package_data = True
 python_requires = >=3.8
 install_requires = 
-    jembe >= {{jembe_version}}
+    jembe >= {{ jembe_version }}
+    jembeui
     Flask-SeaSurf
     Flask-Session
     python-dotenv
@@ -48,10 +49,13 @@ exclude = tests
 [options.extras_require]
 dev = 
     black
+    pylint
+    pylint_flask
+    types-redis
     mypy
     pytest
     coverage [toml]
 
 [options.entry_points]
 console_scripts = 
-    {{project_name}} = {{project_name}}.cli.scripts:cli
+    {{ project_name }} = {{ project_name }}.cli.scripts:cli

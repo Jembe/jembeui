@@ -1,0 +1,79 @@
+from typing import TYPE_CHECKING
+from markupsafe import Markup
+from flask_login import current_user
+from jembeui import Component, Menu, Link
+from jembe import config, listener
+
+if TYPE_CHECKING:
+    import jembe
+
+
+__all__ = (
+    "CSidebarMenu",
+    "CNavbarMenu",
+)
+
+# menu displayed on the side bar of the page
+sidebar_menu = Menu(
+    style=Menu.Style(
+        display_as=Menu.Style.VERTICAL_COLLAPSIBLE, classes="p-2 menu-compact"
+    ),
+    items=[
+        Link("/main/dashboard"),
+        # Link("/main/welcome"),
+    ],
+)
+
+# menu displayed at the top of the page in navigation bar
+navbar_menu = Menu(
+    items=[
+        Menu(
+            items=[
+                Link("/main/user_profile", "Account Settings", "Manage yor account"),
+                Link("/main/logout", "Log out"),
+            ],
+            icon="user",
+            description=lambda c: current_user.name,
+            header=lambda c: Markup(
+                '<li><div class="text-xs tracking-wider uppercase cursor-default text-base-content/80 hover:bg-transparent">'
+                f"{current_user.name}"
+                "</div></li>"
+            ),
+            style=Menu.Style(
+                btn_classes="btn-ghost btn-circle",
+                classes="overflow-hidden shadow-md bg-base-100 rounded w-48 border border-base-300",
+                dropdown_classes="dropdown-end dropdown-hover",
+            ),
+        ),
+        Link("/main/login", "Log in", style="btn-ghost", active_for_exec_names=[]),
+    ],
+    style=Menu.Style(display_as=Menu.Style.DROPDOWNS),
+)
+
+
+@config(Component.Config(changes_url=False))
+class CSidebarMenu(Component):
+    """Display sidebar menu in drawer"""
+
+    def hydrate(self):
+        self.menu = sidebar_menu.bind_to(self)
+
+    @listener(event="update_ac")
+    def jui_on_update_ac(self, event: "jembe.Event"):
+        """Redisplay itself on update_ac event, to update menu items"""
+        super().jui_on_update_ac(event)
+        return True
+
+
+@config(Component.Config(changes_url=False))
+class CNavbarMenu(Component):
+    """Display menu in NavBar"""
+
+    def hydrate(self):
+        self.menu = navbar_menu.bind_to(self)
+
+    @listener(event="update_ac")
+    def jui_on_update_ac(self, event: "jembe.Event"):
+        """Redisplay itself on update_ac event, to update menu items"""
+        super().jui_on_update_ac(event)
+        return True

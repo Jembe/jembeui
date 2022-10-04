@@ -1,0 +1,31 @@
+{{ '{%' }} extends "jembeui/components/page.html" {{ '%}' }}
+{{ '{%' }} block css {{ '%}' }}
+  <link rel="stylesheet"
+        href="{{ '{{' }} url_for('static', filename='css/{{ project_name }}' + get_package_version('{{ project_name }}') + '.css'){{ '}}' }}"/>
+{{ '{%' }} endblock css {{ '%}' }}
+{{ '{%' }} block favicon {{ '%}' }}
+  <link rel="shortcut icon"
+        type="image/png"
+        href="{{ '{{' }} url_for('static', filename='icons/favicon-32x32.png'){{ '}}' }}"/>
+{{ '{%' }} endblock favicon {{ '%}' }}
+{{ '{%' }} block logo {{ '%}' }}
+  <div class="inline-flex text-lg transition-all duration-200 font-title text-primary md:text-3xl">
+    <span class="capitalize text-primary">{{ project_name[:-2] }}</span> <span class="uppercase text-base-content">{{ project_name[-2:] }}</span>
+  </div>
+{{ '{%' }} endblock logo {{ '%}' }}
+
+{{ '{%' }} block content_padded {{ '%}' }}
+<div class="flex items-center w-full h-[70vh]">
+    <div class="max-w-sm m-auto card">
+        <div class="card-body">
+            <h2 class="card-title text-error-content">Error!</h2>
+            <p>{{ '{{' }}error{{ '}}' }}</p>
+        </div>
+    </div>
+</div>
+{{ '{%' }} endblock content_padded {{ '%}' }}
+
+{{ '{%' }} block script {{ '%}' }}
+  {{ '{{' }} super() {{ '}}' }}
+    <script src="{{ '{{' }} url_for('static', filename='js/{{ project_name }}' + get_package_version('{{ project_name }}') + '.js') {{ '}}' }}" defer></script>
+{{ '{%' }} endblock script {{ '%}' }}

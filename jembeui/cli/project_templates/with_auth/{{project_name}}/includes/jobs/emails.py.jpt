@@ -1,0 +1,86 @@
+from typing import TYPE_CHECKING
+from rq import Retry
+from flask_mail import Message
+from flask import current_app, render_template
+from ...app import mail, get_rq
+
+if TYPE_CHECKING:
+    from {{ project_name }}.models import SignUp, User
+
+
+__all__ = (
+    "send_email",
+    "send_signup_verification_email",
+    "send_password_recovery_email",
+)
+
+
+def _get_app_url() -> str:
+    """Returns root URL of the application"""
+    # return request.url_root
+    return current_app.config.get("APP_ROOT_URL", "http://localhost:5000")
+
+
+def send_email(message: Message):
+    """Sends email message
+
+    Args:
+        message (Message): Message to be send
+    """
+    mail.send(message)
+
+
+def send_signup_verification_email(signup: "SignUp", signup_verification_url: str):
+    """Sends verification mail after user creates new accoutn/SingUps
+
+    Args:
+        signup (SignUp): Model from db that represents user signup.
+        signup_verification_url (str): Url where to redirect user to verify email.
+    """
+    get_rq().enqueue(
+        send_email,
+        Message(
+            "Verify your email for {{ project_name }}!",
+            recipients=[signup.email],
+            body=render_template(
+                "emails/signup_verification.txt",
+                verification_url=signup_verification_url,
+                signup=signup,
+            ),
+            html=render_template(
+                "emails/signup_verification.html",
+                verification_url=signup_verification_url,
+                signup=signup,
+            ),
+        ),
+        retry=Retry(max=4, interval=[30, 60, 2 * 60, 3 * 60]),
+        description=f"Send SignUp Verification email to {signup.email}.",
+    )
+
+
+def send_password_recovery_email(user: "User", recovery_url: str):
+    """Sends password recovery email
+
+    Args:
+        user (User): User that email is send to
+        recovery_url (str): url for password recovery page
+    """
+    get_rq().enqueue(
+        send_email,
+        Message(
+            "Set your new {{ project_name }} password",
+            recipients=[user.email],
+            body=render_template(
+                "emails/password_recovery.txt",
+                recovery_url=recovery_url,
+                user=user,
+            ),
+            html=render_template(
+                "emails/password_recovery.html",
+                recovery_url=recovery_url,
+                user=user,
+            ),
+        ),
+        retry=Retry(max=4, interval=[30, 60, 2 * 60, 3 * 60]),
+        description=f"Send password recovery email to {user.email}.",
+    )

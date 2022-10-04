@@ -1,0 +1,7 @@
+from jembeui import Component
+
+__all__ = ("CDemo",)
+
+
+class CDemo(Component):
+    """Welcomes the visitor"""

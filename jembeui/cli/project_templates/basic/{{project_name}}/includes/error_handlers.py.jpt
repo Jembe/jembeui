@@ -8,12 +8,13 @@ if TYPE_CHECKING:
 __all__ = ("register_error_handlers",)
 
 
-def register_error_hadlers(app: "Flask"):
+def register_error_handlers(app: "Flask"):
+    """Registars error handlers to Flask app"""
     app.register_error_handler(404, on_http_404)
 
 
 def on_http_404(e):
-
+    """Error handler for HTTP 404 error"""
     if not (
         request.path.startswith("/static")
         or request.path.startswith("/jembe/static")
@@ -26,6 +27,11 @@ def on_http_404(e):
         return redirect(page_url("/main/p404"))
     else:
         return (
-            """<div style="height:100vh; display:flex;"><div style="margin:auto; font-size:22px; display:flex; flex-direction:column; align-items: center; gap:8px; font-family:ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';"><div style="font-size:36px; color:red">404</div><div>File not found!</div></div>""",
+            """<div style="height:100vh; display:flex; ">
+                <div style="margin:auto; font-size:22px; display:flex; flex-direction:column; align-items: center; gap:8px; font-family:ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;">
+                    <div style="font-size:36px; color:red">404</div>
+                    <div>File not found!</div>
+                </div>
+            </div>""",
             404,
         )

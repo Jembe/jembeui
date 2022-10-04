@@ -1,0 +1,86 @@
+from typing import TYPE_CHECKING, Union, Optional
+from urllib.parse import urljoin
+from markupsafe import Markup
+import wtforms as wtf
+from flask_login import current_user
+from flask import request
+from jembe import config
+from jembeui import CCreateRecord, Form
+from {{ project_name }}.includes.jobs import send_signup_verification_email
+from {{ project_name }}.models import SignUp, User
+
+if TYPE_CHECKING:
+    from flask_sqlalchemy import Model
+
+__all__ = ("CSignUp",)
+
+
+class SignUpForm(Form):
+    __style__ = Form.Style(
+        fields=dict(
+            email=Form.FieldStyle(is_compact=True)
+        )
+    )
+    email = wtf.StringField(
+        "Enter email address",
+        validators=[
+            wtf.validators.DataRequired("Email is required"),
+            wtf.validators.Email(message="Enter a valid email."),
+        ],
+    )
+
+    def validate_email(self, field):
+        """Checks if user with same email already exists"""
+        if self.cform.session.query(User).filter(User.email == field.data).first():
+            raise wtf.ValidationError(
+                "User with same email is already registred. "
+                "You can recover your password."
+            )
+
+    def submit(self, record: Union["Model", dict]) -> Optional[Union["Model", dict]]:
+        """Create SignUp record in database and sends signup confirmation email"""
+        # create signup record in database
+        self.email.data = self.email.data.lower()
+        signup: "SignUp" = super().submit(record)  # type:ignore
+
+        # send verification email
+        send_signup_verification_email(
+            signup,
+            urljoin(
+                request.url_root,
+                self.cform.component("/main/signup_verification", uuid=signup.uuid).url,
+            ),
+        )
+
+        return signup
+
+
+@config(
+    CCreateRecord.Config(
+        form=SignUpForm,
+        get_record=lambda c: SignUp(),
+    )
+)
+class CSignUp(CCreateRecord):
+    """Displays signup form"""
+
+    def update_ac(self):
+        """Only unauthenticated user can signup"""
+        if current_user.is_authenticated:
+            self.ac_deny()
+        else:
+            self.ac_allow()
+
+    def on_form_submited(self, signup: "SignUp") -> Optional[bool]:
+        """display message to user to check its inbox"""
+        self.jui.push_page_message(
+            "Check your inbox to log in",
+            Markup(
+                "<div class='prose'><p>To complete setup and log in, click the verification"
+                f" link in the email we've send to <br><strong>{signup.email}</strong></p></div>"
+            ),
+        )
+        return False
+
+    def push_page_alert_on_form_invalid(self):
+        """Don't push alerts when form is invalid"""

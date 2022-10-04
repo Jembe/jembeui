@@ -1,7 +1,0 @@
-from jembeui import Component
-
-__all__ = ("CAbout",)
-
-
-class CAbout(Component):
-    pass

@@ -1,0 +1,17 @@
+from flask_login import current_user
+from jembe import config
+from jembeui import Component
+
+__all__ = ("CDashboard",)
+
+
+@config(Component.Config(changes_url=False))
+class CDashboard(Component):
+    """Application dashboard"""
+
+    def update_ac(self):
+        """avaiable to authenticated user only"""
+        if current_user.is_authenticated:
+            self.ac_allow()
+        else:
+            self.ac_deny()

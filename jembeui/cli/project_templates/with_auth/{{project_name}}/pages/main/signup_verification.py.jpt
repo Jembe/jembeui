@@ -1,0 +1,92 @@
+from typing import TYPE_CHECKING, Optional, Union
+import wtforms as wtf
+from flask_login import current_user, login_user
+from jembe import config
+from jembeui import Form, CForm
+from {{ project_name }}.models import SignUp, User
+
+if TYPE_CHECKING:
+    from flask_sqlalchemy import Model
+
+__all__ = ("CSignUpVerification",)
+
+
+class SignUpVerificationForm(Form):
+    """Verifes signups and creates user account"""
+
+    __style__ = Form.Style(
+        fields=dict(
+            email=Form.FieldStyle(is_compact=True),
+            name=Form.FieldStyle(is_compact=True),
+            password=Form.FieldStyle(is_compact=True),
+        )
+    )
+
+    email = wtf.EmailField(render_kw={"disabled": True})
+
+    name = wtf.StringField(
+        "Enter full name",
+        validators=[wtf.validators.DataRequired("Full name is required")],
+    )
+
+    password = wtf.PasswordField(
+        "Create password",
+        validators=[wtf.validators.DataRequired("Password is required")],
+    )
+
+    def submit(self, record: Union["Model", dict]) -> Optional[Union["Model", dict]]:
+        """creates and logins new user"""
+        # create user
+        signup: SignUp = record  # type:ignore
+        user = User()
+        user.name = self.name.data
+        user.email = signup.email
+        user.set_password(self.password.data)
+        self.cform.session.add(user)
+
+        # delete signup
+        self.cform.session.delete(signup)
+
+        # commit changes
+        self.cform.session.commit()
+
+        return user
+
+
+@config(
+    CForm.Config(
+        title="Set up your {{ project_name }} account",
+        form=SignUpVerificationForm,
+        get_record=lambda c: (
+            c.session.query(SignUp)
+            .filter(SignUp.uuid == c.state.uuid and SignUp.is_valid)
+            .first()
+        ),
+    )
+)
+class CSignUpVerification(CForm):
+    """Verifies user email provided during signup"""
+
+    def update_ac(self):
+        """Only Anonymous user can verify signup"""
+        if current_user.is_authenticated:
+            self.ac_deny()
+        else:
+            self.ac_allow()
+
+    def __init__(self, uuid: str, form: Optional[Form] = None):
+        """Defines uuid state/url  and form state param"""
+        super().__init__()
+
+    def on_form_submited(self, user: "User") -> Optional[bool]:
+        """Login user, emit login and update_ac and display welcome alert"""
+        # login user
+        login_user(user)
+
+        # push page alert
+        self.jui.push_page_alert(f"Welcome {user.email}!")
+
+        self.emit("login")
+        self.emit("update_ac")
+
+        return False

@@ -1,10 +1,11 @@
 from typing import TYPE_CHECKING
-from jembe import Jembe
-from jembeui import JembeUI
+import os
 from flask_seasurf import SeaSurf
 from flask_session import Session
 from flask_babel import Babel
-from .error_handlers import register_error_hadlers
+from jembe import Jembe
+from jembeui import JembeUI
+from .includes.error_handlers import register_error_handlers
 
 if TYPE_CHECKING:
     from flask import Flask
@@ -21,8 +22,9 @@ jui = JembeUI()
 
 
 def init_app(app: "Flask"):
+    """Initialize the Flask Application"""
     with app.app_context():
-        register_error_hadlers(app)
+        register_error_handlers(app)
         csrf.init_app(app)
         session.init_app(app)
 

@@ -1,0 +1,32 @@
+"""Flask regular routes unrelated to Jembe pages"""
+import os
+from flask import redirect, current_app as app, send_from_directory, request
+from jembe import page_url
+
+# enable google login
+from .google_login import google_login, google_login_callback
+
+# enable keycloak login
+from .keycloak_login import keycloak_login, keycloak_login_callback
+
+
+@app.route("/")
+def index():
+    """Redirects to Main jembe page."""
+    return redirect(page_url("/main"))
+
+
+@app.route("/favicon.ico")
+def favicon():
+    """Return favicon when requested without reading HTML metatag"""
+    return send_from_directory(
+        os.path.join(app.root_path, "static", "icons"), "favicon.png"
+    )
+
+
+# Create sitemap.xml and robots.txt in static directory and enable this route
+# @app.route("/robots.txt")
+# @app.route("/sitemap.xml")
+# def static_from_root():
+#     """Return robots.txt and sitemap.xml"""
+#     return send_from_directory(app.static_folder, request.path[1:])

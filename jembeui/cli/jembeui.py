@@ -1,14 +1,15 @@
 from getpass import getuser
+import os
 import importlib
 import click
 from click import echo, secho
-import os
 from jembe.cli.utils import make_python_identifier, extract_project_template
+import jembeui as jui
 
 
 @click.group()
 def jembeui():
-    pass
+    """Defines click jembeui group"""
 
 
 @jembeui.command()
@@ -22,30 +23,38 @@ def jembeui():
 @click.option(
     "--description", help="Description", prompt=True, required=False, default=""
 )
-def startproject(name, description):
+@click.option(
+    "--template",
+    help="Project template",
+    prompt="Project template",
+    required=True,
+    type=click.Choice(["basic", "with_auth"], case_sensitive=False),
+)
+def startproject(name, description, template="basic"):
     """Starts JembeUI project in current directory"""
     name = make_python_identifier(name)
-
-    import jembeui
 
     ctx = {
         "project_name": name,
         "project_description": description,
         "project_author": getuser(),
         "jembe_version": importlib.metadata.version("jembe"),
-        "secret_key": str(os.urandom(24).__repr__()),
-        "jembeui_root": jembeui.__path__[0],
+        "secret_key": str(repr(os.urandom(24))),
+        "jembeui_root": jui.__path__[0],
     }
 
-    extract_project_template("basic", ctx=ctx, root_dir=jembeui.__path__[0])
+    extract_project_template(template.lower(), ctx=ctx, root_dir=jui.__path__[0])
 
     echo()
-    echo("New JembeUI project is suceessfully created in current directory!", color=True)
+    echo(
+        "New JembeUI project is suceessfully created in current directory!", color=True
+    )
     echo()
     echo("To install required development dependencies execute:")
     secho("\t$ pip install -e .[dev]", bold=True)
     secho("\t$ npm install", bold=True)
-    secho("\t$ flask db init", bold=True)
+    if template == "with_auth":
+        secho("\t$ flask db upgrade", bold=True)
     echo()
     echo("To start development execute (in separate terminals):")
     secho("\t$ flask run", bold=True)
@@ -53,4 +62,8 @@ def startproject(name, description):
     echo()
     echo("To package project for deployment run:")
     secho("\t$ python -m build", bold=True)
+    echo()
+    secho(
+        "Please read README.md for detail instructions and more information.", bold=True
+    )
     echo()

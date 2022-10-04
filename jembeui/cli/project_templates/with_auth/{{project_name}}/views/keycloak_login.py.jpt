@@ -1,0 +1,116 @@
+import json
+import requests
+from flask_login import login_user
+from flask import redirect, current_app as app, request, render_template
+from oauthlib.oauth2 import WebApplicationClient
+from jembe import page_url
+from {{ project_name }}.models import User
+
+__all__ = "keycloak_login", "keycloak_login_callback"
+
+KEYCLOAK_CLIENT_ID = app.config.get("KEYCLOAK_CLIENT_ID")
+KEYCLOAK_CLIENT_SECRET = app.config.get("KEYCLOAK_CLIENT_SECRET")
+KEYCLOAK_CLIENT_DISCOVERY_URL = app.config.get("KEYCLOAK_CLIENT_DISCOVERY_URL")
+
+
+keycloak_client = WebApplicationClient(KEYCLOAK_CLIENT_ID)
+
+
+@app.route("/keycloak_login")
+def keycloak_login():
+    """Login using keycloak authentication"""
+    # get keycloak authorization endpoint
+    try:
+        authorization_endpoint = _get_keycloak_provider_cfg()["authorization_endpoint"]
+    except requests.exceptions.ConnectTimeout:
+        return _get_error_response(
+            "Can't reach Keycloak Authentication server! Please, contact support."
+        )
+
+    # Construct login request
+    request_uri = keycloak_client.prepare_request_uri(
+        authorization_endpoint,
+        redirect_uri=request.root_url + "keycloak_login_callback",
+        scope=["openid", "email", "profile"],
+    )
+    # redirect user to keycloak
+    return redirect(request_uri)
+
+
+@app.route("/keycloak_login_callback")
+def keycloak_login_callback():
+    """Receives keycloak authorization code, gets keycloak token and login the user"""
+    # Get Google authorization code send back to app
+    code = request.args.get("code")
+
+    # Find out what URL to hit to get tokens that allow us to ask for
+    # things in user behalf
+    keycloak_provider_cfg = _get_keycloak_provider_cfg()
+    token_endpoint = keycloak_provider_cfg["token_endpoint"]
+
+    # Prepare and send request to get tokens
+    token_url, headers, body = keycloak_client.prepare_token_request(
+        token_endpoint,
+        authorization_response=request.url,
+        redirect_url=request.base_url,
+        code=code,
+    )
+    token_response = requests.post(
+        token_url,
+        headers=headers,
+        data=body,
+        auth=(
+            KEYCLOAK_CLIENT_ID,
+            KEYCLOAK_CLIENT_SECRET,
+        ),
+        timeout=3,
+    )
+
+    # parse the tokens
+    keycloak_client.parse_request_body_response(json.dumps(token_response.json()))
+
+    # Now that we have tokens (yay) let's find and hit URL
+    # from Google that gives you user's profile information,
+    # including their Google Profile Image and Email
+    userinfo_endpoint = keycloak_provider_cfg["userinfo_endpoint"]
+    uri, headers, body = keycloak_client.add_token(userinfo_endpoint)
+    userinfo_response = requests.get(uri, headers=headers, data=body, timeout=3)
+
+    # We want to make sure their email is verified.
+    # The user authenticated with Google, authorized our
+    # app, and now we've verified their email through Google!
+    userinfo = userinfo_response.json()
+    print(userinfo)
+    if userinfo.get("email_verified"):
+        unique_id = userinfo["sub"]
+        user_email = userinfo["email"]
+        user_name = f"{userinfo['given_name']} {userinfo['family_name']}"
+    else:
+        return _get_error_response(
+            "User email not available or not verified by Keycloak."
+        )
+    user = User.get_user_from_oauth_login(unique_id, user_email, user_name)
+
+    login_user(user)
+
+    return redirect(page_url("/main"))
+
+
+def _get_error_response(message):
+    return (
+        render_template(
+            "error.html",
+            error=message,
+            placeholder=lambda *a, **kw: "",
+            component=lambda *a, **kw: "",
+            _config=None
+        ),
+        400,
+    )
+
+
+def _get_keycloak_provider_cfg():
+    return requests.get(
+        KEYCLOAK_CLIENT_DISCOVERY_URL,
+        timeout=3,
+    ).json()

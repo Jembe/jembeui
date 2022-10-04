@@ -1,0 +1,39 @@
+<div class="p-8">
+    <div class="flex mb-8">
+        <a href="{{ '{{' }} component('/main').url {{ '}}' }}" jmb-on:click.prevent="cancel()" class="block m-auto">
+            {{ '{%' }} include "includes/logo.html" {{ '%}' }}
+        </a>
+    </div>
+    <div class="max-w-sm m-auto border shadow-md card bg-base-100">
+        <div class="gap-8 card-body">
+            <h2 class="card-title">Log in to your account</h2>
+            {{ '{{' }} form() {{ '}}' }}
+            <div>
+                <div class="card-actions">
+                    <button class="btn btn-primary btn-block" jmb-on:click="submit()">Log in</button>
+                </div>
+                <div class="divider">or</div>
+                <div class="card-actions">
+                    <a class="justify-between btn btn-outline btn-primary btn-block" href="{{ '{{' }} url_for('google_login') {{ '}}' }}">
+                        <img src="{{ '{{' }} url_for('static', filename='icons/google.svg') {{ '}}' }}" class="w-8 h-8" alt="Google logo">
+                        <span class="flex-grow">Continue with Google</span>
+                    </a>
+                    <a class="justify-between btn btn-outline btn-primary btn-block" href="{{ '{{' }} url_for('keycloak_login') {{ '}}' }}">
+                        <img src="{{ '{{' }} url_for('static', filename='icons/keycloak.svg') {{ '}}' }}" class="w-8 h-8" alt="Keycloak logo">
+                        <span class="flex-grow">Continue with Keycloak</span>
+                    </a>
+                </div>
+                <div class="divider opacity-70"></div>
+                <div class="flex items-center justify-center gap-2 text-sm">
+                    {{ '{%' }}- if  component("/main/password_reset").is_accessible {{ '%}' }}
+                    <a class="link link-primary link-hover" href="{{ '{{' }} component().url {{ '}}' }}" jmb-on:click.prevent="{{ '{{' }} component().jrl {{ '}}' }}">Can't log in?</a>
+                    {{ '{%' }}- endif {{ '%}' }}
+                    {{ '{%' }}- if  component("/main/signup").is_accessible {{ '%}' }}
+                    <div>•</div>
+                    <a class="link link-primary link-hover" href="{{ '{{' }} component().url {{ '}}' }}" jmb-on:click.prevent="{{ '{{' }} component().jrl {{ '}}' }}">Sign up for an account</a>
+                    {{ '{%' }}- endif {{ '%}' }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

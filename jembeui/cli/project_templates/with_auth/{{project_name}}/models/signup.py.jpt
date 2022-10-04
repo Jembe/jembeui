@@ -1,0 +1,48 @@
+from uuid import uuid4
+from datetime import datetime, timedelta
+from sqlalchemy.ext.hybrid import hybrid_property
+import sqlalchemy as sa
+from {{ project_name }}.app import db
+
+
+__all__ = ("SignUp",)
+
+
+def default_uuid() -> str:
+    """Generates unique uuid for singups"""
+    uuid = str(uuid4())
+    while db.session.query(SignUp).filter(SignUp.uuid == uuid).first():
+        uuid = str(uuid4())
+    return uuid
+
+
+class SignUp(db.Model):  # type:ignore
+    """Active SignUps"""
+
+    __tablename__ = "signups"
+
+    id = sa.Column(sa.Integer(), primary_key=True)
+
+    # unique Id used in confirmation link
+    uuid = sa.Column(sa.String(255), nullable=False, default=default_uuid)
+
+    email = sa.Column(sa.String(255), nullable=False)
+
+    # created at
+    created_at = sa.Column(sa.DateTime, default=datetime.utcnow, nullable=False)
+
+    __table_args__ = (
+        sa.Index("idx_signups_uuid", sa.func.lower(uuid), unique=True),
+        sa.Index("idx_signups_email", sa.func.lower(email)),
+    )
+
+    @hybrid_property
+    def is_valid(self):
+        """Check if SignUP is valid, not older than seven days"""
+        return self.created_at > datetime.utcnow() - timedelta(days=7)
+
+    def on_insert(self, session: "sa.orm.Session"):
+        """Delete all existing singups for same email address"""
+        session.query(SignUp).filter(
+            SignUp.email == self.email.lower(), SignUp.id != self.id
+        ).delete(synchronize_session=False)

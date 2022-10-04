@@ -1,0 +1,35 @@
+import json
+import click
+from flask import current_app as app
+from rq import Worker
+from jembeui.cli.utils import list_used_jembeui_templates
+from .app import jmb, get_redis
+
+
+@app.cli.command("create-tw-content")
+@click.option(
+    "--save", is_flag=True, help="Save list of files in tailwind.content.json"
+)
+def build_tailwind_content_json(save):
+    """Create list of JembeUI templates used by the application"""
+
+    templates = list_used_jembeui_templates(jmb)
+
+    if save:
+        # save list in file
+        with open("tailwind.content.json", "w", encoding="UTF-8") as f:
+            f.write(json.dumps(templates, indent=2))
+        click.echo("Success! tailwind.content.json is created.")
+    else:
+        # print list as json to console
+        click.echo(json.dumps(templates, indent=2))
+
+
+@app.cli.command("run_rq")
+def run_rq():
+    """Run Redis Queue Worker to support runnin tasks in backgroud like sending emails"""
+    worker = Worker(
+        app.config.get("REDIS_QUEUES", ("high", "default", "low")),
+        connection=get_redis(),
+    )
+    worker.work(with_scheduler=True)

@@ -1,0 +1,9 @@
+from jembe import config
+from jembeui import Component
+
+__all__ = ("CWelcome",)
+
+
+@config(Component.Config(changes_url=False))
+class CWelcome(Component):
+    """Welcomes the visitor"""

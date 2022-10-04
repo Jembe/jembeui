@@ -1,0 +1,25 @@
+import rq
+import redis
+from flask import current_app
+
+__all__ = (
+    "get_rq",
+    "get_redis",
+)
+
+
+def get_redis() -> "redis.Redis":
+    """Returns active redis client"""
+    return redis.from_url(current_app.config.get("REDIS_URL", "redis://localhost:6379"))
+
+
+def get_rq(name: str = "default") -> "rq.Queue":
+    """Returns RQ queh
+
+    Args:
+        name (str, optional): Queue name. Defaults to "default".
+
+    Returns:
+        rq.Queue: RQ queue
+    """
+    return rq.Queue(name=name, connection=get_redis())

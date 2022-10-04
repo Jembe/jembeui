@@ -1,0 +1,23 @@
+{{ '{%' }} from 'jembeui/macros/icons.html' import display_icon {{ '%}' }}
+<div class="p-8">
+    <div class="flex mb-8">
+        <a href="{{ '{{' }} component('/main').url {{ '}}' }}" jmb-on:click.prevent="cancel()" class="block m-auto">
+            {{ '{%' }} include "includes/logo.html" {{ '%}' }}
+        </a>
+    </div>
+    <div class="max-w-sm m-auto border shadow-md card bg-base-100">
+        <div class="gap-8 card-body">
+            <h2 class="card-title">Logout from your account</h2>
+            <div class="flex items-center gap-4">
+                <div>{{ '{{' }} display_icon("user-circle", "solid", class="w-16 h-16 opacity-70") {{ '}}' }}</div>
+                <div>
+                    <h3 class="text-lg font-semibold">{{ '{{' }} current_user.name {{ '}}' }}</h3>
+                    <p>{{ '{{' }} current_user.email {{ '}}' }}</p>
+                </div>
+            </div>
+            <div class="card-actions">
+                <button class="btn btn-primary btn-block" jmb-on:click="logout()">Log out</button>
+            </div>
+        </div>
+    </div>
+</div>

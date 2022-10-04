@@ -1,0 +1,24 @@
+from flask_login import current_user
+from jembe import config
+from jembeui import Component
+from .update_password import CUpdatePassword
+
+__all__ = ("CUserProfile",)
+
+
+@config(
+    Component.Config(
+        components=dict(
+            update_password=CUpdatePassword,
+        )
+    )
+)
+class CUserProfile(Component):
+    """Aggregator component to display various forms to configure user setting"""
+
+    def update_ac(self):
+        """Only authenticated user can see his profile"""
+        if current_user.is_authenticated:
+            self.ac_allow()
+        else:
+            self.ac_deny()
