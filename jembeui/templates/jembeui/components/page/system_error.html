@@ -9,10 +9,10 @@
     $local.isNetworkError = $event.detail.networkError; 
     if (!$local.isNetworkError){ 
         if ($event.detail.response.status === 413) { 
-            $refs.title.innerText = 'File Upload Error'; 
-            $refs.content.innerHTML = '<p>File is bigger than server allows.</p>'
+            $refs.title.innerText = '{% trans %}File Upload Error{% endtrans %}'; 
+            $refs.content.innerHTML = '{% trans %}<p>File is bigger than server allows.</p>{% endtrans %}'
         } else { 
-            $refs.title.innerText = 'Server error: ' + $event.detail.response.status; 
+            $refs.title.innerText = '{% trans %}Server error: {% endtrans %}' + $event.detail.response.status; 
             $event.detail.response.text().then( function(content) { 
                 $refs.content.innerHTML = '<iframe></iframe>'; 
                 $refs.content.children[0].classList.add('h-[70vh]','border-none','w-full'); 
@@ -20,8 +20,8 @@
             })
         } 
     } else { 
-        $refs.title.innerText = 'Network error'; 
-        $refs.content.innerHTML = '<p>Application server unreachable.<br/><br/>Please check your internet connection and/or contact Support.</p>' 
+        $refs.title.innerText = '{% trans %}Network error{% endtrans %}'; 
+        $refs.content.innerHTML = '{% trans %}<p>Application server unreachable.<br/><br/>Please check your internet connection and/or contact Support.</p>{% endtrans %}' 
     } 
     $local.showError = true; "
   jmb-bind:class="{'modal-open': $local.showError}"
@@ -42,7 +42,7 @@
         class="btn btn-error"
         jmb-on:click.prevent="$local.showError=false;$refs.content.innerHTML=''"
       >
-        Close
+        {% trans %}Close{% endtrans %}
       </button>
     </div>
   </div>

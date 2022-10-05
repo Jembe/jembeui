@@ -94,7 +94,7 @@
               {%- block navbar_right %}
               <!-- Change theme button -->
               <label class="items-center flex-none swap btn btn-ghost btn-circle"
-                     jmb-bind:title="$local.theme==='light'?'Dark mode': 'Light mode'">
+                     jmb-bind:title="$local.theme==='light'?'{% trans %}Dark mode{% endtrans %}': '{% trans %}Light mode{% endtrans %}'">
                 <input type="checkbox" jmb-bind:checked="$local.theme === 'dark'"
                        jmb-on:change="$local.theme=$local.theme === 'dark'? 'light': 'dark'; localStorage.setItem('jui_page_theme', $local.theme); $nextTick(() =>{$updateDom()})"/>
                 {{ display_icon("sun", class="w-6 h-6 stroke-current swap-on")}}
@@ -112,7 +112,7 @@
           </div>
         {%- endblock content %}
         <!-- Page Alerts -->
-        <div class="absolute inset-0 flex justify-end pointer-events-none">
+        <div class="absolute inset-0 flex justify-end pointer-events-none"></div>
           <div class="box-border flex flex-col justify-end h-full gap-4 p-8 sm:max-w-1/3">{{ component("page_alerts") }}</div>
         </div>
       </div>

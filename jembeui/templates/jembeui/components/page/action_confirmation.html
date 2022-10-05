@@ -17,13 +17,13 @@
                            class="w-full input input-bordered input-error"
                            jmb-model="$local.dcp"/>
                     <label jmb-show="!$local.phraseIsValid" class="label text-error">
-                        <span class="label-text-alt text-error">Invalid phrase entered! Please enter '{{ confirmation.danger_confirmation_phrase }}' to confirm the action.</span>
+                        <span class="label-text-alt text-error">{% trans phrase=confirmation.danger_confirmation_phrase %}Invalid phrase entered! Please enter '{{ phrase }}' to confirm the action.{% endtrans %}</span>
                     </label>
                 {% endif %}
                 <div class="modal-action">
                     <button class="btn btn-outline"
                             jmb-on:click.prevent="cancel(); $local.phraseIsValid = true;$local.dcp=null">
-                        Cancel
+                        {% trans %}Cancel{% endtrans %}
                     </button>
                     <button jmb-on:click.prevent="{% if confirmation.is_danger %} if ($local.dcp !== confirmation.danger_confirmation_phrase) { $local.phraseIsValid = false;$local.dcp=null } else { $local.phraseIsValid = true;$local.dcp=null; confirm() }
                     {% else %}

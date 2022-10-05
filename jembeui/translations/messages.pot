@@ -1,0 +1,97 @@
+# Translations template for jembeUI.
+# Copyright (C) 2022 ORGANIZATION
+# This file is distributed under the same license as the jembeUI project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: jembeUI VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2022-10-05 23:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.10.1\n"
+
+#: jembeui/components/form/create_record.py:58
+msgid "Save"
+msgstr ""
+
+#: jembeui/components/form/create_record.py:59
+#: jembeui/templates/jembeui/components/page/action_confirmation.html:26
+msgid "Cancel"
+msgstr ""
+
+#: jembeui/components/form/create_record.py:103
+msgid "{} created."
+msgstr ""
+
+#: jembeui/components/form/create_record.py:106
+msgid "Form is invalid"
+msgstr ""
+
+#: jembeui/components/form/form.py:324
+msgid "Unsaved changes"
+msgstr ""
+
+#: jembeui/components/page/action_confirmation.py:21
+msgid "Ok"
+msgstr ""
+
+#: jembeui/templates/jembeui/components/component.html:5
+#, python-format
+msgid "Generic component template for <strong>%(exec_name)s</strong>"
+msgstr ""
+
+#: jembeui/templates/jembeui/components/page.html:97
+msgid "Dark mode"
+msgstr ""
+
+#: jembeui/templates/jembeui/components/page.html:97
+msgid "Light mode"
+msgstr ""
+
+#: jembeui/templates/jembeui/components/page/action_confirmation.html:20
+#, python-format
+msgid "Invalid phrase entered! Please enter '%(phrase)s' to confirm the action."
+msgstr ""
+
+#: jembeui/templates/jembeui/components/page/alerts.html:23
+msgid "close"
+msgstr ""
+
+#: jembeui/templates/jembeui/components/page/message.html:8
+#: jembeui/templates/jembeui/components/page/system_error.html:45
+msgid "Close"
+msgstr ""
+
+#: jembeui/templates/jembeui/components/page/system_error.html:12
+msgid "File Upload Error"
+msgstr ""
+
+#: jembeui/templates/jembeui/components/page/system_error.html:13
+msgid "<p>File is bigger than server allows.</p>"
+msgstr ""
+
+#: jembeui/templates/jembeui/components/page/system_error.html:15
+msgid "Server error: "
+msgstr ""
+
+#: jembeui/templates/jembeui/components/page/system_error.html:23
+msgid "Network error"
+msgstr ""
+
+#: jembeui/templates/jembeui/components/page/system_error.html:24
+msgid ""
+"<p>Application server unreachable.<br/><br/>Please check your internet "
+"connection and/or contact Support.</p>"
+msgstr ""
+
+#: jembeui/templates/jembeui/includes/input.html:45
+msgid "Optional"
+msgstr ""
+

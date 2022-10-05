@@ -8,6 +8,7 @@ from typing import (
     Dict,
     Tuple,
 )
+from flask_babel import lazy_gettext as _
 from .form import CForm
 from ...includes.link import Link
 from ...includes.menu import Menu
@@ -54,8 +55,8 @@ class CCreateRecord(CForm):
             if menu is None:
                 menu = Menu(
                     items=[
-                        Link("submit()", "Save", style="btn-primary", as_button=True),
-                        Link("cancel()", "Cancel", style="btn-ghost", as_button=True),
+                        Link("submit()", _("Save"), style="btn-primary", as_button=True),
+                        Link("cancel()", _("Cancel"), style="btn-ghost", as_button=True),
                     ],
                 )
             super().__init__(
@@ -99,7 +100,7 @@ class CCreateRecord(CForm):
         return super().on_form_canceled()
 
     def push_page_alert_on_form_submit(self):
-        self.jui.push_page_alert(f"{self.title} created.", "success")
+        self.jui.push_page_alert(_("{} created.").format(self.title), "success")
 
     def push_page_alert_on_form_invalid(self):
-        self.jui.push_page_alert("Form is invalid", "warning")
+        self.jui.push_page_alert(_("Form is invalid"), "warning")

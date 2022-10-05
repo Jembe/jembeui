@@ -20,7 +20,7 @@
                 <div class="flex-none">
                     <a href="#"
                        class="link"
-                       jmb-on:click.stop.prevent.defer="alerts['{{ uid }}'] = {}; $self.parentElement.parentElement.remove()">close
+                       jmb-on:click.stop.prevent.defer="alerts['{{ uid }}'] = {}; $self.parentElement.parentElement.remove()">{% trans %}close{% endtrans %}
                     </a>
                 </div>
             {% endif %}

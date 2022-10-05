@@ -1,8 +1,9 @@
 from typing import TYPE_CHECKING, Any, Optional
 from dataclasses import dataclass, field, asdict
+from flask_babel import lazy_gettext as _
 
-from ..component import Component
 from jembe import config, listener, action, JembeInitParamSupport
+from ..component import Component
 
 if TYPE_CHECKING:
     import jembe
@@ -17,7 +18,7 @@ class Confirmation(JembeInitParamSupport):
     question: str
     action_name: str
     action_params: dict = field(default_factory=dict)
-    confirmation_title: str = "Ok"
+    confirmation_title: str = _("Ok")
     is_danger: bool = False
     # string that user should typein to confirm danger operation
     danger_confirmation_phrase: Optional[str] = None

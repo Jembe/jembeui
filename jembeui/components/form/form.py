@@ -11,6 +11,7 @@ from typing import (
 )
 import sqlalchemy as sa
 
+from flask_babel import lazy_gettext as _
 from flask import current_app
 from jembe import NotFound, listener, action
 from ...helpers import get_jembeui
@@ -320,7 +321,7 @@ class CForm(Component):
             return redisplay
         else:
             self.jui.ask_for_action_confirmation(
-                "cancel", "Unsaved changes", self.get_confirm_cancel_question()
+                "cancel", _("Unsaved changes"), self.get_confirm_cancel_question()
             )
 
     @action

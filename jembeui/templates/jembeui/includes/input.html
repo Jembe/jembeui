@@ -42,7 +42,7 @@
         <span class="label-text">{{ field.label.text }}</span>
         {%- if field.description or not field.flags.required %}
         <span class="flex items-center gap-2 label-text-alt">
-            {%- if not field.flags.required %}<span class="text-opacity-70">Optional</span>{% endif %}
+            {%- if not field.flags.required %}<span class="text-opacity-70">{% trans %}Optional{% endtrans %}</span>{% endif %}
             {%- if field.description %}
             <div class="tooltip tooltip-left" data-tip="{{ field.description }}">
                 {{ display_icon("question-mark-circle", class="w-5 h-5")}} 

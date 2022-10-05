@@ -35,7 +35,7 @@ class Component(jembe.Component):
         ):
             self._init_class_based_config()
             # regular config params
-            self.title = title if title else self.default_title
+            self.title = title if title is not None else self.default_title
             if template is None:
                 template = ("", self.default_template)
             elif (
@@ -112,13 +112,14 @@ class Component(jembe.Component):
 
     @property
     def title(self) -> str:
+        """Component title"""
         if "title" in self.state and self.state.title is not None:
             return self.state.title
 
-        if isinstance(self._config.title, str):
-            return self._config.title
+        if callable(self._config.title):
+            return self._config.title(self)
 
-        return self._config.title(self)
+        return self._config.title
 
     _jui_utils: JuiUtils
 
