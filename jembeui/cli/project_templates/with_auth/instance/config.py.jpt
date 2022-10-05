@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 import json
+# import jembeui
 from datetime import timedelta
 
 instance_path = os.environ.get(
@@ -71,3 +72,7 @@ KEYCLOAK_CLIENT_DISCOVERY_URL = (
 
 # disable https for oauth2 for development
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
+
+# Jembe UI Config
+# JEMBEUI_SUPPORTED_LOCALES = ["sr", "en"]
+# BABEL_TRANSLATION_DIRECTORIES = f"translations;{jembeui.__path__[0]}/translations"

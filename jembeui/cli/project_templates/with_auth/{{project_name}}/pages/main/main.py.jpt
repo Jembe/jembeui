@@ -24,6 +24,7 @@ __all__ = ("CMainPage",)
 @jmb.page(
     "main",
     CPage.Config(
+        title="{{ project_name }}",
         components=dict(
             welcome=CWelcome,
             dashboard=CDashboard,
@@ -48,7 +49,7 @@ __all__ = ("CMainPage",)
             "logout",
             "login",
             "password_reset",
-            "password_rest_confirmation",
+            "password_reset_confirmation",
         ),
         display_without_sidebar=(
             "welcome",
@@ -57,7 +58,7 @@ __all__ = ("CMainPage",)
             "logout",
             "login",
             "password_reset",
-            "password_rest_confirmation",
+            "password_reset_confirmation",
         ),
     ),
 )

@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING, Optional, Union
 import wtforms as wtf
+from flask_babel import lazy_gettext as _
 from flask_login import current_user, login_user
 from jembe import config
 from jembeui import Form, CForm
@@ -25,17 +26,19 @@ class SignUpVerificationForm(Form):
     email = wtf.EmailField(render_kw={"disabled": True})
 
     name = wtf.StringField(
-        "Enter full name",
-        validators=[wtf.validators.DataRequired("Full name is required")],
+        _("Enter full name"),
+        validators=[
+            wtf.validators.DataRequired(_("Full name is required.")),
+        ],
     )
 
     password = wtf.PasswordField(
-        "Create password",
-        validators=[wtf.validators.DataRequired("Password is required")],
+        _("Create password"),
+        validators=[wtf.validators.DataRequired(_("Password is required."))],
     )
 
     def submit(self, record: Union["Model", dict]) -> Optional[Union["Model", dict]]:
-        """creates and logins new user"""
+        """Create and login new user"""
         # create user
         signup: SignUp = record  # type:ignore
         user = User()
@@ -55,7 +58,7 @@ class SignUpVerificationForm(Form):
 
 @config(
     CForm.Config(
-        title="Set up your {{ project_name }} account",
+        title=_("Set up your account"),
         form=SignUpVerificationForm,
         get_record=lambda c: (
             c.session.query(SignUp)
@@ -84,7 +87,7 @@ class CSignUpVerification(CForm):
         login_user(user)
 
         # push page alert
-        self.jui.push_page_alert(f"Welcome {user.email}!")
+        self.jui.push_page_alert(_("Welcome {}!").format(user.name))
 
         self.emit("login")
         self.emit("update_ac")

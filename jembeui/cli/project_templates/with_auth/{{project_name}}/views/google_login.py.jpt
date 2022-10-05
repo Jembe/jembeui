@@ -1,5 +1,6 @@
 import json
 import requests
+from flask_babel import lazy_gettext as _
 from flask_login import login_user
 from flask import redirect, current_app as app, request, render_template
 from oauthlib.oauth2 import WebApplicationClient
@@ -26,7 +27,7 @@ def google_login():
         authorization_endpoint = _get_google_provider_cfg()["authorization_endpoint"]
     except requests.exceptions.ConnectTimeout:
         return _get_error_response(
-            "Can't reach Google servers! Please, contact support."
+            _("Can't reach Google servers! Please, contact support.")
         )
 
     # Construct login request
@@ -89,7 +90,7 @@ def google_login_callback():
         user_name = f"{userinfo['given_name']} {userinfo['family_name']}"
     else:
         return _get_error_response(
-            "User email not available or not verified by Google."
+            _("User email not available or not verified by Google.")
         )
 
     user = User.get_user_from_oauth_login(unique_id, user_email, user_name, picture)

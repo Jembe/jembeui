@@ -1,11 +1,13 @@
+from flask_babel import lazy_gettext as _
 from flask_login import current_user, logout_user
-from jembe import action
+from jembe import action, config
 from jembeui import Component
 
 
 __all__ = ("CLogout",)
 
 
+@config(Component.Config(title=_("Logout from your account")))
 class CLogout(Component):
     """Displays logout page with button to logout current user"""
 
@@ -23,7 +25,7 @@ class CLogout(Component):
 
         logout_user()
 
-        self.jui.push_page_alert(f"{user_name} logged out!")
+        self.jui.push_page_alert(_("{} logged out!").format(user_name))
         self.emit("logout")
         self.emit("update_ac")
 

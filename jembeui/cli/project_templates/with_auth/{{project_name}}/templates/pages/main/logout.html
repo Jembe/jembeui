@@ -7,7 +7,7 @@
     </div>
     <div class="max-w-sm m-auto border shadow-md card bg-base-100">
         <div class="gap-8 card-body">
-            <h2 class="card-title">Logout from your account</h2>
+            <h2 class="card-title">{{ '{{' }} title {{ '}}' }}</h2>
             <div class="flex items-center gap-4">
                 <div>{{ '{{' }} display_icon("user-circle", "solid", class="w-16 h-16 opacity-70") {{ '}}' }}</div>
                 <div>
@@ -16,7 +16,7 @@
                 </div>
             </div>
             <div class="card-actions">
-                <button class="btn btn-primary btn-block" jmb-on:click="logout()">Log out</button>
+                <button class="btn btn-primary btn-block" jmb-on:click="logout()">{{ '{%' }} trans {{ '%}' }}Log out{{ '{%' }} endtrans {{ '%}' }}</button>
             </div>
         </div>
     </div>

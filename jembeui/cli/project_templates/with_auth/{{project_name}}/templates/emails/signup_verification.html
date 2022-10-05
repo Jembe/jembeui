@@ -1,12 +1,10 @@
-{{ '{%' }}- set app_name = "{{ project_name }}" {{ '%}' }}
 {{ '{%' }} set user_name = signup.email.split("@")[0].replace(".", " ") {{ '%}' }},
 <!doctype html>
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>Confirm your registration to {{ '{{' }} app_name {{ '}}' }}</title>
-    
+    <title>{{ '{%' }} trans {{ '%}' }}Confirm your registration to {{ '{{' }} app_name {{ '}}' }}{{ '{%' }} endtrans {{ '%}' }}</title>
   <style>
 @media only screen and (max-width: 620px) {
   table.body h1 {
@@ -100,7 +98,7 @@ table.body .article {
 }
 </style></head>
   <body class style="background-color: #f9f9fa; font-family: sans-serif; -webkit-font-smoothing: antialiased; font-size: 14px; line-height: 1.4; margin: 0; padding: 0; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%;">
-    <span class="preheader" style="color: transparent; display: none; height: 0; max-height: 0; max-width: 0; opacity: 0; overflow: hidden; mso-hide: all; visibility: hidden; width: 0;">Verify your email and finish registration at {{ '{{' }} app_name {{ '}}' }}.</span>
+    <span class="preheader" style="color: transparent; display: none; height: 0; max-height: 0; max-width: 0; opacity: 0; overflow: hidden; mso-hide: all; visibility: hidden; width: 0;">{{ '{%' }} trans {{ '%}' }}Verify your email and finish registration at {{ '{{' }} app_name {{ '}}' }}.{{ '{%' }} endtrans {{ '%}' }}</span>
     <table role="presentation" border="0" cellpadding="0" cellspacing="0" class="body" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: #f9f9fa; width: 100%;" width="100%" bgcolor="#f9f9fa">
       <tr>
         <td style="font-family: sans-serif; font-size: 14px; vertical-align: top;" valign="top">&nbsp;</td>
@@ -116,8 +114,8 @@ table.body .article {
                   <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;" width="100%">
                     <tr>
                       <td style="font-family: sans-serif; font-size: 14px; vertical-align: top;" valign="top">
-                        <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;">Hi {{ '{{' }} user_name {{ '}}' }},</p>
-                        <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;">To finish setting up your account and start using {{ '{{' }} app_name {{ '}}' }},<br> confirm we've got the correct email for you.</p>
+                        <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;">{{ '{%' }} trans {{ '%}' }}Hi {{ '{{' }} user_name {{ '}}' }},{{ '{%' }} endtrans {{ '%}' }}</p>
+                        <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;">{{ '{%' }} trans {{ '%}' }}To finish setting up your account and start using {{ '{{' }} app_name {{ '}}' }},<br> confirm we've got the correct email for you.{{ '{%' }} endtrans {{ '%}' }}</p>
                         <table role="presentation" border="0" cellpadding="0" cellspacing="0" class="btn btn-primary" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; box-sizing: border-box; width: 100%;" width="100%">
                           <tbody>
                             <tr>
@@ -125,7 +123,7 @@ table.body .article {
                                 <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;">
                                   <tbody>
                                     <tr>
-                                      <td style="font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 2px; text-align: center; background-color: #0060df;" valign="top" align="center" bgcolor="#0060df"> <a href="{{ '{{' }} verification_url {{ '}}' }}" target="_blank" style="border: none; border-radius: 2px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: normal; margin: 0; padding: 7px 8px; min-width: 132px; height: 32px; text-decoration: none; background-color: #0060df; color: #f9f9fa;">Verify your email</a> </td>
+                                      <td style="font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 2px; text-align: center; background-color: #0060df;" valign="top" align="center" bgcolor="#0060df"> <a href="{{ '{{' }} verification_url {{ '}}' }}" target="_blank" style="border: none; border-radius: 2px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: normal; margin: 0; padding: 7px 8px; min-width: 132px; height: 32px; text-decoration: none; background-color: #0060df; color: #f9f9fa;">{{ '{%' }} trans {{ '%}' }}Verify your email{{ '{%' }} endtrans {{ '%}' }}</a></td>
                                     </tr>
                                   </tbody>
                                 </table>

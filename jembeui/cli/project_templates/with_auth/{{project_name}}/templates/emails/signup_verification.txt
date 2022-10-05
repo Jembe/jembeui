@@ -1,5 +1,7 @@
-Hi {{ '{{' }} signup.email.split("@")[0].replace(".", " "){{ '}}' }},
+{{ '{%' }}- trans name=signup.email.split("@")[0].replace(".", " ") {{ '%}' }} 
+Hi {{ '{{' }} name {{ '}}' }},
 
-To finish setting up your account and start using {{ project_name }}, confirm we've got the correct email for you
+To finish setting up your account and start using {{ '{{' }} app_name {{ '}}' }}, confirm we've got the correct email for you
 
 Verify your email {{ '{{' }} verification_url {{ '}}' }}
+{{ '{%' }} endtrans {{ '%}' }}

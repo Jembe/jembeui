@@ -1,4 +1,4 @@
-recursive-include jembeui *.py *.html *.css *.js *.jpt *.woff *.woff2 *.png *.ico *.jpg *.svg *.eot *.ttf README *.txt
+recursive-include jembeui *.py *.html *.css *.js *.jpt *.woff *.woff2 *.png *.ico *.jpg *.svg *.eot *.ttf README *.txt, *.mo
 prune jembeui/src
 prune .venv
 prune node_modules

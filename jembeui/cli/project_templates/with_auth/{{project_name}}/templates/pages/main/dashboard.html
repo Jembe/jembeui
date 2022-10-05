@@ -1,7 +1,7 @@
 {{ '{%' }} from 'jembeui/macros/icons.html' import display_icon {{ '%}' }}
 <div class="p-8">
-    <h1 class="text-sm font-semibold tracking-wider">Dashboard</h1>
-    <div class="grid grid-cols-1 gap-8 mt-8 md:grid-cols-3">
+    <h1 class="text-sm font-semibold tracking-wider">{{ '{{' }} title {{ '}}' }}</h1>
+        <div class="grid grid-cols-1 gap-8 mt-8 md:grid-cols-3">
         {{ '{%' }} for _ in range(2) {{ '%}' }}
             <div class="shadow card">
                 <div class="card-body">

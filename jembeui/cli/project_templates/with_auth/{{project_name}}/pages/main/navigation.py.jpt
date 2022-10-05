@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING
 from markupsafe import Markup
+from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from jembeui import Component, Menu, Link
 from jembe import config, listener
@@ -29,8 +30,12 @@ navbar_menu = Menu(
     items=[
         Menu(
             items=[
-                Link("/main/user_profile", "Account Settings", "Manage yor account"),
-                Link("/main/logout", "Log out"),
+                Link(
+                    "/main/user_profile",
+                    _("Account settings"),
+                    _("Manage your account"),
+                ),
+                Link("/main/logout", _("Log out")),
             ],
             icon="user",
             description=lambda c: current_user.name,
@@ -45,7 +50,7 @@ navbar_menu = Menu(
                 dropdown_classes="dropdown-end dropdown-hover",
             ),
         ),
-        Link("/main/login", "Log in", style="btn-ghost", active_for_exec_names=[]),
+        Link("/main/login", _("Log in"), style="btn-ghost", active_for_exec_names=[]),
     ],
     style=Menu.Style(display_as=Menu.Style.DROPDOWNS),
 )

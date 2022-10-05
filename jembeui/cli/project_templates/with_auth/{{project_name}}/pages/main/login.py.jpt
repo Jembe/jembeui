@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING, Optional, Union
 import wtforms as wtf
 import sqlalchemy as sa
+from flask_babel import lazy_gettext as _
 from flask_login import login_user, current_user
 from jembe import config
 from jembeui import Form, CForm
@@ -14,6 +15,7 @@ __all__ = ("CLogin",)
 
 class LoginForm(Form):
     """Login form"""
+
     __style__ = Form.Style(
         fields=dict(
             email=Form.FieldStyle(is_compact=True),
@@ -22,15 +24,16 @@ class LoginForm(Form):
     )
 
     email = wtf.EmailField(
-        "Enter email",
+        _("Enter email"),
         validators=[
-            wtf.validators.DataRequired("Email is required."),
-            wtf.validators.Email("Enter a valid email."),
+            wtf.validators.DataRequired(_("Email is required.")),
+            wtf.validators.Email(_("Enter a valid email.")),
         ],
     )
 
     password = wtf.PasswordField(
-        "Enter password", validators=[wtf.validators.DataRequired("Password is required")]
+        _("Enter password"),
+        validators=[wtf.validators.DataRequired(_("Password is required."))],
     )
 
     def validate_password(self, field):
@@ -41,9 +44,7 @@ class LoginForm(Form):
             .first()
         )
         if not user or not user.check_password(field.data):
-            raise wtf.ValidationError(
-                "Invalid email and password combination"
-            )
+            raise wtf.ValidationError(_("Invalid email and password combination."))
 
     def submit(self, record: Union["Model", dict]) -> Optional[Union["Model", dict]]:
         """Return user on submit"""
@@ -57,6 +58,7 @@ class LoginForm(Form):
 
 @config(
     CForm.Config(
+        title=_("Log in to your account"),
         form=LoginForm,
         get_record=lambda c: {},
     )
@@ -83,7 +85,7 @@ class CLogin(CForm):
     def on_form_submited(self, user: "User") -> Optional[bool]:
         """Login user and emit update_ac and login events"""
         if not login_user(user):
-            raise ValueError("User is deactivated.")
+            raise ValueError(_("User is deactivated."))
 
         self.emit("login", redirect_to=self.state.redirect_to)
         self.emit("update_ac")
@@ -92,4 +94,4 @@ class CLogin(CForm):
 
     def push_page_alert_on_form_submit(self):
         """Say welcome to user"""
-        self.jui.push_page_alert(f"Welcome {current_user.name}!")
+        self.jui.push_page_alert(_("Welcome {}!").format(current_user.name))

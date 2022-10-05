@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING, Union, Optional
 from urllib.parse import urljoin
 from markupsafe import Markup
 import wtforms as wtf
+from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask import request
 from jembe import config
@@ -16,16 +17,12 @@ __all__ = ("CSignUp",)
 
 
 class SignUpForm(Form):
-    __style__ = Form.Style(
-        fields=dict(
-            email=Form.FieldStyle(is_compact=True)
-        )
-    )
+    __style__ = Form.Style(fields=dict(email=Form.FieldStyle(is_compact=True)))
     email = wtf.StringField(
-        "Enter email address",
+        _("Enter email address"),
         validators=[
-            wtf.validators.DataRequired("Email is required"),
-            wtf.validators.Email(message="Enter a valid email."),
+            wtf.validators.DataRequired(_("Email is required.")),
+            wtf.validators.Email(message=_("Enter a valid email.")),
         ],
     )
 
@@ -33,8 +30,10 @@ class SignUpForm(Form):
         """Checks if user with same email already exists"""
         if self.cform.session.query(User).filter(User.email == field.data).first():
             raise wtf.ValidationError(
-                "User with same email is already registred. "
-                "You can recover your password."
+                _(
+                    "User with same email is already registred. "
+                    "You can recover your password."
+                )
             )
 
     def submit(self, record: Union["Model", dict]) -> Optional[Union["Model", dict]]:
@@ -57,6 +56,7 @@ class SignUpForm(Form):
 
 @config(
     CCreateRecord.Config(
+        title=_("Sign up for your account"),
         form=SignUpForm,
         get_record=lambda c: SignUp(),
     )
@@ -74,10 +74,12 @@ class CSignUp(CCreateRecord):
     def on_form_submited(self, signup: "SignUp") -> Optional[bool]:
         """display message to user to check its inbox"""
         self.jui.push_page_message(
-            "Check your inbox to log in",
+            _("Check your inbox to log in"),
             Markup(
-                "<div class='prose'><p>To complete setup and log in, click the verification"
-                f" link in the email we've send to <br><strong>{signup.email}</strong></p></div>"
+                _(
+                    "<div class='prose'><p>To complete setup and log in, click the verification"
+                    " link in the email we've send to <strong>{}</strong></p></div>"
+                ).format(signup.email)
             ),
         )
         return False

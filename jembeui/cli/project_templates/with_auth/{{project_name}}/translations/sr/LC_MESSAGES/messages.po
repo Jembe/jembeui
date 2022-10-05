@@ -1,0 +1,381 @@
+
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2022-10-05 23:53+0200\n"
+"PO-Revision-Date: 2022-10-05 12:51+0200\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: sr\n"
+"Language-Team: sr <LL@li.org>\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.10.3\n"
+
+#: {{ project_name }}/includes/jobs/emails.py:44
+msgid "Verify your email for {{ project_name }}!"
+msgstr "Potvrdite vaš email za {{ project_name }}!"
+
+#: {{ project_name }}/includes/jobs/emails.py:74
+msgid "Set your new {{ project_name }} password!"
+msgstr "Promjenite vašu {{ project_name }} lozinku!"
+
+#: {{ project_name }}/pages/main/dashboard.py:9
+msgid "Dashboard"
+msgstr "Komandna tabla"
+
+#: {{ project_name }}/pages/main/login.py:27
+msgid "Enter email"
+msgstr "Unesite email"
+
+#: {{ project_name }}/pages/main/login.py:29 {{ project_name }}/pages/main/password_reset.py:30
+#: {{ project_name }}/pages/main/signup.py:24
+msgid "Email is required."
+msgstr "Email je obavezan."
+
+#: {{ project_name }}/pages/main/login.py:30 {{ project_name }}/pages/main/password_reset.py:31
+#: {{ project_name }}/pages/main/signup.py:25
+msgid "Enter a valid email."
+msgstr "Unesite ispravan email."
+
+#: {{ project_name }}/pages/main/login.py:35
+msgid "Enter password"
+msgstr "Unesite lozinku"
+
+#: {{ project_name }}/pages/main/login.py:36
+#: {{ project_name }}/pages/main/password_reset_confirmation.py:27
+#: {{ project_name }}/pages/main/signup_verification.py:37
+msgid "Password is required."
+msgstr "Lozinka je obavezna."
+
+#: {{ project_name }}/pages/main/login.py:47
+msgid "Invalid email and password combination."
+msgstr "Neispravna kombinacija email-a i lozinke."
+
+#: {{ project_name }}/pages/main/login.py:61
+msgid "Log in to your account"
+msgstr "Prijavite se na vaš nalog"
+
+#: {{ project_name }}/pages/main/login.py:88
+msgid "User is deactivated."
+msgstr "Korisnik je deaktiviran."
+
+#: {{ project_name }}/pages/main/login.py:97
+#: {{ project_name }}/pages/main/password_reset_confirmation.py:78
+#: {{ project_name }}/pages/main/signup_verification.py:90
+msgid "Welcome {}!"
+msgstr "Dobro došli {}!"
+
+#: {{ project_name }}/pages/main/logout.py:10
+msgid "Logout from your account"
+msgstr "Odjavite se is aplikacije"
+
+#: {{ project_name }}/pages/main/logout.py:28
+msgid "{} logged out!"
+msgstr "{} je odjavljen!"
+
+#: {{ project_name }}/pages/main/navigation.py:35
+msgid "Account settings"
+msgstr "Podešavanja"
+
+#: {{ project_name }}/pages/main/navigation.py:36
+msgid "Manage your account"
+msgstr "Upravljajte svojim nalogom"
+
+#: {{ project_name }}/pages/main/navigation.py:38
+#: {{ project_name }}/templates/pages/main/logout.html:19
+msgid "Log out"
+msgstr "Odjavi me"
+
+#: {{ project_name }}/pages/main/navigation.py:53
+#: {{ project_name }}/templates/pages/main/login.html:13
+msgid "Log in"
+msgstr "Prijavi se"
+
+#: {{ project_name }}/pages/main/password_reset.py:28
+msgid "Enter email, where to send recovery link to"
+msgstr "Unesite vaš email, gdje da pošaljemo link"
+
+#: {{ project_name }}/pages/main/password_reset.py:53
+#: {{ project_name }}/pages/main/password_reset.py:84
+#: {{ project_name }}/pages/main/password_reset.py:96
+#: {{ project_name }}/templates/pages/main/login.html:25
+msgid "Can't log in?"
+msgstr "Ne možete se prijaviti?"
+
+#: {{ project_name }}/pages/main/password_reset.py:55
+msgid "We send a recovery link to you at <strong>{}</strong>"
+msgstr "Poslali smo vam link za promjenu lozinke na <strong>{}</strong>"
+
+#: {{ project_name }}/pages/main/password_reset.py:86
+msgid "User with email <strong>{}</strong> doesn't exist or it is suspended."
+msgstr "Korisnik sa email-om <strong>{}</strong> ne postoji ili je suspendovan."
+
+#: {{ project_name }}/pages/main/password_reset_confirmation.py:26
+msgid "A few words you'll find easy to remember"
+msgstr "Lozinka koju ćete lako zapamtiti"
+
+#: {{ project_name }}/pages/main/password_reset_confirmation.py:30
+msgid "Confirm password"
+msgstr "Potvrdite lozinku"
+
+#: {{ project_name }}/pages/main/password_reset_confirmation.py:33
+msgid "Passwords must match."
+msgstr "Lozinke moraju biti iste."
+
+#: {{ project_name }}/pages/main/password_reset_confirmation.py:34
+msgid "Password confirmation is required."
+msgstr "Potvrda lozinke je obavezna."
+
+#: {{ project_name }}/pages/main/password_reset_confirmation.py:59
+msgid "Choose a new password"
+msgstr "Odaberite novu lozinku"
+
+#: {{ project_name }}/pages/main/signup.py:22
+msgid "Enter email address"
+msgstr "Unesite email adresu"
+
+#: {{ project_name }}/pages/main/signup.py:33
+msgid "User with same email is already registred. You can recover your password."
+msgstr ""
+"Korisnik sa istim email-om već postoji. Promjenite lozinku da bi ste se "
+"prijavili."
+
+#: {{ project_name }}/pages/main/signup.py:59
+msgid "Sign up for your account"
+msgstr "Kreirajte vaš nalog"
+
+#: {{ project_name }}/pages/main/signup.py:77
+msgid "Check your inbox to log in"
+msgstr "Provjerite vaš Inbox"
+
+#: {{ project_name }}/pages/main/signup.py:79
+msgid ""
+"<div class='prose'><p>To complete setup and log in, click the "
+"verification link in the email we've send to "
+"<strong>{}</strong></p></div>"
+msgstr ""
+"<div class='prose'><p>Da bi kreirali nalog i prijavili se, kliknite na "
+"varifikacioni link u email-u koji smo vam poslali na "
+"<strong>{}</strong></p></div>"
+
+#: {{ project_name }}/pages/main/signup_verification.py:29
+msgid "Enter full name"
+msgstr "Unesite ime i prezime"
+
+#: {{ project_name }}/pages/main/signup_verification.py:31
+msgid "Full name is required."
+msgstr "Vaše ime i prezime su obavezni."
+
+#: {{ project_name }}/pages/main/signup_verification.py:36
+msgid "Create password"
+msgstr "Unesite novu lozinku"
+
+#: {{ project_name }}/pages/main/signup_verification.py:61
+msgid "Set up your account"
+msgstr "Kreirajte vaš nalog"
+
+#: {{ project_name }}/pages/main/user_profile/update_password.py:16
+msgid "Update password"
+msgstr "Promjenite lozinku"
+
+#: {{ project_name }}/pages/main/user_profile/update_password.py:37
+msgid "Reset your password"
+msgstr "Promjenite lozinku"
+
+#: {{ project_name }}/pages/main/user_profile/update_password.py:39
+msgid "We send a password reset link to you at <strong>{}</strong>"
+msgstr "Poslali smo vam link za promjenu lozinke na <strong>{}</strong>"
+
+#: {{ project_name }}/pages/main/user_profile/user_profile.py:12
+msgid "Account Settings"
+msgstr "Podešavanja"
+
+#: {{ project_name }}/templates/error.html:21
+msgid "Error!"
+msgstr "Greška!"
+
+#: {{ project_name }}/templates/emails/password_recovery.html:6
+#: {{ project_name }}/templates/emails/password_recovery.html:100
+#, python-format
+msgid "Set your new %(app_name)s password"
+msgstr "Promjenite vašu %(app_name)s  lozinku!"
+
+#: {{ project_name }}/templates/emails/password_recovery.html:116
+#, python-format
+msgid "Hi %(name)s,"
+msgstr "Zdravo %(name)s,"
+
+#: {{ project_name }}/templates/emails/password_recovery.html:117
+#, python-format
+msgid ""
+"We've received a request to set a new password for this %(app_name)s "
+"account:<br><strong>%(email)s</strong>"
+msgstr ""
+"Primili smo zahtjev za promjenu lozinke za sledeći %(app_name)s "
+"nalog:<br><strong>%(email)s</strong>"
+
+#: {{ project_name }}/templates/emails/password_recovery.html:125
+msgid "Set password"
+msgstr "Promijeni lozinku"
+
+#: {{ project_name }}/templates/emails/password_recovery.html:133
+msgid "If you didn't request this, you can safely ignore this email."
+msgstr "Ako nista tražili promjenu lozinke, ignorišite ovaj email."
+
+#: {{ project_name }}/templates/emails/password_recovery.txt:1
+#, python-format
+msgid ""
+"Hi %(name)s,\n"
+"\t\n"
+"We've received a request to set a new password for this %(app_name)s "
+"account:\n"
+"%(email)s\n"
+"\n"
+"Set new password at %(recovery_url)s\n"
+"\n"
+"If you didn't requested this, you can safely ignore this email.\n"
+msgstr ""
+"Zdravo %(name)s,\n"
+"\t\n"
+"Primili smo zahtjev za promjenu %(app_name)s lozine za sledeći nalog:\n"
+"%(email)s\n"
+"\n"
+"Promijeni lozinku na %(recovery_url)s\n"
+"\n"
+"Ako nista tražili promjenu lozinke, ignorišite ovaj email.\n"
+
+#: {{ project_name }}/templates/emails/signup_verification.html:7
+#, python-format
+msgid "Confirm your registration to %(app_name)s"
+msgstr "Potvrdite kreiranje %(app_name)s naloga"
+
+#: {{ project_name }}/templates/emails/signup_verification.html:101
+#, python-format
+msgid "Verify your email and finish registration at %(app_name)s."
+msgstr "Potvrdite vaš email i završite kreiranje %(app_name)s naloga."
+
+#: {{ project_name }}/templates/emails/signup_verification.html:117
+#, python-format
+msgid "Hi %(user_name)s,"
+msgstr "Zdravo %(user_name)s,"
+
+#: {{ project_name }}/templates/emails/signup_verification.html:118
+#, python-format
+msgid ""
+"To finish setting up your account and start using %(app_name)s,<br> "
+"confirm we've got the correct email for you."
+msgstr ""
+"Da bi završili kreiranje naloga i počeli koristiti %(app_name)s,<br> "
+"potvrdite da smo dobili vašu ispravnu email adresu."
+
+#: {{ project_name }}/templates/emails/signup_verification.html:126
+msgid "Verify your email"
+msgstr "Potvrdite kreiranje naloga"
+
+#: {{ project_name }}/templates/emails/signup_verification.txt:1
+#, python-format
+msgid ""
+" \n"
+"Hi %(name)s,\n"
+"\n"
+"To finish setting up your account and start using %(app_name)s, confirm "
+"we've got the correct email for you\n"
+"\n"
+"Verify your email %(verification_url)s\n"
+msgstr ""
+" \n"
+"Zdravo %(name)s,\n"
+"\n"
+"Da bi završili kreiranja naloga i počeli koristiti %(app_name)s, "
+"potvrdite da smo dobili ispravnu email adresu\n"
+"\n"
+"Potvrdite vaš email na linku %(verification_url)s\n"
+
+#: {{ project_name }}/templates/pages/main/login.html:15
+msgid "or"
+msgstr "ili"
+
+#: {{ project_name }}/templates/pages/main/login.html:19
+msgid "Continue with Keycloak"
+msgstr "Nastavi sa Keycloak-om"
+
+#: {{ project_name }}/templates/pages/main/login.html:29
+msgid "Sign up for an account"
+msgstr "Kreirajte nalog"
+
+#: {{ project_name }}/templates/pages/main/p404.html:4
+msgid "Error 404!"
+msgstr "Greška 404!"
+
+#: {{ project_name }}/templates/pages/main/p404.html:5
+msgid "Requested page could not be found!"
+msgstr "Tražena stranica nije pronađena"
+
+#: {{ project_name }}/templates/pages/main/password_reset.html:13
+msgid "Send recovery link"
+msgstr "Pošalji link za promjenu lozine"
+
+#: {{ project_name }}/templates/pages/main/password_reset.html:18
+msgid "Return to log in"
+msgstr "Prijavite se"
+
+#: {{ project_name }}/templates/pages/main/password_reset_confirmation.html:12
+msgid "Continue"
+msgstr "Nastavi"
+
+#: {{ project_name }}/templates/pages/main/signup.html:13
+#: {{ project_name }}/templates/pages/main/signup_verification.html:13
+msgid "Sign up"
+msgstr "Kreiraj nalog"
+
+#: {{ project_name }}/templates/pages/main/signup.html:18
+#: {{ project_name }}/templates/pages/main/signup_verification.html:18
+msgid "Already have an account? Log in"
+msgstr "Već imate nalog? Prijavite se"
+
+#: {{ project_name }}/templates/pages/main/user_profile/update_password.html:10
+#, python-format
+msgid ""
+"\n"
+"            You can update your password using <strong>a password reset "
+"link</strong> that we'll send to <strong>%(email)s</strong>"
+msgstr ""
+"            Možete promjeniti vašu lozinku koristeći <strong>link za "
+"promjenu lozinke</strong> koji ćemo vam poslati na "
+"<strong>%(email)s</strong>."
+
+#: {{ project_name }}/templates/pages/main/user_profile/update_password.html:15
+msgid ""
+"\n"
+"                <p>By sending password reset link to your email:</p>\n"
+"                <ul>\n"
+"                    <li>We are sure that you are owner of this "
+"account;</li>\n"
+"                    <li>You can change password even if you forgot the "
+"old one.</li>\n"
+"                </ul>"
+msgstr ""
+"\n"
+"                <p>Slanjem linka za promjenu lozinke na vaš email:</p>\n"
+"                <ul>\n"
+"                    <li>Potvrđujemo da ste vi vlasnik ovog naloga;</li>\n"
+"                    <li>Omogućavamo vam da promjenite lozinku čak i kada "
+"je zaboravite.</li>\n"
+"                </ul>"
+
+#: {{ project_name }}/templates/pages/main/user_profile/update_password.html:25
+msgid "Send password reset link"
+msgstr "Pošalji mi link za promjenu lozinke"
+
+#: {{ project_name }}/views/keycloak_login.py:28
+msgid "Can't reach Keycloak Authentication server! Please, contact support."
+msgstr ""
+
+#: {{ project_name }}/views/keycloak_login.py:91
+msgid "User email not available or not verified by Keycloak."
+msgstr ""
+

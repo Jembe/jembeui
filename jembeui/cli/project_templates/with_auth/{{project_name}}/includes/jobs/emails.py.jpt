@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING
 from rq import Retry
+from flask_babel import lazy_gettext as _
 from flask_mail import Message
 from flask import current_app, render_template
 from ...app import mail, get_rq
@@ -40,15 +41,17 @@ def send_signup_verification_email(signup: "SignUp", signup_verification_url: st
     get_rq().enqueue(
         send_email,
         Message(
-            "Verify your email for {{ project_name }}!",
+            str(_("Verify your email for {{ project_name }}!")),
             recipients=[signup.email],
             body=render_template(
                 "emails/signup_verification.txt",
+                app_name="{{ project_name }}",
                 verification_url=signup_verification_url,
                 signup=signup,
             ),
             html=render_template(
                 "emails/signup_verification.html",
+                app_name="{{ project_name }}",
                 verification_url=signup_verification_url,
                 signup=signup,
             ),
@@ -68,15 +71,17 @@ def send_password_recovery_email(user: "User", recovery_url: str):
     get_rq().enqueue(
         send_email,
         Message(
-            "Set your new {{ project_name }} password",
+            str(_("Set your new {{ project_name }} password")),
             recipients=[user.email],
             body=render_template(
                 "emails/password_recovery.txt",
+                app_name="{{ project_name }}",
                 recovery_url=recovery_url,
                 user=user,
             ),
             html=render_template(
                 "emails/password_recovery.html",
+                app_name="{{ project_name }}",
                 recovery_url=recovery_url,
                 user=user,
             ),

@@ -1,0 +1,349 @@
+# Translations template for {{ project_name }}.
+# Copyright (C) 2022 ORGANIZATION
+# This file is distributed under the same license as the {{ project_name }} project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: {{ project_name }} VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2022-10-05 23:53+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.10.3\n"
+
+#: {{ project_name }}/includes/jobs/emails.py:44
+msgid "Verify your email for {{ project_name }}!"
+msgstr ""
+
+#: {{ project_name }}/includes/jobs/emails.py:74
+msgid "Set your new {{ project_name }} password!"
+msgstr ""
+
+#: {{ project_name }}/pages/main/dashboard.py:9
+msgid "Dashboard"
+msgstr ""
+
+#: {{ project_name }}/pages/main/login.py:27
+msgid "Enter email"
+msgstr ""
+
+#: {{ project_name }}/pages/main/login.py:29 {{ project_name }}/pages/main/password_reset.py:30
+#: {{ project_name }}/pages/main/signup.py:24
+msgid "Email is required."
+msgstr ""
+
+#: {{ project_name }}/pages/main/login.py:30 {{ project_name }}/pages/main/password_reset.py:31
+#: {{ project_name }}/pages/main/signup.py:25
+msgid "Enter a valid email."
+msgstr ""
+
+#: {{ project_name }}/pages/main/login.py:35
+msgid "Enter password"
+msgstr ""
+
+#: {{ project_name }}/pages/main/login.py:36
+#: {{ project_name }}/pages/main/password_reset_confirmation.py:27
+#: {{ project_name }}/pages/main/signup_verification.py:37
+msgid "Password is required."
+msgstr ""
+
+#: {{ project_name }}/pages/main/login.py:47
+msgid "Invalid email and password combination."
+msgstr ""
+
+#: {{ project_name }}/pages/main/login.py:61
+msgid "Log in to your account"
+msgstr ""
+
+#: {{ project_name }}/pages/main/login.py:88
+msgid "User is deactivated."
+msgstr ""
+
+#: {{ project_name }}/pages/main/login.py:97
+#: {{ project_name }}/pages/main/password_reset_confirmation.py:78
+#: {{ project_name }}/pages/main/signup_verification.py:90
+msgid "Welcome {}!"
+msgstr ""
+
+#: {{ project_name }}/pages/main/logout.py:10
+msgid "Logout from your account"
+msgstr ""
+
+#: {{ project_name }}/pages/main/logout.py:28
+msgid "{} logged out!"
+msgstr ""
+
+#: {{ project_name }}/pages/main/navigation.py:35
+msgid "Account settings"
+msgstr ""
+
+#: {{ project_name }}/pages/main/navigation.py:36
+msgid "Manage your account"
+msgstr ""
+
+#: {{ project_name }}/pages/main/navigation.py:38
+#: {{ project_name }}/templates/pages/main/logout.html:19
+msgid "Log out"
+msgstr ""
+
+#: {{ project_name }}/pages/main/navigation.py:53
+#: {{ project_name }}/templates/pages/main/login.html:13
+msgid "Log in"
+msgstr ""
+
+#: {{ project_name }}/pages/main/password_reset.py:28
+msgid "Enter email, where to send recovery link to"
+msgstr ""
+
+#: {{ project_name }}/pages/main/password_reset.py:53
+#: {{ project_name }}/pages/main/password_reset.py:84
+#: {{ project_name }}/pages/main/password_reset.py:96
+#: {{ project_name }}/templates/pages/main/login.html:25
+msgid "Can't log in?"
+msgstr ""
+
+#: {{ project_name }}/pages/main/password_reset.py:55
+msgid "We send a recovery link to you at <strong>{}</strong>"
+msgstr ""
+
+#: {{ project_name }}/pages/main/password_reset.py:86
+msgid "User with email <strong>{}</strong> doesn't exist or it is suspended."
+msgstr ""
+
+#: {{ project_name }}/pages/main/password_reset_confirmation.py:26
+msgid "A few words you'll find easy to remember"
+msgstr ""
+
+#: {{ project_name }}/pages/main/password_reset_confirmation.py:30
+msgid "Confirm password"
+msgstr ""
+
+#: {{ project_name }}/pages/main/password_reset_confirmation.py:33
+msgid "Passwords must match."
+msgstr ""
+
+#: {{ project_name }}/pages/main/password_reset_confirmation.py:34
+msgid "Password confirmation is required."
+msgstr ""
+
+#: {{ project_name }}/pages/main/password_reset_confirmation.py:59
+msgid "Choose a new password"
+msgstr ""
+
+#: {{ project_name }}/pages/main/signup.py:22
+msgid "Enter email address"
+msgstr ""
+
+#: {{ project_name }}/pages/main/signup.py:33
+msgid "User with same email is already registred. You can recover your password."
+msgstr ""
+
+#: {{ project_name }}/pages/main/signup.py:59
+msgid "Sign up for your account"
+msgstr ""
+
+#: {{ project_name }}/pages/main/signup.py:77
+msgid "Check your inbox to log in"
+msgstr ""
+
+#: {{ project_name }}/pages/main/signup.py:79
+msgid ""
+"<div class='prose'><p>To complete setup and log in, click the "
+"verification link in the email we've send to "
+"<strong>{}</strong></p></div>"
+msgstr ""
+
+#: {{ project_name }}/pages/main/signup_verification.py:29
+msgid "Enter full name"
+msgstr ""
+
+#: {{ project_name }}/pages/main/signup_verification.py:31
+msgid "Full name is required."
+msgstr ""
+
+#: {{ project_name }}/pages/main/signup_verification.py:36
+msgid "Create password"
+msgstr ""
+
+#: {{ project_name }}/pages/main/signup_verification.py:61
+msgid "Set up your account"
+msgstr ""
+
+#: {{ project_name }}/pages/main/user_profile/update_password.py:16
+msgid "Update password"
+msgstr ""
+
+#: {{ project_name }}/pages/main/user_profile/update_password.py:37
+msgid "Reset your password"
+msgstr ""
+
+#: {{ project_name }}/pages/main/user_profile/update_password.py:39
+msgid "We send a password reset link to you at <strong>{}</strong>"
+msgstr ""
+
+#: {{ project_name }}/pages/main/user_profile/user_profile.py:12
+msgid "Account Settings"
+msgstr ""
+
+#: {{ project_name }}/templates/error.html:21
+msgid "Error!"
+msgstr ""
+
+#: {{ project_name }}/templates/emails/password_recovery.html:6
+#: {{ project_name }}/templates/emails/password_recovery.html:100
+#, python-format
+msgid "Set your new %(app_name)s password"
+msgstr ""
+
+#: {{ project_name }}/templates/emails/password_recovery.html:116
+#, python-format
+msgid "Hi %(name)s,"
+msgstr ""
+
+#: {{ project_name }}/templates/emails/password_recovery.html:117
+#, python-format
+msgid ""
+"We've received a request to set a new password for this %(app_name)s "
+"account:<br><strong>%(email)s</strong>"
+msgstr ""
+
+#: {{ project_name }}/templates/emails/password_recovery.html:125
+msgid "Set password"
+msgstr ""
+
+#: {{ project_name }}/templates/emails/password_recovery.html:133
+msgid "If you didn't request this, you can safely ignore this email."
+msgstr ""
+
+#: {{ project_name }}/templates/emails/password_recovery.txt:1
+#, python-format
+msgid ""
+"Hi %(name)s,\n"
+"\t\n"
+"We've received a request to set a new password for this %(app_name)s "
+"account:\n"
+"%(email)s\n"
+"\n"
+"Set new password at %(recovery_url)s\n"
+"\n"
+"If you didn't requested this, you can safely ignore this email.\n"
+msgstr ""
+
+#: {{ project_name }}/templates/emails/signup_verification.html:7
+#, python-format
+msgid "Confirm your registration to %(app_name)s"
+msgstr ""
+
+#: {{ project_name }}/templates/emails/signup_verification.html:101
+#, python-format
+msgid "Verify your email and finish registration at %(app_name)s."
+msgstr ""
+
+#: {{ project_name }}/templates/emails/signup_verification.html:117
+#, python-format
+msgid "Hi %(user_name)s,"
+msgstr ""
+
+#: {{ project_name }}/templates/emails/signup_verification.html:118
+#, python-format
+msgid ""
+"To finish setting up your account and start using %(app_name)s,<br> "
+"confirm we've got the correct email for you."
+msgstr ""
+
+#: {{ project_name }}/templates/emails/signup_verification.html:126
+msgid "Verify your email"
+msgstr ""
+
+#: {{ project_name }}/templates/emails/signup_verification.txt:1
+#, python-format
+msgid ""
+" \n"
+"Hi %(name)s,\n"
+"\n"
+"To finish setting up your account and start using %(app_name)s, confirm "
+"we've got the correct email for you\n"
+"\n"
+"Verify your email %(verification_url)s\n"
+msgstr ""
+
+#: {{ project_name }}/templates/pages/main/login.html:15
+msgid "or"
+msgstr ""
+
+#: {{ project_name }}/templates/pages/main/login.html:19
+msgid "Continue with Keycloak"
+msgstr ""
+
+#: {{ project_name }}/templates/pages/main/login.html:29
+msgid "Sign up for an account"
+msgstr ""
+
+#: {{ project_name }}/templates/pages/main/p404.html:4
+msgid "Error 404!"
+msgstr ""
+
+#: {{ project_name }}/templates/pages/main/p404.html:5
+msgid "Requested page could not be found!"
+msgstr ""
+
+#: {{ project_name }}/templates/pages/main/password_reset.html:13
+msgid "Send recovery link"
+msgstr ""
+
+#: {{ project_name }}/templates/pages/main/password_reset.html:18
+msgid "Return to log in"
+msgstr ""
+
+#: {{ project_name }}/templates/pages/main/password_reset_confirmation.html:12
+msgid "Continue"
+msgstr ""
+
+#: {{ project_name }}/templates/pages/main/signup.html:13
+#: {{ project_name }}/templates/pages/main/signup_verification.html:13
+msgid "Sign up"
+msgstr ""
+
+#: {{ project_name }}/templates/pages/main/signup.html:18
+#: {{ project_name }}/templates/pages/main/signup_verification.html:18
+msgid "Already have an account? Log in"
+msgstr ""
+
+#: {{ project_name }}/templates/pages/main/user_profile/update_password.html:10
+#, python-format
+msgid ""
+"\n"
+"            You can update your password using <strong>a password reset "
+"link</strong> that we'll send to <strong>%(email)s</strong>"
+msgstr ""
+
+#: {{ project_name }}/templates/pages/main/user_profile/update_password.html:15
+msgid ""
+"\n"
+"                <p>By sending password reset link to your email:</p>\n"
+"                <ul>\n"
+"                    <li>We are sure that you are owner of this "
+"account;</li>\n"
+"                    <li>You can change password even if you forgot the "
+"old one.</li>\n"
+"                </ul>"
+msgstr ""
+
+#: {{ project_name }}/templates/pages/main/user_profile/update_password.html:25
+msgid "Send password reset link"
+msgstr ""
+
+#: {{ project_name }}/views/keycloak_login.py:28
+msgid "Can't reach Keycloak Authentication server! Please, contact support."
+msgstr ""
+
+#: {{ project_name }}/views/keycloak_login.py:91
+msgid "User email not available or not verified by Keycloak."
+msgstr ""
+

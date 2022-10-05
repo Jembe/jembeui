@@ -1,8 +1,10 @@
+import os
 import json
 import click
 from flask import current_app as app
 from rq import Worker
 from jembeui.cli.utils import list_used_jembeui_templates
+from jembeui.settings import settings 
 from .app import jmb, get_redis
 
 
@@ -33,3 +35,29 @@ def run_rq():
         connection=get_redis(),
     )
     worker.work(with_scheduler=True)
+
+
+@app.cli.command("pybabel-extract")
+def pybabel_extract():
+    """Creates and updates messages.po"""
+    translations_path = "./{{ project_name }}/translations"
+    pot_path = f"{translations_path}/messages.pot"
+
+    do_update = os.path.exists(pot_path)
+    # create pot file
+    os.system(f"pybabel extract -F babel.cfg -k lazy_gettext -o {pot_path} --project={{ project_name}} .")
+
+    # compile translations
+    if do_update:
+        os.system(f"pybabel update -i {pot_path} -d {translations_path}")
+    else:
+        for lang_code in settings.supported_locales:
+            if lang_code != 'en':
+                os.system(f"pybabel init -i {pot_path} -d {translations_path} -l {lang_code}")
+
+
+@app.cli.command("pybabel-compile")
+def pybabel_compile():
+    """Compiles all messages.po"""
+    translations_path = "./{{ project_name }}/translations"
+    os.system(f"pybabel compile -d {translations_path} .")
