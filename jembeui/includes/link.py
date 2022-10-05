@@ -197,12 +197,13 @@ class Link:
             raise ValueError("Link must be binded to component")
         if self.is_external:
             raise ValueError("Component reference doesn't exist for external links")
-        if isinstance(self._to, str):
-            return self._str_to_component_reference_lambda(self._to)(self._component)
-        elif isinstance(self._to, ComponentReference):
+
+        if isinstance(self._to, ComponentReference):
             return self._to
-        else:
+        elif callable(self._to):
             return self._to(self._component)
+        else:
+            return self._str_to_component_reference_lambda(self._to)(self._component)
 
     def _str_to_component_reference_lambda(
         self, to_str: str
@@ -257,14 +258,14 @@ class Link:
                     return cr.action.title()
                 else:
                     return cr.component_instance.title
-        elif isinstance(self._title, str):
-            return self._title
-        else:
+        elif callable(self._title):
             # callable
             title = self._title(self._component)
             if title is None and self.icon is None:
                 return "Unknown link"
             return title
+        else:
+            return self._title
 
     @property
     def description(self) -> Optional[str]:
@@ -273,7 +274,7 @@ class Link:
 
         return (
             self._description
-            if self._description is None or isinstance(self._description, str)
+            if self._description is None or not callable(self._description)
             else self._description(self._component)
         )
 
@@ -284,17 +285,17 @@ class Link:
 
         if self._icon is None:
             return None
-        elif isinstance(self._icon, str):
+        elif isinstance(self._icon, self.Icon):
+            return self._icon
+        elif callable(self._icon):
+            # callable
+            icon = self._icon(self._component)
+            return icon if isinstance(icon, self.Icon) else self.Icon(name=icon)
+        else:
             split = self._icon.split(" ", 2)
             return self.Icon(
                 name=split[0], classes=split[1] if len(split) == 2 else None
             )
-        elif isinstance(self._icon, self.Icon):
-            return self._icon
-        else:
-            # callable
-            icon = self._icon(self._component)
-            return icon if isinstance(icon, self.Icon) else self.Icon(name=icon)
 
     @property
     def style(self) -> "jembeui.Link.Style":
@@ -303,13 +304,11 @@ class Link:
         style: "jembeui.Link.Style"
         if self._style is None:
             style = self.Style(as_button=self._as_button)
-        elif isinstance(self._style, str):
-            style = self.Style(classes=self._style, as_button=self._as_button)
         elif isinstance(self._style, self.Style):
             style = self._style
             if self._as_button:
                 style.as_button = True
-        else:
+        elif callable(self._style):
             # callable
             res = self._style(self._component)
             style = (
@@ -319,6 +318,9 @@ class Link:
             )
             if self._as_button:
                 style.as_button = True
+        else:
+            style = self.Style(classes=self._style, as_button=self._as_button)
+
         if self.icon is None:
             style.title_hidden = False
         elif (

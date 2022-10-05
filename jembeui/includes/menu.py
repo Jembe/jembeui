@@ -219,14 +219,14 @@ class Menu:
 
         if self._title is None:
             return "Unknown Menu" if self.icon is None else None
-        elif isinstance(self._title, str):
-            return self._title
-        else:
+        elif callable(self._title):
             # callable
             title = self._title(self._component)
             if title is None and self.icon is None:
                 return "Unknown Menu"
             return title
+        else:
+            return self._title
 
     @property
     def description(self) -> Optional[str]:
@@ -235,7 +235,7 @@ class Menu:
 
         return (
             self._description
-            if self._description is None or isinstance(self._description, str)
+            if self._description is None or not callable(self._description)
             else self._description(self._component)
         )
 
@@ -246,7 +246,7 @@ class Menu:
 
         return (
             self._header
-            if self._header is None or isinstance(self._header, str)
+            if self._header is None or not callable(self._header)
             else self._header(self._component)
         )
 
@@ -259,16 +259,16 @@ class Menu:
         if self._cached_style is None:
             if self._style is None:
                 self._cached_style = self.Style()
-            elif isinstance(self._style, str):
-                self._cached_style = self.Style(classes=self._style)
             elif isinstance(self._style, self.Style):
                 self._cached_style = self._style
-            else:
+            elif callable(self._style):
                 # callable
                 res = self._style(self._component)
                 self._cached_style = (
                     res if isinstance(res, self.Style) else self.Style(classes=res)
                 )
+            else:
+                self._cached_style = self.Style(classes=self._style)
 
         return self._cached_style
 
@@ -278,14 +278,14 @@ class Menu:
             raise ValueError("Menu must be binded to component")
         if self._icon is None:
             return None
-        elif isinstance(self._icon, str):
+        elif isinstance(self._icon, self.Icon):
+            return self._icon
+        elif callable(self._icon):
+            # callable
+            icon = self._icon(self._component)
+            return icon if isinstance(icon, self.Icon) else self.Icon(name=icon)
+        else:
             split = self._icon.split(" ", 2)
             return self.Icon(
                 name=split[0], classes=split[1] if len(split) == 2 else None
             )
-        elif isinstance(self._icon, self.Icon):
-            return self._icon
-        else:
-            # callable
-            icon = self._icon(self._component)
-            return icon if isinstance(icon, self.Icon) else self.Icon(name=icon)
