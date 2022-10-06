@@ -69,7 +69,8 @@ class User(UserMixin, db.Model):  # type:ignore
                 db.session.add(user)
                 db.session.commit()
         else:
-            user = User(name=name, email=email, password=uuid4())
+            user = User(name=name, email=email)
+            user.set_password(str(uuid4()))            
             db.session.add(user)
             db.session.commit()
 

@@ -88,7 +88,7 @@ msgstr "Upravljajte svojim nalogom"
 #: {{ project_name }}/pages/main/navigation.py:38
 #: {{ project_name }}/templates/pages/main/logout.html:19
 msgid "Log out"
-msgstr "Odjavi me"
+msgstr "Odjavi se"
 
 #: {{ project_name }}/pages/main/navigation.py:53
 #: {{ project_name }}/templates/pages/main/login.html:13

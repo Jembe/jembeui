@@ -12,8 +12,10 @@ class JuiUtils:
     def __init__(self, component: "jembeui.Component") -> None:
         self._component = component
 
-    def push_page_message(self, title: str, message: str):
-        self._component.emit("pushPageMessage", title=title, message=message)
+    def push_page_message(self, title: str, message: str, variant: str = ""):
+        self._component.emit(
+            "pushPageMessage", title=title, message=message, variant=variant
+        )
 
     def push_page_alert(self, message: str, level: str = "base"):
         from .page.alerts import CPageAlerts

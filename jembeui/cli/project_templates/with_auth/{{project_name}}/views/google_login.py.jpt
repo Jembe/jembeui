@@ -1,3 +1,4 @@
+from importlib.metadata import version
 import json
 import requests
 from flask_babel import lazy_gettext as _
@@ -70,7 +71,11 @@ def google_login_callback():
     )
 
     # parse the tokens
-    google_client.parse_request_body_response(json.dumps(token_response.json()))
+    # parse the tokens
+    token_dict = token_response.json()
+    if "error" in token_dict:
+        return _get_error_response(token_dict["error_description"])
+    google_client.parse_request_body_response(token_dict)
 
     # Now that we have tokens (yay) let's find and hit URL
     # from Google that gives you user's profile information,
@@ -107,6 +112,7 @@ def _get_error_response(message):
             error=message,
             placeholder=lambda *a, **kw: "",
             component=lambda *a, **kw: "",
+            get_package_version=lambda pname: version(pname),            
             _config=None,
         ),
         400,
