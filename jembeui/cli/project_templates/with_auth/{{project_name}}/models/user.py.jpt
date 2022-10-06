@@ -2,6 +2,7 @@ from uuid import uuid4
 import sqlalchemy as sa
 from sqlalchemy.orm import object_session
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_babel import lazy_gettext as _
 from flask_login import UserMixin
 from {{ project_name }}.app import db
 
@@ -43,7 +44,7 @@ class User(UserMixin, db.Model):  # type:ignore
         if sess.query(
             sess.query(User).filter(User.email == value, User.id != self.id).exists()
         ).scalar():
-            return ValueError("User with the same email already exists.")
+            raise ValueError(_("User with the same email already exists."))
         return value
 
     def set_password(self, password: str):
