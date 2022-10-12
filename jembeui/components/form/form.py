@@ -110,6 +110,8 @@ class CForm(Component):
             # Add components defined by jembeui.FiledMixin
             if components is None:
                 components = {}
+            # get fields from from and add for subcomponents defined by fields
+            # this is the reason why form can't be dynamic
             for field in self.form():
                 if isinstance(field, FieldMixin):
                     components.update(field.get_jembeui_components())

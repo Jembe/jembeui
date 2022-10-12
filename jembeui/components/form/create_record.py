@@ -32,7 +32,7 @@ class CCreateRecord(CForm):
         def __init__(
             self,
             form: "jembeui.Form",
-            get_record: Optional[Callable[["CForm"], Union["Model", dict]]] = None,
+            get_record: Optional[Callable[["jembeui.CForm"], Union["Model", dict]]] = None,
             menu: Optional[
                 Union["jembeui.Menu", Sequence[Union["jembeui.Link", "jembeui.Menu"]]]
             ] = None,
