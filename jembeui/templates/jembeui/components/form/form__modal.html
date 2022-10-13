@@ -1,0 +1,24 @@
+<div class="modal modal-open">
+    <div class="w-11/12 max-w-4xl modal-box">
+        {%- if component("cancel()").is_accessible %}
+        <button class="absolute btn btn-sm btn-circle btn-ghost right-2 top-2" jmb-on:click="cancel()" title="{%- trans -%}Cancel{%- endtrans -%}">✕</button>
+        {%- endif %}
+
+        <h3 class="flex items-center gap-4 text-lg font-bold">{{ title }}</h3>
+
+        {{ form() }}
+
+        {%- if menu %}
+            {{ menu(classes="modal-action flex-row-reverse justify-start", full_classes=true) }}
+        {%- else %}
+            <div class="modal-action">
+                {%- if component("cancel()").is_accessible %}
+                    <button class="btn btn-ghost" jmb-on:click="cancel()">{% trans %}Cancel{% endtrans %}</button>
+                {%- endif %}
+                {%- if component("submit()").is_accessible %}
+                    <button class="btn btn-primary" jmb-on:click="submit()">{% trans %}Submit{% endtrans %}</button>
+                {%- endif %}
+            </div>
+        {%- endif %}
+    </div>
+</div>

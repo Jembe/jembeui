@@ -81,7 +81,7 @@ class Component(jembe.Component):
             if variant_name in cls.TEMPLATE_VARIANTS:
                 return cls.TEMPLATE_VARIANTS[variant_name]
             raise JembeUIError(
-                f"Template variant {variant_name} for {cls.default_template_exp} does not exist"
+                f"Template variant '{variant_name}' for '{cls.default_template}' does not exist"
             )
 
         @property

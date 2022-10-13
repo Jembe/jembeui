@@ -1,9 +1,25 @@
 from functools import partial
-from typing import TYPE_CHECKING, Any, Callable, Dict, Iterable, Optional, Sequence, Tuple, Union
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Dict,
+    Iterable,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
+)
 from datetime import datetime, date, time, timedelta
 from markupsafe import Markup
 import sqlalchemy as sa
-from flask_babel import format_date, format_datetime, format_time, format_timedelta, lazy_gettext as _
+from flask_babel import (
+    format_date,
+    format_datetime,
+    format_time,
+    format_timedelta,
+    lazy_gettext as _,
+)
 from flask import render_template
 from jembeui.includes.menu import Menu
 from .list import CList
@@ -15,6 +31,7 @@ if TYPE_CHECKING:
     from flask_sqlalchemy import SQLAlchemy
 
 __all__ = ("CListRecords",)
+
 
 def default_field_value(component: "jembe.Component", record, field_name: str) -> str:
     """Default handler for displaying data inside the table"""
@@ -33,11 +50,12 @@ def default_field_value(component: "jembe.Component", record, field_name: str) -
     elif isinstance(value, bool):
         return Markup(
             render_template(
-                "jembeui/s0/widgets/table_boolean_field.html", value=value
+                "jembeui/includes/list_records/boolean_field.html", value=value
             )
         )
     else:
         return str(value) if value is not None else ""  # type: ignore
+
 
 class CListRecords(CList):
     """Display list of records from SQLAlchemy query as HTML table"""
@@ -50,6 +68,7 @@ class CListRecords(CList):
             field_values(Dict[str,Callable]): callable to get value of the field from query
             record_menu: callable that returns menu for current record
         """
+
         default_template: str = "/jembeui/components/list/table.html"
         default_field_value = default_field_value
 
@@ -95,7 +114,10 @@ class CListRecords(CList):
         ):
             # field names
             self.fields = fields if fields is not None else dict()
-            self.fields = {k: v if v is not None else k for k, v in self.fields.items()}
+            self.fields = {
+                k: v if v is not None else k.replace("_", " ")
+                for k, v in self.fields.items()
+            }
             if isinstance(query, sa.orm.Query) and not self.fields:
                 self.fields = {
                     ca["name"]: ca["name"].replace("_", " ")
@@ -109,7 +131,7 @@ class CListRecords(CList):
                     self.field_values[field_name] = self.__class__.default_field_value
 
             # order by
-            order_by = {k:v for k, v in self.fields.items()}
+            order_by = {k: v for k, v in self.fields.items()}
             if order_by_exp is not None:
                 for ordr, exp in order_by_exp.items():
                     if exp is None and ordr in order_by:

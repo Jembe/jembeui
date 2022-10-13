@@ -32,7 +32,9 @@ class CCreateRecord(CForm):
         def __init__(
             self,
             form: "jembeui.Form",
-            get_record: Optional[Callable[["jembeui.CForm"], Union["Model", dict]]] = None,
+            get_record: Optional[
+                Callable[["jembeui.CForm"], Union["Model", dict]]
+            ] = None,
             menu: Optional[
                 Union["jembeui.Menu", Sequence[Union["jembeui.Link", "jembeui.Menu"]]]
             ] = None,
@@ -53,12 +55,10 @@ class CCreateRecord(CForm):
             url_query_params: Optional[Dict[str, str]] = None,
         ):
             if menu is None:
-                menu = Menu(
-                    items=[
-                        Link("submit()", _("Save"), style="btn-primary", as_button=True),
-                        Link("cancel()", _("Cancel"), style="btn-ghost", as_button=True),
-                    ],
-                )
+                menu = [
+                    Link("submit()", _("Save"), style="btn-primary", as_button=True),
+                    Link("cancel()", _("Cancel"), style="btn-ghost", as_button=True),
+                ]
             super().__init__(
                 form,
                 get_record,

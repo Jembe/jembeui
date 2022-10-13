@@ -158,6 +158,7 @@ class CForm(Component):
         if self._config.get_record is not None:
             return self._config.get_record(self)
         raise JembeUIError(
+            f"{self.__class__}: "
             "Can get form original record."
             "Add 'get_record' callback in Config or override Form 'get_record' method."
         )
