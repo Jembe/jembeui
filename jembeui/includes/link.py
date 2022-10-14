@@ -161,12 +161,19 @@ class Link:
             self._to.startswith("https://") or self._to.startswith("http://")
         )
 
+        # Component that creates links,
+        # from this component reference of component to links leads to
+        # is calculated
         self._component: Optional["jembe.Component"] = None
         self._calling_action = False
 
         self._cached_style: Optional["jembeui.Link.Style"] = None
 
     def bind_to(self, component: "jembe.Component") -> "jembeui.Link":
+        """Binds link to component that defines link
+
+        Link must be binded so that title, and 'to' callable can be called
+        """
         if self.is_binded:
             raise JembeUIError("Link is already binded! Link can't be binded twice")
         binded_link: "jembeui.Link" = copy(self)
@@ -201,7 +208,7 @@ class Link:
         elif isinstance(self._to, str) and self._to.startswith("JRL:"):
             return self._to[4:]
         else:
-            return self._component_reference.jrl
+            return self._component_reference.jrl_absolute
 
     @property
     def is_accessible(self) -> bool:
@@ -249,7 +256,7 @@ class Link:
 
     def render(self, **kwds) -> str:
         if not self.is_binded:
-            raise ValueError("Link is not binded to component")
+            raise ValueError(f"Link is not binded to component")
         if not self.is_accessible:
             return ""
 

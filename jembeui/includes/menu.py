@@ -289,3 +289,7 @@ class Menu:
             return self.Icon(
                 name=split[0], classes=split[1] if len(split) == 2 else None
             )
+
+    @property
+    def is_menu(self):
+        return True

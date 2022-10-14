@@ -1,3 +1,4 @@
+from tkinter import W
 from typing import (
     TYPE_CHECKING,
     Optional,
@@ -28,6 +29,15 @@ class CCreateRecord(CForm):
     """
 
     class Config(CForm.Config):
+        """Confgures Create Record component
+
+        - form (jembeui.Form): Form class to be instiated that handles form
+          submision, validation and cancelation
+        - get_record(Callback[[jembeui.CForm], Union[Model,dict]]): Callback
+          that returns data used when inistiating the from
+        TODO list all attributes and describe them
+        """
+
         def __init__(
             self,
             form: "jembeui.Form",
@@ -42,6 +52,7 @@ class CCreateRecord(CForm):
             redisplay_on_submit: bool = False,
             redisplay_on_cancel: bool = False,
             form_state_name: str = "form",
+            submit_title: Union[str, Callable[["jembeui.CForm"], str]] = _("Save"),
             db: Optional["SQLAlchemy"] = None,
             title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
             template: Optional[Union[str, Iterable[str]]] = None,
@@ -53,9 +64,15 @@ class CCreateRecord(CForm):
             changes_url: bool = True,
             url_query_params: Optional[Dict[str, str]] = None,
         ):
+            self.submit_title = submit_title
             if menu is None:
                 menu = [
-                    Link("submit()", _("Save"), style="btn-primary", as_button=True),
+                    Link(
+                        "submit()",
+                        title=submit_title,
+                        style="btn-primary",
+                        as_button=True,
+                    ),
                     Link("cancel()", _("Cancel"), style="btn-ghost", as_button=True),
                 ]
             super().__init__(
@@ -97,6 +114,9 @@ class CCreateRecord(CForm):
     def on_form_canceled(self) -> Optional[bool]:
         self.state.modified_fields = ()
         return super().on_form_canceled()
+
+    def on_form_invalid(self) -> None:
+        """Don't push page alert"""
 
     def push_page_alert_on_form_submit(self):
         self.jui.push_page_alert(_("{} created.").format(self.title), "success")
