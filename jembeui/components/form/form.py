@@ -411,7 +411,7 @@ class CForm(Component):
         """Get question for cancel confirmation.
 
         Default is "Unsaved changes will be lost?"."""
-        return "Unsaved changes will be lost?"
+        return _("Unsaved changes will be lost?")
 
     def hydrate(self):
         """Binds menu from _config if it's configured"""
