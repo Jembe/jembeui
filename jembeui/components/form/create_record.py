@@ -11,7 +11,6 @@ from typing import (
 from flask_babel import lazy_gettext as _
 from .form import CForm
 from ...includes.link import Link
-from ...includes.menu import Menu
 from ...includes.form import Form
 
 if TYPE_CHECKING:

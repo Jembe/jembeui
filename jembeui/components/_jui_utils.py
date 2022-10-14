@@ -73,3 +73,11 @@ class JuiUtils:
                 danger_confirmation_phrase=danger_confirmation_phrase,
             ),
         )
+
+    def redisplay(self, *component_names):
+        """Emit redisplay to named child components cousing them to redisplay itself
+        if they already exist on the page"""
+        if component_names:
+            self._component.emit("redisplay").to(component_names)
+        else:
+            self._component.emit("redisplay")

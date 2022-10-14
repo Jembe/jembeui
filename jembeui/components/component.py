@@ -154,14 +154,6 @@ class Component(jembe.Component):
                     traceback.print_exc()
         return True
 
-    def redisplay(self, *component_names):
-        """Emit redisplay to named child components cousing them to redisplay itself
-        if they already exist on the page"""
-        if component_names:
-            self.emit("redisplay").to(component_names)
-        else:
-            self.emit("redisplay")
-
     @listener(event="update_ac")
     def jui_on_update_ac(self, event: "jembe.Event"):
         avaiable = self.ac_check()

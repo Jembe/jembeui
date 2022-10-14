@@ -77,6 +77,6 @@ class CMainPage(CPage):
             if isinstance(event.exception, NotFound):
                 event.handled = True
                 self.display_component("p404")
-                self.redisplay("navbar_menu", "sidebar_menu")
+                self.jui.redisplay("navbar_menu", "sidebar_menu")
                 # returns True to redisplay it self other
                 return True
