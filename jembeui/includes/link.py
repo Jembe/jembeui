@@ -35,6 +35,31 @@ class Link:
         as_button: bool = False
         title_hidden: bool = False
 
+        def update_with_dict(self, **kwargs) -> "jembeui.Link.Style":
+            """Create new style with updated settings from dict"""
+
+            # def update_str(k, check_value=lambda x: len(x) > 0):
+            #     if k in kwargs and check_value(v := kwargs[k]):
+            #         setattr(new_style, k, str(v))
+
+            def update_ostr(k, check_value=lambda x: len(x) > 0):
+                if k in kwargs and check_value(v := kwargs[k]):
+                    if getattr(new_style, k) is None:
+                        setattr(new_style, k, str(v))
+                    else:
+                        setattr(new_style, k, " ".join((getattr(new_style, k), str(v))))
+
+            def update_bool(k, check_value=lambda x: True):
+                if k in kwargs and check_value(v := kwargs[k]):
+                    setattr(new_style, k, bool(v))
+
+            new_style = copy(self)
+            update_ostr("classes")
+            update_bool("full_classes")
+            update_bool("as_button")
+            update_ostr("title_hidden")
+            return new_style
+
     @dataclass
     class Icon:
         """
@@ -89,12 +114,12 @@ class Link:
     ):
         """Creates url or action/component link that can render itself as HTML
 
-        Link element must be binded to its component before it can be used 
+        Link element must be binded to its component before it can be used
         in jinja2 template
 
         Args:
-            to (Union[ str, &quot;jembe.ComponentReference&quot;, 
-                Callable[[&quot;jembe.Component&quot;], 
+            to (Union[ str, &quot;jembe.ComponentReference&quot;,
+                Callable[[&quot;jembe.Component&quot;],
                 &quot;jembe.ComponentReference&quot;], ]):
                 Determine what should help when user clicks the link. It can be:
 
@@ -104,7 +129,7 @@ class Link:
                     - component full names starting with  /
                     - relative child components names
                     - action name ending with (); params are passed with params attribute
-                    - custom javascript prefixed with JRL: 
+                    - custom javascript prefixed with JRL:
             title (Optional[ Union[ str, Callable[[&quot;jembe.Component&quot;], str], ] ], optional):
                 Title of the link. Defaults to None.
             description (Optional[Union[str, Callable[[&quot;jembe.Component&quot;], str]]], optional):
@@ -139,6 +164,8 @@ class Link:
         self._component: Optional["jembe.Component"] = None
         self._calling_action = False
 
+        self._cached_style: Optional["jembeui.Link.Style"] = None
+
     def bind_to(self, component: "jembe.Component") -> "jembeui.Link":
         if self.is_binded:
             raise JembeUIError("Link is already binded! Link can't be binded twice")
@@ -163,7 +190,7 @@ class Link:
                 raise ValueError("Link must be binded to component")
             return self._to  # type:ignore
         elif isinstance(self._to, str) and self._to.startswith("JRL:"):
-            return '#'
+            return "#"
         else:
             return self._component_reference.url
 
@@ -220,11 +247,15 @@ class Link:
         else:
             return lambda component: component.component(to_str, **self._params)
 
-    def render(self) -> str:
+    def render(self, **kwds) -> str:
         if not self.is_binded:
             raise ValueError("Link is not binded to component")
         if not self.is_accessible:
             return ""
+
+        original_style = self.style
+        self._cached_style = self.style.update_with_dict(**kwds)
+
         context: dict = dict(
             is_external=self.is_external,
             url=self.url,
@@ -237,10 +268,13 @@ class Link:
             active_for_exec_names=self.active_for_exec_names,
             is_accessible=self.is_accessible,
         )
-        return Markup(render_template(self.LINK_TEMPLATE, **context))  # type:ignore
+        result = Markup(render_template(self.LINK_TEMPLATE, **context))  # type:ignore
+        self._cached_style = original_style
+
+        return result
 
     def __call__(self, *args: Any, **kwds: Any) -> Any:
-        return self.render()
+        return self.render(**kwds)
 
     @property
     def title(self) -> Optional[str]:
@@ -302,34 +336,39 @@ class Link:
         if not self.is_binded:
             raise ValueError("Link must be binded to component")
         style: "jembeui.Link.Style"
-        if self._style is None:
-            style = self.Style(as_button=self._as_button)
-        elif isinstance(self._style, self.Style):
-            style = self._style
-            if self._as_button:
-                style.as_button = True
-        elif callable(self._style):
-            # callable
-            res = self._style(self._component)
-            style = (
-                res
-                if isinstance(res, self.Style)
-                else self.Style(classes=res, as_button=self._as_button)
-            )
-            if self._as_button:
-                style.as_button = True
-        else:
-            style = self.Style(classes=self._style, as_button=self._as_button)
 
-        if self.icon is None:
-            style.title_hidden = False
-        elif (
-            isinstance(self._style, str)
-            and self._title is None
-            and ("btn-circle" in self._style or "btn-square" in self._style)
-        ):
-            style.title_hidden = True
-        return style
+        if self._cached_style is None:
+            if self._style is None:
+                style = self.Style(as_button=self._as_button)
+            elif isinstance(self._style, self.Style):
+                style = self._style
+                if self._as_button:
+                    style.as_button = True
+            elif callable(self._style):
+                # callable
+                res = self._style(self._component)
+                style = (
+                    res
+                    if isinstance(res, self.Style)
+                    else self.Style(classes=res, as_button=self._as_button)
+                )
+                if self._as_button:
+                    style.as_button = True
+            else:
+                style = self.Style(classes=self._style, as_button=self._as_button)
+
+            if self.icon is None:
+                style.title_hidden = False
+            elif (
+                isinstance(self._style, str)
+                and self._title is None
+                and ("btn-circle" in self._style or "btn-square" in self._style)
+            ):
+                style.title_hidden = True
+
+            self._cached_style = style
+
+        return self._cached_style
 
     @property
     def active_for_path_names(self) -> Sequence[str]:
@@ -347,7 +386,7 @@ class Link:
                 not self.is_external
                 and self._active_for_path_names is None
                 and self._active_for_exec_names is None
-                and not self._calling_action 
+                and not self._calling_action
             ):
                 return (self._component_reference.exec_name,)
             return ()
