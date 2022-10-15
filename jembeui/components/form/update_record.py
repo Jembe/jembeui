@@ -9,21 +9,22 @@ from typing import (
     Dict,
     Tuple,
 )
+from flask_sqlalchemy import Model
 from flask_babel import lazy_gettext as _
 from .form import CForm
 from ...includes.link import Link
 from ...includes.form import Form
 
 if TYPE_CHECKING:
-    from flask_sqlalchemy import Model, SQLAlchemy
+    from flask_sqlalchemy import SQLAlchemy
     import jembe
     import jembeui
 
-__all__ = ("CCreateRecord",)
+__all__ = ("CUpdateRecord",)
 
 
-class CCreateRecord(CForm):
-    """Displayes form that creates new record
+class CUpdateRecord(CForm):
+    """Displayes form that updates a record
 
     Functionalites over CForm:
 
@@ -31,21 +32,12 @@ class CCreateRecord(CForm):
     """
 
     class Config(CForm.Config):
-        """Configures Create Record component
-
-        - form (jembeui.Form): Form class to be instiated that handles form
-          submision, validation and cancelation
-        - get_record(Callback[[jembeui.CForm], Union[Model,dict]]): Callback
-          that returns data used when inistiating the from
-        TODO list all attributes and describe them
-        """
+        """Configures Update Record component"""
 
         def __init__(
             self,
             form: Type["jembeui.Form"],
-            get_record: Optional[
-                Callable[["jembeui.CForm"], Union["Model", dict]]
-            ] = None,
+            get_record: Optional[Callable[["CForm"], Union["Model", dict]]] = None,
             menu: Optional[
                 Union["jembeui.Menu", Sequence[Union["jembeui.Link", "jembeui.Menu"]]]
             ] = None,
@@ -99,8 +91,18 @@ class CCreateRecord(CForm):
     _config: Config
 
     def __init__(
-        self, form: Optional[Form] = None, modified_fields: Tuple[str, ...] = ()
+        self,
+        record_id: int,
+        form: Optional[Form] = None,
+        modified_fields: Tuple[str, ...] = (),
+        _record: Optional[Union[Model, dict]] = None,
     ):
+        if _record is not None and (
+            _record["id"] == record_id
+            if isinstance(_record, dict)
+            else _record.id == record_id
+        ):
+            self.record = _record
         super().__init__()
 
     @property
@@ -118,7 +120,4 @@ class CCreateRecord(CForm):
         return super().on_form_canceled()
 
     def push_page_alert_on_form_submit(self):
-        self.jui.push_page_alert(_("{} created.").format(self.title), "success")
-
-    # def push_page_alert_on_form_invalid(self):
-    #     self.jui.push_page_alert(_("Form is invalid"), "warning")
+        self.jui.push_page_alert(_("{} updated.").format(self.title), "success")

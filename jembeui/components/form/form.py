@@ -7,6 +7,7 @@ from typing import (
     Optional,
     Sequence,
     Tuple,
+    Type,
     Union,
 )
 import sqlalchemy as sa
@@ -56,7 +57,7 @@ class CForm(Component):
 
         def __init__(
             self,
-            form: "jembeui.Form",
+            form: Type["jembeui.Form"],
             get_record: Optional[Callable[["CForm"], Union["Model", dict]]] = None,
             menu: Optional[
                 Union["jembeui.Menu", Sequence[Union["jembeui.Link", "jembeui.Menu"]]]

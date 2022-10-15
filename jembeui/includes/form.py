@@ -159,6 +159,10 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
         def mount(self, form: "jembeui.Form") -> "jembeui.Form.Style":
             """Mount instance of Style to specific form"""
             self.form = form
+
+            if self.form.is_disabled:
+                self.disabled = True
+
             return self
 
         def field_styles(self):
@@ -213,9 +217,12 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
         prefix="",
         data=None,
         meta=None,
+        disabled: bool = False,
         **kwargs,
     ):
         self.cform: "jembeui.CForm"
+
+        self.is_disabled = disabled
 
         self.is_mounted = False
         super().__init__(
