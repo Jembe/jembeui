@@ -11,7 +11,7 @@ from typing import (
 )
 from flask_sqlalchemy import Model
 from flask_babel import lazy_gettext as _
-from .form import CForm
+from .form_adaptable import CFormAdaptable
 from ...includes.link import Link
 from ...includes.form import Form
 
@@ -20,10 +20,10 @@ if TYPE_CHECKING:
     import jembe
     import jembeui
 
-__all__ = ("CUpdateRecord",)
+__all__ = ("CUpdateRecordAdaptable",)
 
 
-class CUpdateRecord(CForm):
+class CUpdateRecordAdaptable(CFormAdaptable):
     """Displayes form that updates a record
 
     Functionalites over CForm:
@@ -31,13 +31,15 @@ class CUpdateRecord(CForm):
     - implemnts modified fields property and is_from_modified
     """
 
-    class Config(CForm.Config):
+    class Config(CFormAdaptable.Config):
         """Configures Update Record component"""
 
         def __init__(
             self,
-            form: Type["jembeui.Form"],
-            get_record: Optional[Callable[["jembeui.CForm"], Union["Model", dict]]] = None,
+            get_form: Callable[["jembeui.CFormAdaptable"], Type["jembeui.Form"]],
+            get_record: Optional[
+                Callable[["jembeui.CFormAdaptable"], Union["Model", dict]]
+            ] = None,
             menu: Optional[
                 Union["jembeui.Menu", Sequence[Union["jembeui.Link", "jembeui.Menu"]]]
             ] = None,
@@ -46,7 +48,7 @@ class CUpdateRecord(CForm):
             redisplay_on_submit: bool = False,
             redisplay_on_cancel: bool = False,
             form_state_name: str = "form",
-            submit_title: Union[str, Callable[["jembeui.CForm"], str]] = _("Save"),
+            submit_title: Union[str, Callable[["jembeui.CFormAdaptable"], str]] = _("Save"),
             db: Optional["SQLAlchemy"] = None,
             title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
             template: Optional[Union[str, Iterable[str]]] = None,
@@ -70,7 +72,7 @@ class CUpdateRecord(CForm):
                     Link("cancel()", _("Cancel"), style="btn-ghost", as_button=True),
                 ]
             super().__init__(
-                form,
+                get_form,
                 get_record,
                 menu,
                 grab_focus,
@@ -87,6 +89,7 @@ class CUpdateRecord(CForm):
                 changes_url,
                 url_query_params,
             )
+
 
     _config: Config
 

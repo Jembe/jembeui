@@ -119,6 +119,3 @@ class CCreateRecord(CForm):
 
     def push_page_alert_on_form_submit(self):
         self.jui.push_page_alert(_("{} created.").format(self.title), "success")
-
-    # def push_page_alert_on_form_invalid(self):
-    #     self.jui.push_page_alert(_("Form is invalid"), "warning")

@@ -10,29 +10,29 @@ from typing import (
     Union,
 )
 from flask_sqlalchemy import Model
-from .form import CForm
+from .form_adaptable import CFormAdaptable
 
 if TYPE_CHECKING:
     from flask_sqlalchemy import SQLAlchemy
     import jembe
     import jembeui
 
-__all__ = ("CViewRecord",)
+__all__ = ("CViewRecordAdaptable",)
 
 
-class CViewRecord(CForm):
+class CViewRecordAdaptable(CFormAdaptable):
     """Displayes Form that shows read only record from database"""
 
-    # class Config(CForm.Config):
+    # class Config(CFormAdaptable.Config):
     #     """Configures View Record component
 
-    #     # TODO  copy from CForm and add new stuff
+    #     # TODO  copy from CFormAdaptable and add new stuff
     #     """
 
     #     def __init__(
     #         self,
     #         form: Type["jembeui.Form"],
-    #         get_record: Optional[Callable[["jembeui.CForm"], Union["Model", dict]]] = None,
+    #         get_record: Optional[Callable[["jembeui.CFormAdaptable"], Union["Model", dict]]] = None,
     #         menu: Optional[
     #             Union["jembeui.Menu", Sequence[Union["jembeui.Link", "jembeui.Menu"]]]
     #         ] = None,

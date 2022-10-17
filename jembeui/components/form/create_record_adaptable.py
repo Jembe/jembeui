@@ -9,35 +9,43 @@ from typing import (
     Dict,
     Tuple,
 )
-from flask_sqlalchemy import Model
 from flask_babel import lazy_gettext as _
-from .form import CForm
+from .form_adaptable import CFormAdaptable
 from ...includes.link import Link
 from ...includes.form import Form
 
 if TYPE_CHECKING:
-    from flask_sqlalchemy import SQLAlchemy
+    from flask_sqlalchemy import Model, SQLAlchemy
     import jembe
     import jembeui
 
-__all__ = ("CUpdateRecord",)
+__all__ = ("CCreateRecordAdaptable",)
 
 
-class CUpdateRecord(CForm):
-    """Displayes form that updates a record
+class CCreateRecordAdaptable(CFormAdaptable):
+    """Displayes form that creates new record
 
     Functionalites over CForm:
 
     - implemnts modified fields property and is_from_modified
     """
 
-    class Config(CForm.Config):
-        """Configures Update Record component"""
+    class Config(CFormAdaptable.Config):
+        """Configures Create Record component
+
+        - form (jembeui.Form): Form class to be instiated that handles form
+          submision, validation and cancelation
+        - get_record(Callback[[jembeui.CForm], Union[Model,dict]]): Callback
+          that returns data used when inistiating the from
+        TODO list all attributes and describe them
+        """
 
         def __init__(
             self,
-            form: Type["jembeui.Form"],
-            get_record: Optional[Callable[["jembeui.CForm"], Union["Model", dict]]] = None,
+            get_form: Callable[["jembeui.CFormAdaptable"], Type["jembeui.Form"]],
+            get_record: Optional[
+                Callable[["jembeui.CFormAdaptable"], Union["Model", dict]]
+            ] = None,
             menu: Optional[
                 Union["jembeui.Menu", Sequence[Union["jembeui.Link", "jembeui.Menu"]]]
             ] = None,
@@ -46,7 +54,7 @@ class CUpdateRecord(CForm):
             redisplay_on_submit: bool = False,
             redisplay_on_cancel: bool = False,
             form_state_name: str = "form",
-            submit_title: Union[str, Callable[["jembeui.CForm"], str]] = _("Save"),
+            submit_title: Union[str, Callable[["jembeui.CFormAdaptable"], str]] = _("Save"),
             db: Optional["SQLAlchemy"] = None,
             title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
             template: Optional[Union[str, Iterable[str]]] = None,
@@ -70,7 +78,7 @@ class CUpdateRecord(CForm):
                     Link("cancel()", _("Cancel"), style="btn-ghost", as_button=True),
                 ]
             super().__init__(
-                form,
+                get_form,
                 get_record,
                 menu,
                 grab_focus,
@@ -91,18 +99,8 @@ class CUpdateRecord(CForm):
     _config: Config
 
     def __init__(
-        self,
-        record_id: int,
-        form: Optional[Form] = None,
-        modified_fields: Tuple[str, ...] = (),
-        _record: Optional[Union[Model, dict]] = None,
+        self, form: Optional[Form] = None, modified_fields: Tuple[str, ...] = ()
     ):
-        if _record is not None and (
-            _record["id"] == record_id
-            if isinstance(_record, dict)
-            else _record.id == record_id
-        ):
-            self.record = _record
         super().__init__()
 
     @property
@@ -120,4 +118,4 @@ class CUpdateRecord(CForm):
         return super().on_form_canceled()
 
     def push_page_alert_on_form_submit(self):
-        self.jui.push_page_alert(_("{} updated.").format(self.title), "success")
+        self.jui.push_page_alert(_("{} created.").format(self.title), "success")
