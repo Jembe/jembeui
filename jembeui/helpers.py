@@ -54,11 +54,9 @@ def get_component_template_variants(template_name: str) -> Dict[str, str]:
     tname_start = template_name.split(".")[0]
     reexp = re.compile(f"{tname_start}__([^\.]+)\.[^\.]+")
     for tname in current_app.jinja_env.list_templates():
-        print(tname)
         variant_match = reexp.match(tname)
         if variant_match is not None:
             template_variants[variant_match[1]] = tname
-    print(template_name, template_variants)
     return template_variants
 
 
