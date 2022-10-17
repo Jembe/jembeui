@@ -23,12 +23,9 @@ def create_app(config=None) -> "Flask":
     except OSError:
         pass
 
-    with app.app_context():
-        from . import pages
-
     app_services.init_app(app)
 
     with app.app_context():
-        from . import views, commands
+        from . import pages, views, commands
 
     return app
