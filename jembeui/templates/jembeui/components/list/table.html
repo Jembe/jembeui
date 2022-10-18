@@ -1,79 +1,87 @@
 {% from "jembeui/macros/icons.html" import display_icon %}
 <div>
-{% block header %}
-    {% if menu %}
-    <div class="flex justify-end">
-        {{ menu() }} 
-    </div>
-    {% endif %}
-{% endblock header %}
-
-{% block toolbar %}
-{% endblock toolbar %}
-
-{% block content %}
-    {# Display table #}
-    <div class="overflow-x-auto">
-        <table class="table w-full">
-            <!-- head -->
-            <thead>
-                <tr>
-                    {% for field_name, field_title in _config.fields.items() %}
-                    {% if field_name in _config.order_by %}
-                        {% if order_by == field_name %}
-                        <th>
-                            <a href="" jmb-on:click.prevent="order_by='-{{field_name}}';page=0"
-                                class="flex items-center justify-between link link-hover">
-                                {{ field_title|capitalize }}
-                                {{ display_icon("arrow-down", class="w-4 h-4")}}
-                            </a>
-                        </th>
-                        {% elif order_by == "-" + field_name %}
-                        <th>
-                            <a href="" jmb-on:click.prevent="order_by=null;page=0"
-                                class="flex items-center justify-between link link-hover">
-                                {{ field_title|capitalize }}
-                                {{ display_icon("arrow-up", class="w-4 h-4")}}
-                            </a>
-                        </th>
-                        {% else %}
-                        <th>
-                            <a href="" jmb-on:click.prevent="order_by='{{field_name}}';page=0"
-                                class="link link-hover">
-                            {{ field_title|capitalize }}
-                            </a>
-                        </th>
+    {% block header %}
+        {% if menu %}<div class="flex justify-end">{{ menu() }}</div>{% endif %}
+    {% endblock header %}
+    {% block toolbar %}
+        <div class="flex items-center justify-between">
+            {# actions and filters #}
+            <div></div>
+            {# search #}
+            <div >
+                {% if _config.search_filter %}
+                <input jmb-on:input.nonblocking.debounce.450ms="page=0;search=$self.value;"
+                        value="{{ search }}"
+                        type="search"
+                        placeholder="{%- trans -%}Search...{%- endtrans -%}"
+                        class="my-1.5 input input-sm input-bordered"/>
+                {% endif %}
+            </div>
+        </div>
+    {% endblock toolbar %}
+    {% block content %}
+        {# Display table #}
+        <div class="overflow-x-auto">
+            <table class="table w-full">
+                <!-- head -->
+                <thead>
+                    <tr>
+                        {% for field_name, field_title in _config.fields.items() %}
+                            {% if field_name in _config.order_by %}
+                                {% if order_by == field_name %}
+                                    <th>
+                                        <a href=""
+                                           jmb-on:click.prevent="order_by='-{{ field_name }}';page=0"
+                                           class="flex items-center justify-between link link-hover">
+                                            {{ field_title|capitalize }}
+                                            {{ display_icon("arrow-down", class="w-4 h-4")}}
+                                        </a>
+                                    </th>
+                                {% elif order_by == "-" + field_name %}
+                                    <th>
+                                        <a href=""
+                                           jmb-on:click.prevent="order_by=null;page=0"
+                                           class="flex items-center justify-between link link-hover">
+                                            {{ field_title|capitalize }}
+                                            {{ display_icon("arrow-up", class="w-4 h-4")}}
+                                        </a>
+                                    </th>
+                                {% else %}
+                                    <th>
+                                        <a href=""
+                                           jmb-on:click.prevent="order_by='{{ field_name }}';page=0"
+                                           class="link link-hover">
+                                            {{ field_title|capitalize }}
+                                        </a>
+                                    </th>
+                                {% endif %}
+                            {% else %}
+                                <th>{{ field_title|capitalize }}</th>
+                            {% endif %}
+                        {% endfor %}
+                        {% if _config.record_menu %}
+                            <th>{% trans %}Actions{% endtrans %}</th>
                         {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in records %}
+                        <tr>
+                            {% for field_name in _config.fields.keys() %}
+                                <td>{{ field_values[field_name](record, field_name)|default("", true) }}</td>
+                            {% endfor %}
+                            {% if _config.record_menu %}<td>{{ get_record_menu(record)() }}</td>{% endif %}
+                        </tr>
                     {% else %}
-                        <th>{{ field_title|capitalize }}</th>
-                    {% endif %}
+                        <tr>
+                            <td colspan="{{ _config.fields.keys()|length }}"
+                                class="text-center opacity-75">{{ _config.no_data_message }}</td>
+                        </tr>
                     {% endfor %}
-                    {% if _config.record_menu %}
-                        <th>{% trans %}Actions{% endtrans %}</th>
-                    {% endif %}
-                </tr>
-            </thead>
-            <tbody>
-            {% for record in records %}
-                <tr>
-                {% for field_name in _config.fields.keys() %}
-                    <td>
-                        {{ field_values[field_name](record, field_name)|default("", true) }}
-                    </td>
-                {% endfor %}
-                    {% if _config.record_menu %}
-                    <td>{{ get_record_menu(record)() }}</td>
-                    {% endif %}
-                </tr>
-            {% else %} 
-                <tr>
-                    <td colspan="{{ _config.fields.keys()|length }}" class="text-center opacity-75">
-                    {{ _config.no_data_message }}
-                    </td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    </div>
-{% endblock content %}
+                </tbody>
+            </table>
+        </div>
+    {% endblock content %}
+    {% block footer %}
+    {% endblock footer %}
 </div>
