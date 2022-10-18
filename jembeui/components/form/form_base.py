@@ -126,7 +126,14 @@ class CFormBase(Component):
     ) -> Any:
         """Load 'form'/_config.form_state_name state param using form specific load"""
         if name == config.form_state_name:
-            return config.form.load_init_param(value)
+            # I need Form class from get_from_type compenent.method
+            # I need to change Form.dump_init_params to include
+            # reference to Form class so that load can work without problem
+            # or
+            # with field value send field type hash 
+            # md5((Flask.__module__ + '.' +Flask.__qualname__).encode() ).hexdigest()
+            return Form.load_init_param(value)
+            # return config.form.load_init_param(value)
         return super().load_init_param(config, name, value)
 
     def get_record(self) -> Union["Model", dict]:
