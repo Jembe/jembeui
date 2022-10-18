@@ -93,13 +93,21 @@ class Component(jembe.Component):
 
             # if component is in components package use it to generate default
             # template by package name
-            packages = self._component_class.__module__.split(".")
-            if len(packages) > 1 and packages[0] not in ("jembe", "jembeui"):
-                try:
-                    components_index = packages.index("components")
-                    templates.append(f"{'/'.join(packages[components_index])}.html")
-                except ValueError:
-                    pass
+            for mro in self._component_class.__mro__:
+                packages = mro.__module__.split(".")
+                if len(packages) > 1 and packages[0] not in ("jembe", "jembeui"):
+                    try:
+                        components_index = packages.index("components")
+                        if len(packages) > 1 and packages[-1] == packages[-2]:
+                            templates.append(
+                                f"{'/'.join(packages[components_index:-1])}.html"
+                            )
+                        else:
+                            templates.append(
+                                f"{'/'.join(packages[components_index:])}.html"
+                            )
+                    except ValueError:
+                        pass
 
             # return template names
             return tuple(templates)
