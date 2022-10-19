@@ -39,10 +39,15 @@
 {# field label on top #}
 <div class="w-full form-control">
     <label class="label">
-        <span class="label-text">{{ field.label.text }}</span>
-        {%- if field.description or not field.flags.required %}
+        <span class="label-text">
+            {{ field.label.text }}
+            {%- if not field_style.disabled and field_style.mark_if_required and field.flags.required -%}
+                <span class="text-sm text-error" title="{%- trans -%}Required{%- endtrans -%}"> *</span>
+            {%- endif -%}
+        </span>
+        {%- if field.description or ( field_style.mark_if_optional and not field.flags.required and not field_style.disabled) %}
         <span class="flex items-center gap-2 label-text-alt">
-            {%- if not field.flags.required %}<span class="text-opacity-70">{% trans %}Optional{% endtrans %}</span>{% endif %}
+            {%- if field_style.mark_if_optional and not field.flags.required and not field_style.disabled %}<span class="text-opacity-60">{% trans %}Optional{% endtrans %}</span>{% endif %}
             {%- if field.description %}
             <div class="tooltip tooltip-left" data-tip="{{ field.description }}">
                 {{ display_icon("question-mark-circle", class="w-5 h-5")}} 

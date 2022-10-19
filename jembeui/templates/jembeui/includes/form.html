@@ -7,6 +7,7 @@
         {%- if field_style.ends_block %}
         {%- endif %} #}
         {# row #}
+        {% if not field_style.is_hidden_field %}
         <div>
             {# column #}
             <div>
@@ -14,5 +15,6 @@
                 {{ field_style() }}
             </div>
         </div>
+        {% endif %}
     {%- endfor %}
 </div>

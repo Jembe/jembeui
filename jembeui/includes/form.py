@@ -65,7 +65,9 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
         form_style: Optional["jembeui.Form.Style"] = None
 
         DEFAULT_TEMPLATE = "jembeui/includes/input.html"
-        TEMPLATE_BY_CLASS_NAME = {}  # type:ignore
+        TEMPLATE_BY_CLASS_NAME = {
+            "HiddenField": "jembeui/includes/hidden.html",
+        }  # type:ignore
 
         def mount(
             self, field: "wtf.Field", form_style: "jembeui.Form.Style"
@@ -105,6 +107,21 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
             """Renders field as HTML"""
             return self.render()
 
+        @property
+        def is_hidden_field(self) -> bool:
+            """Returns True if field is hidden"""
+            return isinstance(self.field.widget, wtf.widgets.HiddenInput)
+
+        @property
+        def mark_if_optional(self) -> bool:
+            """Put marking on optional fields"""
+            return self.form_style.mark_optional_fields
+
+        @property
+        def mark_if_required(self) -> bool:
+            """Put marking on required fields"""
+            return self.form_style.mark_required_fields
+
     @dataclass
     class Style:
         """Defines how form should be displayed.
@@ -134,6 +151,9 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
         template: Union[str, Sequence[str]] = "jembeui/includes/form.html"
 
         form: Optional["jembeui.Form"] = None
+
+        mark_optional_fields: bool = True
+        mark_required_fields: bool = False
 
         def get_field_style(self, field: "wtf.Field") -> "jembeui.Form.FieldStyle":
             """Returns configured or default mounted field style and save it to self.fields"""
