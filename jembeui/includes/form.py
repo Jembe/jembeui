@@ -457,8 +457,7 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
             self._instance_style.mount(self)
             return self._instance_style
 
-    @classmethod
-    def get_jembeui_components(cls) -> Dict[str, "jembe.ComponentRef"]:
+    def get_jembeui_components(self) -> Dict[str, "jembe.ComponentRef"]:
         """Return subcomponents defined inside form that should be added
         to CForm compoennt
 
@@ -468,7 +467,7 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
         components = {}
         # add jembe field subcomponents
         # get fields from form dummy instance
-        for field in cls():
+        for field in self:
             if isinstance(field, FieldMixin):
                 components.update(field.get_jembeui_components())
 

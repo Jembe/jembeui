@@ -53,7 +53,7 @@ class FieldMixin:
 
     def get_jembeui_component_name(self, name: str) -> str:
         """Returns name to be used by parent CForm component to register field subcomponent"""
-        return f"form_field__{self.short_name}__{name}"  # type:ignore
+        return f"form__field__{self.short_name}__{name}"  # type:ignore
 
     def get_jembeui_components(self) -> Dict[str, "jembe.ComponentRef"]:
         """Returns dict of components to be registred into form parent Component"""

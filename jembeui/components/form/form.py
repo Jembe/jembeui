@@ -100,7 +100,7 @@ class CForm(Component):
                 components = {}
             # get fields from from and add for subcomponents defined by fields
             # this is the reason why form can't be dynamic
-            components.update(self.form.get_jembeui_components())
+            components.update(self.form().get_jembeui_components())
 
             # Use default db when db is None
             if db is not None:
@@ -141,8 +141,14 @@ class CForm(Component):
         Subcomponent of field can accept this init parameter to
         gain access of parent form when needed
         """
-        if cconfig.name.startswith("form_field__"):
-            return {"_from": self.form}
+        if cconfig.name.startswith("form__"):
+            return {
+                "record_id": self.record.get("id", None)
+                if isinstance(self.record, dict)
+                else getattr(self.record, "id", None),
+                "_record": self.record,
+                "_from": self.form,
+            }
         return {}
 
     def get_record(self) -> Union["Model", dict]:
