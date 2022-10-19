@@ -12,6 +12,7 @@ from .file_field import FileField
 from .field import FieldMixin
 
 if TYPE_CHECKING:
+    import jembe
     import jembeui
     from flask_sqlalchemy import Model
 
@@ -455,6 +456,23 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
             self._instance_style = deepcopy(self.__style__)
             self._instance_style.mount(self)
             return self._instance_style
+
+    @classmethod
+    def get_jembeui_components(cls) -> Dict[str, "jembe.ComponentRef"]:
+        """Return subcomponents defined inside form that should be added
+        to CForm compoennt
+
+        By default returns components defined by jembe.FieldMixin fileds.
+        Override method to add additional components
+        """
+        components = {}
+        # add jembe field subcomponents
+        # get fields from form dummy instance
+        for field in cls():
+            if isinstance(field, FieldMixin):
+                components.update(field.get_jembeui_components())
+
+        return components
 
     def __call__(self, **kwargs) -> str:
         """Renders form using style configuration"""

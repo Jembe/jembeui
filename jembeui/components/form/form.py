@@ -100,9 +100,7 @@ class CForm(Component):
                 components = {}
             # get fields from from and add for subcomponents defined by fields
             # this is the reason why form can't be dynamic
-            for field in self.form():
-                if isinstance(field, FieldMixin):
-                    components.update(field.get_jembeui_components())
+            components.update(self.form.get_jembeui_components())
 
             # Use default db when db is None
             if db is not None:
