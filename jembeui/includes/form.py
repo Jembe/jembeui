@@ -59,11 +59,14 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
         disabled: bool = False
 
         is_compact: bool = False
+        size: Optional[str] = None
+
+        instant_submit: Optional[bool] = None
 
         template: Optional[Union[str, Sequence[str]]] = None
 
-        field: Optional["wtf.Field"] = None
-        form_style: Optional["jembeui.Form.Style"] = None
+        _field: Optional["wtf.Field"] = None
+        _form_style: Optional["jembeui.Form.Style"] = None
 
         DEFAULT_TEMPLATE = "jembeui/includes/input.html"
         TEMPLATE_BY_CLASS_NAME = {
@@ -74,8 +77,8 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
             self, field: "wtf.Field", form_style: "jembeui.Form.Style"
         ) -> "jembeui.Form.FieldStyle":
             """Mount instance of Style to specific field"""
-            self.field = field
-            self.form_style = form_style
+            self._field = field
+            self._form_style = form_style
 
             if (
                 field.render_kw
@@ -83,6 +86,17 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
                 and field.render_kw["disabled"]
             ):
                 self.disabled = True
+
+            # field size
+            if self.size is None and self._form_style.fields_size is not None:
+                self.size = self._form_style.fields_size
+
+            # instant submit
+            if self.instant_submit is None:
+                if self._form_style.instant_submit is not None:
+                    self.instant_submit = self._form_style.instant_submit
+                else:
+                    self.instant_submit = False
 
             if self.template is None:
                 self.template = self.TEMPLATE_BY_CLASS_NAME.get(
@@ -92,15 +106,15 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
 
         def render(self) -> str:
             """Renders field as HTML"""
-            if self.field is None or self.form_style is None:
+            if self._field is None or self._form_style is None:
                 raise JembeUIError("Field is not mounted")
-            if self.form_style.form is None:
+            if self._form_style.form is None:
                 raise JembeUIError("Form is not mounted")
             ctx = {
-                "field": self.field,
+                "field": self._field,
                 "field_style": self,
-                "form": self.form_style.form,
-                "cform": self.form_style.form.cform,
+                "form": self._form_style.form,
+                "cform": self._form_style.form.cform,
             }
             return Markup(render_template(self.template, **ctx))  # type:ignore
 
@@ -111,17 +125,33 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
         @property
         def is_hidden_field(self) -> bool:
             """Returns True if field is hidden"""
-            return isinstance(self.field.widget, wtf.widgets.HiddenInput)
+            if self._field is None:
+                raise JembeUIError("Field style is not mounted")
+            return isinstance(self._field.widget, wtf.widgets.HiddenInput)
 
         @property
         def mark_if_optional(self) -> bool:
             """Put marking on optional fields"""
-            return self.form_style.mark_optional_fields
+            if self._form_style is None:
+                raise JembeUIError("Field style is not mounted")
+            return self._form_style.mark_optional_fields
 
         @property
         def mark_if_required(self) -> bool:
             """Put marking on required fields"""
-            return self.form_style.mark_required_fields
+            if self._form_style is None:
+                raise JembeUIError("Field style is not mounted")
+            return self._form_style.mark_required_fields
+
+        @property
+        def form_style(self) -> Optional["jembeui.Form.Style"]:
+            """REturn Form style of the Form to wich this field is attached to"""
+            return self._form_style
+
+        @property
+        def field(self) -> Optional["wtf.Field"]:
+            """Return Field to which tish field style is attached to"""
+            return self._field
 
     @dataclass
     class Style:
@@ -144,17 +174,18 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
         disabled: bool = False
         classes: Optional[str] = None
 
+        fields_size: Optional[str] = None
         fields: Optional[Dict[str, "jembeui.Form.FieldStyle"]] = None
 
         # instant_validate: bool = False
-        # instant_submit: bool = False
+        instant_submit: Optional[bool] = None
 
         template: Union[str, Sequence[str]] = "jembeui/includes/form.html"
 
-        form: Optional["jembeui.Form"] = None
-
         mark_optional_fields: bool = True
         mark_required_fields: bool = False
+
+        _form: Optional["jembeui.Form"] = None
 
         def get_field_style(self, field: "wtf.Field") -> "jembeui.Form.FieldStyle":
             """Returns configured or default mounted field style and save it to self.fields"""
@@ -179,9 +210,9 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
 
         def mount(self, form: "jembeui.Form") -> "jembeui.Form.Style":
             """Mount instance of Style to specific form"""
-            self.form = form
+            self._form = form
 
-            if self.form.is_disabled:
+            if self._form.is_disabled:
                 self.disabled = True
 
             return self
@@ -194,11 +225,11 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
             - iterate over all fields as they are defined in form
             """
             if self.fields is None:
-                for field in self.form:
+                for field in self._form:
                     yield self.get_field_style(field)
             else:
                 for field_name in self.fields.keys():
-                    field = getattr(self.form, field_name)
+                    field = getattr(self._form, field_name)
                     yield self.get_field_style(field)
 
         def updated_from_dict(self, **kwargs) -> "jembeui.Form.Style":
@@ -222,12 +253,26 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
 
         def render(self, **kwargs) -> str:
             """Renders form as HTML"""
-            ctx = {"form": self.form, "form_style": self.updated_from_dict(**kwargs)}
+            ctx = {
+                "form": self._form,
+                "form_style": self.updated_from_dict(**kwargs),
+                "component": self._form.cform._jinja2_component if self._form else None,
+                "component_reset": self._form.cform._jinja2_component_reset
+                if self._form
+                else None,
+                "placeholder": self._form.cform._jinja2_placeholder
+                if self._form
+                else None,
+            }
             return Markup(render_template(self.template, **ctx))  # type:ignore
 
         def __call__(self, *args, **kwargs) -> str:
             """Renders form as HTML"""
             return self.render(**kwargs)
+
+        @property
+        def form(self) -> Optional["jembeui.Form"]:
+            return self._form
 
     __style__: Style = Style()
 

@@ -15,9 +15,10 @@
         "placeholder": field.label.text if field_style.is_compact else false,
         "class": " ".join([
             "input input-bordered",
-            "input-error" if field.errors else ""
+            "input-error" if field.errors else "",
+            "input-" + field_style.size if field_style.size is not none else "",
         ]),
-        "jmb-on:change.defer": jmb_on_action,
+        "jmb-on:change.defer": jmb_on_action + ";submit();" if jmb_on_action else false,
         "jmb-on:keydown.enter": "$self.blur();$self.focus();submit()" if not field_style.disabled  and "submit" in cform._config.component_actions else false
     } %}
     {{ field(**field_attrs) }}
