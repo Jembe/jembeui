@@ -23,47 +23,57 @@ __all__ = ("CViewRecord",)
 class CViewRecord(CForm):
     """Displayes Form that shows read only record from database"""
 
-    # class Config(CForm.Config):
-    #     """Configures View Record component
+    class Config(CForm.Config):
+        """Configures View Record component
 
-    #     # TODO  copy from CForm and add new stuff
-    #     """
+        Removes menu
+        """
 
-    #     def __init__(
-    #         self,
-    #         form: Type["jembeui.Form"],
-    #         get_record: Optional[Callable[["jembeui.CForm"], Union["Model", dict]]] = None,
-    #         menu: Optional[
-    #             Union["jembeui.Menu", Sequence[Union["jembeui.Link", "jembeui.Menu"]]]
-    #         ] = None,
-    #         form_state_name: str = "form",
-    #         db: Optional["SQLAlchemy"] = None,
-    #         title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
-    #         template: Optional[Union[str, Iterable[str]]] = None,
-    #         components: Optional[Dict[str, "jembe.ComponentRef"]] = None,
-    #         inject_into_components: Optional[
-    #             Callable[["jembe.Component", "jembe.ComponentConfig"], dict]
-    #         ] = None,
-    #         redisplay: Tuple["jembe.RedisplayFlag", ...] = (),
-    #         changes_url: bool = True,
-    #         url_query_params: Optional[Dict[str, str]] = None,
-    #     ):
-    #         super().__init__(
-    #             form=form,
-    #             get_record=get_record,
-    #             menu=[] if menu is None else menu,
-    #             form_state_name=form_state_name,
-    #             db=db,
-    #             title=title,
-    #             template=template,
-    #             components=components,
-    #             inject_into_components=inject_into_components,
-    #             redisplay=redisplay,
-    #             changes_url=changes_url,
-    #             url_query_params=url_query_params,
-    #         )
+        def __init__(
+            self,
+            form: Type["jembeui.Form"],
+            get_record: Optional[
+                Callable[["jembeui.CForm"], Union["Model", dict]]
+            ] = None,
+            menu: Optional[
+                Union["jembeui.Menu", Sequence[Union["jembeui.Link", "jembeui.Menu"]]]
+            ] = [],
+            grab_focus: bool = True,
+            confirm_cancel: bool = True,
+            redisplay_on_submit: bool = False,
+            redisplay_on_cancel: bool = False,
+            form_state_name: str = "form",
+            db: Optional["SQLAlchemy"] = None,
+            title: Optional[Union[str, Callable[["jembe.Component"], str]]] = None,
+            template: Optional[Union[str, Iterable[str]]] = None,
+            components: Optional[Dict[str, "jembe.ComponentRef"]] = None,
+            inject_into_components: Optional[
+                Callable[["jembe.Component", "jembe.ComponentConfig"], dict]
+            ] = None,
+            redisplay: Tuple["jembe.RedisplayFlag", ...] = (),
+            changes_url: bool = True,
+            url_query_params: Optional[Dict[str, str]] = None,
+        ):
+            super().__init__(
+                form,
+                get_record,
+                menu,
+                grab_focus,
+                confirm_cancel,
+                redisplay_on_submit,
+                redisplay_on_cancel,
+                form_state_name,
+                db,
+                title,
+                template,
+                components,
+                inject_into_components,
+                redisplay,
+                changes_url,
+                url_query_params,
+            )
 
-    # _config: Config
+    _config: Config
 
     def __init__(self, record_id: int, _record: Optional[Union[Model, dict]] = None):
 
