@@ -1,3 +1,4 @@
+from dataclasses import asdict, is_dataclass
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -12,6 +13,7 @@ from typing import (
 )
 import sqlalchemy as sa
 
+from flask_sqlalchemy import Model
 from flask_babel import lazy_gettext as _
 from flask import current_app
 from jembe import NotFound, listener, action
@@ -19,13 +21,12 @@ from ...helpers import get_jembeui
 from ...exceptions import JembeUIError
 from ..component import Component
 from ...includes.form import Form
-from ...includes.field import FieldMixin
 from ...includes.menu import Menu
 
 if TYPE_CHECKING:
     import jembe
     import jembeui
-    from flask_sqlalchemy import SQLAlchemy, Model
+    from flask_sqlalchemy import SQLAlchemy
 
 __all__ = ("CForm",)
 
@@ -147,7 +148,7 @@ class CForm(Component):
                 if isinstance(self.record, dict)
                 else getattr(self.record, "id", None),
                 "_record": self.record,
-                "_from": self.form,
+                "_form": self.form,
             }
         return {}
 
@@ -192,15 +193,20 @@ class CForm(Component):
 
         - Form instance is saved and retrived from state if 'form' state exist.
         - Form instance is created and cached localy when 'form' state does not exist."""
+
+        def get_form_init_params():
+            if isinstance(self.record, dict):
+                return {"data": self.record}
+            elif is_dataclass(self.record):
+                return {"data": asdict(self.record)}
+            else:
+                return {"obj": self.record}
+
         form_type = self._config.form
 
         if self._config.form_state_name in self.state.keys():
             if self.state.form is None:
-                self.state.form = (
-                    form_type(data=self.record)
-                    if isinstance(self.record, dict)
-                    else form_type(obj=self.record)
-                )
+                self.state.form = form_type(**get_form_init_params())
 
             if not self.state.form.is_mounted:
                 self.state.form.mount(self, self._config.form_state_name)
@@ -208,11 +214,7 @@ class CForm(Component):
             return self.state.form
         else:
             if not hasattr(self, "_form"):
-                self._form = (
-                    form_type(data=self.record)
-                    if isinstance(self.record, dict)
-                    else form_type(obj=self.record)
-                )
+                self._form = form_type(**get_form_init_params())
 
             if not self._form.is_mounted:
                 self._form.mount(self, self._config.form_state_name)
@@ -377,7 +379,7 @@ class CForm(Component):
 
         self.push_page_alert_on_form_submit()
 
-        if self._config.redisplay_on_submit:
+        if self._config.redisplay_on_submit and isinstance(submited_record, Model):
             # reset form state to get data from database on redisplay
             setattr(self.state, self._config.form_state_name, None)
 
