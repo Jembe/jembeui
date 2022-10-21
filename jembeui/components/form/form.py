@@ -295,7 +295,7 @@ class CForm(Component):
             self.on_form_invalid()
 
         # Submit is unsuccessfull
-        if not isinstance(self.record, dict):
+        if not isinstance(self.record, dict) and not is_dataclass(self.record):
             self.session.rollback()
 
         return True

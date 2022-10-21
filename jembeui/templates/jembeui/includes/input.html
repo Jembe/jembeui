@@ -6,7 +6,13 @@
         {%- set jmb_on_action %}
             {{ cform._config.form_state_name }}.{{ field.name }} = $self.value;
             {%- if "modified_fields" in cform.state %}
-            if (modified_fields.indexOf('{{ field.name }}') === -1 ) { modified_fields.push('{{ field.name }}')}
+            if (modified_fields.indexOf('{{ field.name }}') === -1 ) { modified_fields.push('{{ field.name }}')};
+            {%- endif %}
+            {%- if field_style.on_change_submit and "submit" in form.cform._config.component_actions %}
+            submit(); 
+            {%- endif %}
+            {%- if field_style.on_change_validate and "validate" in form.cform._config.component_actions %}
+            validate(); 
             {%- endif %}
         {%- endset %}
     {%- endif %}
@@ -18,7 +24,7 @@
             "input-error" if field.errors else "",
             "input-" + field_style.size if field_style.size is not none else "",
         ]),
-        "jmb-on:change.defer": jmb_on_action + ";submit();" if jmb_on_action else false,
+        "jmb-on:change{}".format(".defer" if field_style.on_change_defer else ""): jmb_on_action  if jmb_on_action else false,
         "jmb-on:keydown.enter": "$self.blur();$self.focus();submit()" if not field_style.disabled  and "submit" in cform._config.component_actions else false
     } %}
     {{ field(**field_attrs) }}

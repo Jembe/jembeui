@@ -1,3 +1,4 @@
+from tkinter import W
 from typing import TYPE_CHECKING, Any, Optional, Sequence, Union, Dict
 from datetime import datetime, date
 from copy import copy, deepcopy
@@ -61,7 +62,9 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
         is_compact: bool = False
         size: Optional[str] = None
 
-        instant_submit: Optional[bool] = None
+        on_change_submit: Optional[bool] = None
+        on_change_validate: Optional[bool] = None
+        on_change_defer: Optional[bool] = None
 
         template: Optional[Union[str, Sequence[str]]] = None
 
@@ -91,12 +94,26 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
             if self.size is None and self._form_style.fields_size is not None:
                 self.size = self._form_style.fields_size
 
-            # instant submit
-            if self.instant_submit is None:
-                if self._form_style.instant_submit is not None:
-                    self.instant_submit = self._form_style.instant_submit
+            # on change submit
+            if self.on_change_submit is None:
+                if self._form_style.on_change_submit is not None:
+                    self.on_change_submit = self._form_style.on_change_submit
                 else:
-                    self.instant_submit = False
+                    self.on_change_submit = False
+
+            # on change validate
+            if self.on_change_validate is None:
+                if self._form_style.on_change_validate is not None:
+                    self.on_change_validate = self._form_style.on_change_validate
+                else:
+                    self.on_change_validate = False
+
+            # on change defer
+            if self.on_change_defer is None:
+                if self._form_style.on_change_defer is not None:
+                    self.on_change_defer = self._form_style.on_change_defer
+                else:
+                    self.on_change_defer = True
 
             if self.template is None:
                 self.template = self.TEMPLATE_BY_CLASS_NAME.get(
@@ -159,10 +176,8 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
 
         - classes: list of classes to add to the form container
         - disabled: Disable all fields in form. Default is False.
-        - instant_validate: Form validation should be called imediatlly after
-            field value is changed.
-        - instant_submit: Form should be submited imediatlly after field
-            value is changed. Default is False.
+        - instant_validate: call validate imediatlly after field value is changed. Default is None
+        - on_change_submit: call submited imediatlly after field value is changed. Default is None.
         - template: Default template to render the from. Can be list of
             template names.
             Templates can ignore all other settings of the form style.
@@ -178,7 +193,9 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
         fields: Optional[Dict[str, "jembeui.Form.FieldStyle"]] = None
 
         # instant_validate: bool = False
-        instant_submit: Optional[bool] = None
+        on_change_submit: Optional[bool] = None
+        on_change_validate: Optional[bool] = None
+        on_change_defer: Optional[bool] = None
 
         template: Union[str, Sequence[str]] = "jembeui/includes/form.html"
 
