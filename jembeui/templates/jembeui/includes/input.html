@@ -1,5 +1,5 @@
 {% from "jembeui/macros/icons.html" import display_icon %}
-
+{# input input-bordered input-error input-lg input-md input-sm input-xs select select-bordered select-error select-lg select-sm select-xs select-md #}
 {% macro display_widget(field, field_style) %}
     {%- set jmb_on_action = false %}
     {%- if not field_style.disabled %}
@@ -20,9 +20,9 @@
         "disabled": field_style.disabled,
         "placeholder": field.label.text if field_style.is_compact else false,
         "class": " ".join([
-            "input input-bordered",
-            "input-error" if field.errors else "",
-            "input-" + field_style.size if field_style.size is not none else "",
+            "{bc} {bc}-bordered".format(bc=field_style._base_class),
+            "{bc}-error".format(bc=field_style._base_class) if field.errors else "",
+            "{bc}-".format(bc=field_style._base_class) + field_style.size if field_style.size is not none else "",
         ]),
         "jmb-on:change{}".format(".defer" if field_style.on_change_defer else ""): jmb_on_action  if jmb_on_action else false,
         "jmb-on:keydown.enter": "$self.blur();$self.focus();submit()" if not field_style.disabled  and "submit" in cform._config.component_actions else false

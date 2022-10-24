@@ -139,6 +139,8 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
         _field: Optional["wtf.Field"] = None
         _form_style: Optional["jembeui.Form.Style"] = None
 
+        _base_class: str = "input"
+
         DEFAULT_TEMPLATE = "jembeui/includes/input.html"
         TEMPLATE_BY_CLASS_NAME = {
             "HiddenField": "jembeui/includes/hidden.html",
@@ -187,6 +189,11 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
                 self.template = self.TEMPLATE_BY_CLASS_NAME.get(
                     field.__class__.__name__, self.DEFAULT_TEMPLATE
                 )
+
+            # support select
+            if self.field and isinstance(self.field.widget, wtf.widgets.Select):
+                self._base_class = "select"
+
             return self
 
         def render(self) -> str:
