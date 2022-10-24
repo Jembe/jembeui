@@ -300,6 +300,29 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
 
             return field_style
 
+        def field_style(self, field_name:str) ->"jembeui.Form.FieldStyle":
+            """Return field style for field name"""
+            if not self._form:
+                raise ValueError("FormStyle is not mounted")
+
+            if self.fields is None or field_name not in self.fields:
+                field_style = Form.FieldStyle()
+                if self.fields:
+                    self.fields[field_name] = field_style
+                else:
+                    self.fields = {field_name: field_style}
+            else:
+                field_style = self.fields[field_name]
+                if field_style.field is not None and field_style.field.name == field_name:
+                    return field_style
+            field = getattr(self._form, field_name)
+            field_style.mount(field, self)
+
+            if self.disabled:
+                field_style.disabled = True
+
+            return field_style
+
         def mount(self, form: "jembeui.Form") -> "jembeui.Form.Style":
             """Mount instance of Style to specific form"""
             self._form = form
@@ -324,13 +347,8 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
                 fields in the self.fields
             - iterate over all fields as they are defined in form
             """
-            if self.fields is None:
-                for field in self._form:
-                    yield self.get_field_style(field)
-            else:
-                for field_name in self.fields.keys():
-                    field = getattr(self._form, field_name)
-                    yield self.get_field_style(field)
+            for field in self._form:
+                yield self.get_field_style(field)
 
         def updated_from_dict(self, **kwargs) -> "jembeui.Form.Style":
             """Create new style from this one where settings are updated form dict"""
@@ -356,6 +374,7 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
             ctx = {
                 "form": self._form,
                 "form_style": self.updated_from_dict(**kwargs),
+                "field_style": lambda field_name: self.field_style(field_name),
                 "component": self._form.cform._jinja2_component if self._form else None,
                 "component_reset": self._form.cform._jinja2_component_reset
                 if self._form
