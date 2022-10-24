@@ -1,22 +1,25 @@
-from dataclasses import asdict, is_dataclass
 from typing import (
     TYPE_CHECKING,
     Any,
     Callable,
     Dict,
     Iterable,
+    List,
     Optional,
     Sequence,
     Tuple,
     Type,
     Union,
 )
+from dataclasses import asdict, is_dataclass
 import sqlalchemy as sa
+from uuid import uuid1
 
 from flask_sqlalchemy import Model
 from flask_babel import lazy_gettext as _
 from flask import current_app
-from jembe import NotFound, listener, action
+from jembe.common import dataclass_from_dict
+from jembe import NotFound, listener, action, IsDataclass
 from ...helpers import get_jembeui
 from ...exceptions import JembeUIError
 from ..component import Component
@@ -28,7 +31,9 @@ if TYPE_CHECKING:
     import jembeui
     from flask_sqlalchemy import SQLAlchemy
 
-__all__ = ("CForm",)
+__all__ = ("CForm", "WDB")
+
+WDB = Dict[str, List[Tuple[str, IsDataclass]]]
 
 
 class CForm(Component):
@@ -74,6 +79,8 @@ class CForm(Component):
             redisplay: Tuple["jembe.RedisplayFlag", ...] = (),
             changes_url: bool = True,
             url_query_params: Optional[Dict[str, str]] = None,
+            # _is_trail_form: bool = False,
+            # _trail_form_dataclass: Optional[IsDataclass] = None,
         ):
             self.form = form
 
@@ -103,6 +110,21 @@ class CForm(Component):
             # this is the reason why form can't be dynamic
             components.update(self.form().get_jembeui_components())
 
+            # Lead form
+            self.is_lead_form = hasattr(form, "__trail_forms__")
+            self.trail_forms_config = {}
+            if self.is_lead_form:
+                # Add trail form config and compoents
+
+                self.trail_forms_config = {
+                    form.get_trail_form_component_name(name): tfc
+                    for name, tfc in form.__trail_forms__.items()
+                }
+
+                for name, tfc in self.trail_forms_config.items():
+                    if name not in components:
+                        components[name] = self.get_trail_form_component(tfc)
+
             # Use default db when db is None
             if db is not None:
                 self.db: "SQLAlchemy" = db
@@ -123,9 +145,35 @@ class CForm(Component):
                 url_query_params=url_query_params,
             )
 
+        def get_trail_form_component(
+            self, tfc: "jembeui.TrailFormConfig"
+        ) -> "jembe.ComponentRef":
+            from .trail_form import CTrailUpdateForm
+
+            return (
+                CTrailUpdateForm,
+                CTrailUpdateForm.Config(
+                    form=tfc.form, trail_form_dataclass=tfc.dataclass
+                ),
+            )
+
     _config: Config
 
     _record: Union["Model", dict]
+
+    def __init__(self, wdb: Optional[WDB] = None):
+        super().__init__()
+
+    def init(self):
+        if self._config.is_lead_form:
+            if "wdb" not in self.state:
+                raise JembeUIError(
+                    f"wdb state parameter must be configured for lead form {self._config.full_name}."
+                )
+            if self.state.wdb is None:
+                # Initialise WDB Working data on client
+                self.state.wdb = self._create_wdb()
+        return super().init()
 
     @classmethod
     def load_init_param(
@@ -134,6 +182,22 @@ class CForm(Component):
         """Load 'form'/_config.form_state_name state param using form specific load"""
         if name == config.form_state_name:
             return config.form.load_init_param(value)
+        elif name == "wdb" and config.is_lead_form:
+            if value is None:
+                return None
+            return {
+                tfcname: [
+                    (
+                        uid,
+                        dataclass_from_dict(
+                            config.trail_forms_config[tfcname].dataclass, r
+                        ),
+                    )
+                    for uid, r in record_list
+                ]
+                for tfcname, record_list in value.items()
+            }
+
         return super().load_init_param(config, name, value)
 
     def inject_into(self, cconfig: "jembe.ComponentConfig") -> Dict[str, Any]:
@@ -235,10 +299,13 @@ class CForm(Component):
             return False
         if len(self.modified_form_fields) > 0:
             return True
+        return False
 
     @property
     def modified_form_fields(self) -> Optional[Sequence[str]]:
         """Should return list of modified fields or None if component doesn' track modified fields"""
+        if "modified_fields" in self.state:
+            return self.state.modified_fields
         return None
 
     @property
@@ -272,6 +339,15 @@ class CForm(Component):
 
         if self.form.validate():
             try:
+                self.before_form_submit()
+                # submit wdb if exist
+                if self._config.is_lead_form:
+                    for cname, tfc in self._config.trail_forms_config.items():
+                        tfc.submit_records(
+                            self, [rec for _, rec in self.state.wdb.get(cname, [])]
+                        )
+                    self.state.wdb = None
+
                 # submit form
                 submited_record = self.form.submit(self.record)
 
@@ -330,6 +406,9 @@ class CForm(Component):
             self.form.cancel(self.record)
             redisplay = self.on_form_canceled()
             self.emit("cancel", record=self.record, record_id=record_id)
+            # wdb support
+            if self._config.is_lead_form:
+                self.state.wdb = None
             return redisplay
         else:
             self.jui.ask_for_action_confirmation(
@@ -367,6 +446,9 @@ class CForm(Component):
         Defaults calls self.push_page_alert_on_form_invalid"""
         self.push_page_alert_on_form_invalid()
 
+    def before_form_submit(self) -> None:
+        """Hook called before form submit but after form is validated"""
+
     def on_form_submited(
         self, submited_record: Optional[Union["Model", dict]]
     ) -> Optional[bool]:
@@ -376,6 +458,9 @@ class CForm(Component):
 
         Defaults calls self.push_page_alert_on_form_submit and
         returns value defined by _config.redisplay_on_submit"""
+
+        if "modified_fields" in self.state:
+            self.state.modified_fields = ()
 
         self.push_page_alert_on_form_submit()
 
@@ -390,7 +475,12 @@ class CForm(Component):
 
         Default calls self.push_page_alert_on_form_cancel, and returns
         _config.redisplay_on_cancel"""
+
+        if "modified_fields" in self.state:
+            self.state.modified_fields = ()
+
         self.push_page_alert_on_form_cancel()
+
         return self._config.redisplay_on_cancel
 
     def on_form_submit_exception(self, error: Exception) -> None:
@@ -427,3 +517,85 @@ class CForm(Component):
         self.menu = (
             self._config.menu.bind_to(self) if self._config.menu is not None else None
         )
+
+    # WDB specific methods
+    def _create_wdb(self) -> WDB:
+        """Creates WDB using _config.trails_forms_config"""
+        if not self._config.is_lead_form:
+            return {}
+        wdb: WDB = {}
+        for component_name, tfc in self._config.trail_forms_config.items():
+            wdb[component_name] = [
+                (uuid1().hex, tfc.model_to_dataclass(record))
+                for record in tfc.get_records(self)
+            ]
+        return wdb
+
+    @action
+    def add_wdb_record(self, tfc_name: str, to_end=False):
+        """Add wdb_record to wdb and also new trail form to handle it"""
+        if not self._config.is_lead_form:
+            return None
+        if tfc_name not in self._config.trail_forms_config.keys():
+            return None
+
+        tfc = self._config.trail_forms_config[tfc_name]
+
+        if tfc.create_record is None:
+            raise ValueError("TrailFormConfig.create_record is not defined")
+        new_record = tfc.model_to_dataclass(tfc.create_record(self))
+
+        # self.state.wdb[tfc_name].append(new_record)
+        if to_end:
+            self.state.wdb[tfc_name].append((uuid1().hex, new_record))
+        else:
+            self.state.wdb[tfc_name] = [(uuid1().hex, new_record)] + self.state.wdb[
+                tfc_name
+            ]
+
+    @action
+    def remove_wdb_record(self, tfcname: str, uid: str):
+        """Removes record from wDB"""
+        position = next(
+            (
+                idx
+                for idx, rec in enumerate(self.state.wdb.get(tfcname, []))
+                if rec[0] == uid
+            ),
+            None,
+        )
+        if (
+            position is None
+            or position < 0
+            or position >= len(self.state.wdb.get(tfcname, []))
+        ):
+            return
+        del self.state.wdb[tfcname][position]
+
+    @listener(event="updateWDB", source="./*.*")
+    def on_update_wdb(self, event: "jembe.Event"):
+        """Updates wdb by receiving trail form event"""
+        if event.source_name in self._config.trail_forms_config:
+            tfcname = event.source_name
+            operation = event.params.get("operation", "update")
+            record = event.params.get("record")
+            uid = event.params.get("uid")
+            position = next(
+                (
+                    idx
+                    for idx, rec in enumerate(self.state.wdb.get(tfcname, []))
+                    if rec[0] == uid
+                ),
+                None,
+            )
+            if (
+                position is None
+                or position < 0
+                or position >= len(self.state.wdb.get(tfcname, []))
+            ):
+                return
+            if operation == "update":
+                self.state.wdb[tfcname][position] = (uid, record)
+            elif operation == "delete":
+                del self.state.wdb[tfcname][position]
+            return True

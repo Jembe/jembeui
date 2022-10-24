@@ -11,7 +11,8 @@ from typing import (
 )
 from flask_sqlalchemy import Model
 from flask_babel import lazy_gettext as _
-from .form import CForm
+
+from .form import CForm, WDB
 from ...includes.link import Link
 from ...includes.form import Form
 
@@ -37,7 +38,9 @@ class CUpdateRecord(CForm):
         def __init__(
             self,
             form: Type["jembeui.Form"],
-            get_record: Optional[Callable[["jembeui.CForm"], Union["Model", dict]]] = None,
+            get_record: Optional[
+                Callable[["jembeui.CForm"], Union["Model", dict]]
+            ] = None,
             menu: Optional[
                 Union["jembeui.Menu", Sequence[Union["jembeui.Link", "jembeui.Menu"]]]
             ] = None,
@@ -96,6 +99,7 @@ class CUpdateRecord(CForm):
         form: Optional[Form] = None,
         modified_fields: Tuple[str, ...] = (),
         _record: Optional[Union[Model, dict]] = None,
+        wdb: Optional[WDB] = None,
     ):
         if _record is not None and (
             _record["id"] == record_id
@@ -104,20 +108,6 @@ class CUpdateRecord(CForm):
         ):
             self.record = _record
         super().__init__()
-
-    @property
-    def modified_form_fields(self) -> Optional[Sequence[str]]:
-        return self.state.modified_fields
-
-    def on_form_submited(
-        self, submited_record: Optional[Union["Model", dict]]
-    ) -> Optional[bool]:
-        self.state.modified_fields = ()
-        return super().on_form_submited(submited_record)
-
-    def on_form_canceled(self) -> Optional[bool]:
-        self.state.modified_fields = ()
-        return super().on_form_canceled()
 
     def push_page_alert_on_form_submit(self):
         self.jui.push_page_alert(_("{} updated.").format(self.title), "success")

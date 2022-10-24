@@ -7,12 +7,12 @@ from flask_babel import get_locale
 
 from .exceptions import JembeUIError
 from .sqlalchemy import SaFile
+
 from .includes.link import Link
 from .includes.menu import Menu
-from .includes.form import Form
 from .includes.field import FieldMixin
 from .includes.file_field import FileField
-
+from .includes.form import Form, TrailFormConfig
 from .components import (
     Component,
     CPage,
@@ -38,10 +38,12 @@ __all__ = (
     "Link",
     "Menu",
     "Form",
+    "TrailFormConfig",
     "CForm",
     "CCreateRecord",
     "CViewRecord",
     "CUpdateRecord",
+    "IsDataclass",
     # "Breadcrumb",
     # "BreadcrumbList",
     # "Form",

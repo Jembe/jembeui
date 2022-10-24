@@ -10,7 +10,8 @@ from typing import (
     Tuple,
 )
 from flask_babel import lazy_gettext as _
-from .form import CForm
+
+from .form import CForm, WDB
 from ...includes.link import Link
 from ...includes.form import Form
 
@@ -99,23 +100,12 @@ class CCreateRecord(CForm):
     _config: Config
 
     def __init__(
-        self, form: Optional[Form] = None, modified_fields: Tuple[str, ...] = ()
+        self,
+        form: Optional[Form] = None,
+        modified_fields: Tuple[str, ...] = (),
+        wdb: Optional[WDB] = None,
     ):
         super().__init__()
-
-    @property
-    def modified_form_fields(self) -> Optional[Sequence[str]]:
-        return self.state.modified_fields
-
-    def on_form_submited(
-        self, submited_record: Optional[Union["Model", dict]]
-    ) -> Optional[bool]:
-        self.state.modified_fields = ()
-        return super().on_form_submited(submited_record)
-
-    def on_form_canceled(self) -> Optional[bool]:
-        self.state.modified_fields = ()
-        return super().on_form_canceled()
 
     def push_page_alert_on_form_submit(self):
         self.jui.push_page_alert(_("{} created.").format(self.title), "success")

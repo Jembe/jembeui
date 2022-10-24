@@ -1,9 +1,18 @@
-from tkinter import W
-from typing import TYPE_CHECKING, Any, Optional, Sequence, Union, Dict
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    List,
+    Optional,
+    Sequence,
+    Type,
+    Union,
+    Dict,
+)
 from datetime import datetime, date
 from copy import copy, deepcopy
 from abc import ABCMeta
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 from markupsafe import Markup
 import wtforms as wtf
 from flask import render_template
@@ -11,13 +20,70 @@ from jembeui import JembeUIError
 from jembe import JembeInitParamSupport, ComponentPreviousStateUnavaiableError
 from .file_field import FileField
 from .field import FieldMixin
+from jembe import IsDataclass
 
 if TYPE_CHECKING:
     import jembe
     import jembeui
     from flask_sqlalchemy import Model
 
-__all__ = ("Form",)
+__all__ = ("Form", "TrailFormConfig")
+
+
+@dataclass
+class TrailFormConfig:
+    title: str
+    form: Type["jembeui.Form"]
+    model: Type["Model"]
+    relationship_name: Optional[str]
+    dataclass: "jembe.IsDataclass"
+    get_records: Callable[["jembeui.CForm"], List["Model"]]
+    create_record: Optional[Callable[["jembeui.CForm"], "Model"]] = None
+    submit_records: Optional[
+        Callable[["jembeui.CForm", List["jembe.IsDataclass"]], None]
+    ] = None
+    model_to_dataclass: Callable[
+        ["Model"], "jembe.IsDataclass"
+    ] = lambda record: record.to_dataclass()
+
+    def __post_init__(self):
+        if self.submit_records is None and self.relationship_name is not None:
+            self.submit_records = self.submit_records_default
+        if self.submit_records is None and self.relationship_name is None:
+            raise ValueError(
+                "Please provide submit_records or relationship_name attribute"
+            )
+        if self.create_record is None:
+            self.create_record = lambda c: self.model()
+
+    def submit_records_default(self, c: "jembeui.CForm", records_dc: List[IsDataclass]):
+        if self.relationship_name is None:
+            raise ValueError("reltionship_name must be set")
+
+        records = list(self.get_records(c))
+        # update or delete existing records in database
+        for record in records:
+            record_dc = next((r for r in records_dc if r.id == record.id), None)
+            if record_dc:
+                # update record
+                updated = False
+                for k, v in asdict(record_dc).items():
+                    if hasattr(record, k) and getattr(record, k) != v:
+                        setattr(record, k, v)
+                        updated = True
+                if updated:
+                    c.session.add(record)
+            else:
+                c.session.delete(record)
+        # create new records in database
+        for record_dc in records_dc:
+            if record_dc.id is None:
+                record = self.model()
+                setattr(record, self.relationship_name, c.record)
+                for k, v in asdict(record_dc).items():
+                    if hasattr(record, k) and getattr(record, k) != v:
+                        setattr(record, k, v)
+                c.session.add(record)
 
 
 class FormMeta(wtf.form.FormMeta, ABCMeta):
@@ -40,6 +106,8 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
 
     TODO give beter explanation how form renders work using style
     """
+
+    __trail_forms__: Dict[str, "jembeui.TrailFormConfig"]
 
     @dataclass
     class FieldStyle:
@@ -231,6 +299,14 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
 
             if self._form.is_disabled:
                 self.disabled = True
+
+            if (
+                self._form
+                and self._form.cform
+                and getattr(self._form.cform._config, "is_trail_form", False)
+            ):
+                self.on_change_defer = True
+                self.on_change_submit = True
 
             return self
 
@@ -534,6 +610,10 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
                 components.update(field.get_jembeui_components())
 
         return components
+
+    @classmethod
+    def get_trail_form_component_name(cls, trail_form_name: str) -> str:
+        return f"form__{trail_form_name}"
 
     def __call__(self, **kwargs) -> str:
         """Renders form using style configuration"""

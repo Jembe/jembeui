@@ -10,7 +10,7 @@ from typing import (
     Union,
 )
 from flask_sqlalchemy import Model
-from .form import CForm
+from .form import CForm, WDB
 
 if TYPE_CHECKING:
     from flask_sqlalchemy import SQLAlchemy
@@ -38,8 +38,8 @@ class CViewRecord(CForm):
             menu: Optional[
                 Union["jembeui.Menu", Sequence[Union["jembeui.Link", "jembeui.Menu"]]]
             ] = [],
-            grab_focus: bool = True,
-            confirm_cancel: bool = True,
+            grab_focus: bool = False,
+            confirm_cancel: bool = False,
             redisplay_on_submit: bool = False,
             redisplay_on_cancel: bool = False,
             form_state_name: str = "form",
@@ -73,10 +73,25 @@ class CViewRecord(CForm):
                 url_query_params,
             )
 
+        def get_trail_form_component(self, tfc: "jembeui.TrailFormConfig") -> "jembe.ComponentRef":
+            from .trail_form import CTrailViewForm
+
+            return (
+                CTrailViewForm,
+                CTrailViewForm.Config(
+                    form=tfc.form,
+                    trail_form_dataclass=tfc.dataclass
+                ),
+            )
+
     _config: Config
 
-    def __init__(self, record_id: int, _record: Optional[Union[Model, dict]] = None):
-
+    def __init__(
+        self,
+        record_id: int,
+        _record: Optional[Union[Model, dict]] = None,
+        wdb: Optional[WDB] = None
+    ):
         if _record is not None and (
             _record["id"] == record_id
             if isinstance(_record, dict)
@@ -90,5 +105,4 @@ class CViewRecord(CForm):
             else self._config.form(obj=self.record, disabled=True)
         )
         self.form.mount(self)
-
         super().__init__()

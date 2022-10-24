@@ -1,20 +1,54 @@
+{% from 'jembeui/macros/icons.html' import display_icon %}
 <div class="flex flex-col gap-2 {{ form_style.classes }}">
     {%- for field_style in form_style.field_styles() %}
-        {# {%- if field_style.is_inline %}
-        {%- endif %}
-        {%- if field_style.starts_block %}
-        {%- endif %}
-        {%- if field_style.ends_block %}
-        {%- endif %} #}
+        {# {%- if field_style.is_inline %}{%- endif %}
+        {%- if field_style.starts_block %}{%- endif %}
+        {%- if field_style.ends_block %}{%- endif %} #}
         {# row #}
         {% if not field_style.is_hidden_field %}
-        <div>
-            {# column #}
             <div>
-                {# field #}
-                {{ field_style() }}
+                {# column #}
+                <div>
+                    {# field #}
+                    {{ field_style() }}
+                </div>
             </div>
-        </div>
         {% endif %}
     {%- endfor %}
+    <div>
+        {% for tfcname, tfc in form.cform._config.trail_forms_config.items() %}
+            {% if form.cform.state.wdb[tfcname] or not form_style.disabled %}
+                <div class="flex items-center justify-between">
+                    <h3 class="py-2 text-lg font-medium tracking-wide">{{ tfc.title|default("Title", true) }}</h3>
+                    <div>
+                        {% if not form_style.disabled %}
+                            <button class="rounded btn btn-primary btn-outline btn-xs bg-base-100"
+                                    jmb-on:click="add_wdb_record('{{ tfcname }}')">
+                                {{ display_icon("plus", class="w-5 h-5")}}{% trans %} Add {% endtrans %}
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
+                {% for uid, record in form.cform.state.wdb[tfcname] %}
+                    <div class="w-full mt-4 shadow card card-bordered card-compact">
+                        <div class="card-body">
+                            {% if not form_style.disabled %}
+                            <div class="justify-end card-actions">
+                                <button class="btn btn-square btn-ghost btn-sm" title="{%- trans -%}Delete{%- endtrans -%}"
+                                    jmb-on:click="remove_wdb_record('{{ tfcname }}', '{{ uid }}')">
+                                    {{ display_icon("trash", class="w-5 h-5") }}
+                                </button>
+                            </div>
+                            {% endif %}
+                            {% if form_style.disabled %}
+                            {{ component(tfcname, record = record).key(uid)}}
+                            {% else %}
+                            {{ component(tfcname, record = record).key(uid)}}
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+    </div>
 </div>

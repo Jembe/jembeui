@@ -1,3 +1,6 @@
 [MASTER]
-disable = missing-module-docstring
-good-names = db
+init-hook="import jembe, jembeui, jembewf, sys, os;sys.path.extend((os.path.dirname(jembeui.__path__[0]),os.path.dirname(jembewf.__path__[0])),os.path.dirname(jembe.__path__[0])))"
+disable = missing-module-docstring,attribute-defined-outside-init
+load-plugins= pylint_flask, pylint_flask_sqlalchemy
+ignored-classes=scoped_session
+good-names=db
