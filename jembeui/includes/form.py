@@ -448,7 +448,7 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
                     if field.validate(self):
                         # File is valid:
                         # - Move it to temporary storage
-                        field.data.move_to_temp()
+                        field.data = field.data.move_to_temp()
                     else:
                         # File is not valid:
                         # - remove it from disk
@@ -577,7 +577,7 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
         for field in self:
             if isinstance(field, FileField):
                 if field.data and field.data.in_temp_storage():
-                    field.data.move_to_public()
+                    field.data = field.data.move_to_public()
                 if record:
                     if isinstance(record, dict):
                         if record[field.name] and record[field.name] != field.data:
