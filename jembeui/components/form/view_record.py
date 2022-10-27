@@ -80,7 +80,8 @@ class CViewRecord(CForm):
                 CTrailViewForm,
                 CTrailViewForm.Config(
                     form=tfc.form,
-                    trail_form_dataclass=tfc.dataclass
+                    trail_form_dataclass=tfc.dataclass,
+                    changes_url=False
                 ),
             )
 
