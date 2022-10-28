@@ -375,6 +375,9 @@ class CForm(Component):
         # Submit is unsuccessfull
         if not isinstance(self.record, dict) and not is_dataclass(self.record):
             self.session.rollback()
+        
+        if current_app.debug or current_app.testing:
+            print("Validation Errors: ", self.form.errors)
 
         return True
 
