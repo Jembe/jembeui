@@ -1,10 +1,18 @@
 {% from "jembeui/macros/icons.html" import display_icon %}
 {# input input-bordered input-error input-lg input-md input-sm input-xs select select-bordered select-error select-lg select-sm select-xs select-md #}
-{% macro display_widget(field, field_style) %}
+{% set field_id = "{}--{}".format(cform.exec_name.strip("/").replace("/","-").replace(".","_"), field.name) %}
+{% set is_date_field = field.__class__.__name__ == "DateField" %}
+
+{% macro display_widget(field, field_style, field_id) %}
     {%- set jmb_on_action = false %}
     {%- if not field_style.disabled %}
         {%- set jmb_on_action %}
-            {{ cform._config.form_state_name }}.{{ field.name }} = $self.value;
+            {% if is_date_field %}
+                {{ cform._config.form_state_name }}.{{ field.name }} = $self.__datepicker.getDate('yyyy-mm-dd');
+            {% else %}
+                {{ cform._config.form_state_name }}.{{ field.name }} = $self.value;
+            {% endif %}
+
             {%- if "modified_fields" in cform.state %}
             if (modified_fields.indexOf('{{ field.name }}') === -1 ) { modified_fields.push('{{ field.name }}')};
             {%- endif %}
@@ -17,15 +25,25 @@
         {%- endset %}
     {%- endif %}
     {%- set field_attrs = {
+        "id": field_id,
+        "type": "text" if is_date_field else false,
         "disabled": field_style.disabled,
         "placeholder": field.label.text if field_style.is_compact else false,
         "class": " ".join([
             "{bc} {bc}-bordered".format(bc=field_style._base_class),
             "{bc}-error".format(bc=field_style._base_class) if field.errors else "",
             "{bc}-".format(bc=field_style._base_class) + field_style.size if field_style.size is not none else "",
+            "input-datepicker" if is_date_field else "",
         ]),
-        "jmb-on:change{}".format(".defer" if field_style.on_change_defer else ""): jmb_on_action  if jmb_on_action else false,
-        "jmb-on:keydown.enter": "$self.blur();$self.focus();submit()" if not field_style.disabled  and "submit" in cform._config.component_actions else false
+        "jmb-on:change{}".format(".defer" if field_style.on_change_defer else ""): jmb_on_action  if jmb_on_action and not is_date_field else false,
+        "jmb-on:change-date.camel{}".format(".defer" if field_style.on_change_defer else ""): jmb_on_action if jmb_on_action and is_date_field else false, 
+
+        "jmb-on:keydown.enter": "$self.blur();$self.focus();submit()" if not field_style.disabled  and "submit" in cform._config.component_actions else false,
+
+        "jmb-on:ready.once": "if($self.__datepicker === undefined){{$self.__datepicker = new Datepicker($self, {{format:'{}', language:'{}', container:'#{}--datepicker'}})}}".format(
+                jembeui_get_js_date_format('datepicker'), jembeui_get_locale_code('-'), field_id
+            ) if is_date_field and not field_style.disabled else false,
+        "value": field.data|dateformat if is_date_field else field.data,
     } %}
     {{ field(**field_attrs) }}
 {% endmacro %}
@@ -33,7 +51,7 @@
 {%- if field_style.is_compact %}
 {# field label in placeholder #}
 <div class="w-full form-control">
-    {{ display_widget(field, field_style)}}
+    {{ display_widget(field, field_style, field_id)}}
     {%- if field.errors %}
     <label class="label">
         <span class="text-red-700 label-text-alt">
@@ -41,6 +59,9 @@
         </span>
     </label>
     {%- endif %}
+    {% if not field_style.disabled and is_date_field %}
+    <div id="{{ field_id }}--datepicker" jmb-ignore class="relative"></div>
+    {% endif %}
 </div>
 {%- else %}
 {# field label on top #}
@@ -63,7 +84,7 @@
         </span>
         {%- endif %}
     </label>
-    {{ display_widget(field, field_style)}}
+    {{ display_widget(field, field_style, field_id)}}
     {%- if field.errors %}
     <label class="label">
         <span class="text-red-700 label-text-alt">
@@ -71,5 +92,8 @@
         </span>
     </label>
     {%- endif %}
+    {% if not field_style.disabled and is_date_field %}
+    <div id="{{ field_id }}--datepicker" jmb-ignore class="relative"></div>
+    {% endif %}
 </div>
 {%- endif %}

@@ -160,6 +160,11 @@
     {% else %}
     <script src="{{ url_for('jembeui.static', filename='js/jembeui' + get_package_version('jembeui') + '.js') }}" defer></script>
     {% endif %}
+    {% with locale_code = jembeui_get_locale_code('-') %}
+    {% if locale_code != 'en' %}
+    <script src="{{url_for('jembeui.static', filename='js/datepicker-locales/{}.js'.format(locale_code))}}" defer></script>
+    {% endif %} 
+    {% endwith %}
     <script defer>
       window.addEventListener("DOMContentLoaded", function(event) {
           window.jembeClient.addXRequestHeaderGenerator(function() {
