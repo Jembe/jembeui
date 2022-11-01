@@ -4,7 +4,7 @@ from copy import copy
 from dataclasses import dataclass
 from markupsafe import Markup
 from flask import render_template
-from jembe import ComponentReference, ComponentConfig
+from jembe import ComponentReference, ComponentConfig, NotFound
 from ..exceptions import JembeUIError
 
 if TYPE_CHECKING:
@@ -199,7 +199,11 @@ class Link:
         elif isinstance(self._to, str) and self._to.startswith("JRL:"):
             return "#"
         else:
-            return self._component_reference.url
+            return (
+                self._component_reference.url
+                if self._component_reference is not None
+                else None
+            )
 
     @property
     def jrl(self) -> Optional[str]:
@@ -208,7 +212,11 @@ class Link:
         elif isinstance(self._to, str) and self._to.startswith("JRL:"):
             return self._to[4:]
         else:
-            return self._component_reference.jrl_absolute
+            return (
+                self._component_reference.jrl_absolute
+                if self._component_reference is not None
+                else None
+            )
 
     @property
     def is_accessible(self) -> bool:
@@ -231,21 +239,31 @@ class Link:
                     and self._is_accessible(self._component)
                 )
             )
-            return self._component_reference.is_accessible and is_accessible
+            return (
+                is_accessible
+                and self._component_reference is not None
+                and self._component_reference.is_accessible
+            )
 
     @cached_property
-    def _component_reference(self) -> "jembe.ComponentReference":
+    def _component_reference(self) -> Optional["jembe.ComponentReference"]:
         if not self.is_binded:
             raise ValueError("Link must be binded to component")
         if self.is_external:
             raise ValueError("Component reference doesn't exist for external links")
 
-        if isinstance(self._to, ComponentReference):
-            return self._to
-        elif callable(self._to):
-            return self._to(self._component)
-        else:
-            return self._str_to_component_reference_lambda(self._to)(self._component)
+        try:
+            if isinstance(self._to, ComponentReference):
+                return self._to
+            elif callable(self._to):
+                return self._to(self._component)
+            else:
+                return self._str_to_component_reference_lambda(self._to)(
+                    self._component
+                )
+        except NotFound:
+            # component reference is not accessable
+            return None
 
     def _str_to_component_reference_lambda(
         self, to_str: str
@@ -303,6 +321,8 @@ class Link:
                     return None
 
                 cr = self._component_reference
+                if cr is None:
+                    return None
                 if cr.action != ComponentConfig.DEFAULT_DISPLAY_ACTION:
                     return cr.action.title()
                 else:
@@ -403,7 +423,8 @@ class Link:
                 and self._active_for_exec_names is None
                 and not self._calling_action
             ):
-                return (self._component_reference.exec_name,)
+                if self._component_reference is not None:
+                    return (self._component_reference.exec_name,)
             return ()
 
     @property
