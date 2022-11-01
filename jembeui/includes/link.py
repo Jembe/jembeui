@@ -223,7 +223,15 @@ class Link:
             else:
                 return self._is_accessible(self._component)
         else:
-            return self._component_reference.is_accessible
+            is_accessible = (
+                self._is_accessible is None
+                or (isinstance(self._is_accessible, bool) and self._is_accessible)
+                or (
+                    callable(self._is_accessible)
+                    and self._is_accessible(self._component)
+                )
+            )
+            return self._component_reference.is_accessible and is_accessible
 
     @cached_property
     def _component_reference(self) -> "jembe.ComponentReference":
