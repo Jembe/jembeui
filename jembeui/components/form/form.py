@@ -353,6 +353,12 @@ class CForm(Component):
                 # submit form
                 submited_record = self.form.submit(self.record)
 
+                self.after_form_submit()
+
+                # commit database session
+                if not isinstance(self.record, dict) and not is_dataclass(self.record):
+                    self.session.commit()
+
                 # get submited record id
                 if submited_record is None:
                     submited_record_id = None
@@ -368,14 +374,14 @@ class CForm(Component):
 
                 return self.on_form_submited(submited_record)
             except Exception as error:
+                # Submit is unsuccessfull
+                if not isinstance(self.record, dict) and not is_dataclass(self.record):
+                    self.session.rollback()
+
                 self.on_form_submit_exception(error)
         else:
             self.on_form_invalid()
 
-        # Submit is unsuccessfull
-        if not isinstance(self.record, dict) and not is_dataclass(self.record):
-            self.session.rollback()
-        
         if current_app.debug or current_app.testing:
             print("Validation Errors: ", self.form.errors)
 
@@ -454,10 +460,13 @@ class CForm(Component):
     def before_form_submit(self) -> None:
         """Hook called before form submit but after form is validated"""
 
+    def after_form_submit(self) -> None:
+        """Hook called after form submit but before session is commited"""
+
     def on_form_submited(
         self, submited_record: Optional[Union["Model", dict]]
     ) -> Optional[bool]:
-        """Hook called when the from is successfully submited
+        """Hook called when the from is successfully submited and session is commited
 
         Returns True, False or None to identify should form redisplay itself.
 
