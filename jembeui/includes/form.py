@@ -144,6 +144,7 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
         DEFAULT_TEMPLATE = "jembeui/includes/input.html"
         TEMPLATE_BY_CLASS_NAME = {
             "HiddenField": "jembeui/includes/hidden.html",
+            "DateField": "jembeui/includes/date.html",
         }  # type:ignore
 
         def mount(

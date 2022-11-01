@@ -1,13 +1,12 @@
 {% from "jembeui/macros/icons.html" import display_icon %}
-{# input input-bordered input-error input-lg input-md input-sm input-xs select select-bordered select-error select-lg select-sm select-xs select-md #}
 {% set field_id = "{}--{}".format(cform.exec_name.strip("/").replace("/","-").replace(".","_"), field.name) %}
-{% set is_text_area_field = field.__class__.__name__ == "TextAreaField" %}
 
 {% macro display_widget(field, field_style, field_id) %}
     {%- set jmb_on_action = false %}
     {%- if not field_style.disabled %}
         {%- set jmb_on_action %}
-            {{ cform._config.form_state_name }}.{{ field.name }} = $self.value;
+            {{ cform._config.form_state_name }}.{{ field.name }} = $self.__datepicker.getDate('yyyy-mm-dd');
+
             {%- if "modified_fields" in cform.state %}
             if (modified_fields.indexOf('{{ field.name }}') === -1 ) { modified_fields.push('{{ field.name }}')};
             {%- endif %}
@@ -27,10 +26,18 @@
             "{bc} {bc}-bordered".format(bc=field_style._base_class),
             "{bc}-error".format(bc=field_style._base_class) if field.errors else "",
             "{bc}-".format(bc=field_style._base_class) + field_style.size if field_style.size is not none else "",
+            "input-datepicker",
         ]),
-        "jmb-on:change{}".format(".defer" if field_style.on_change_defer else ""): jmb_on_action  if jmb_on_action  else false,
-        "jmb-on:keydown.enter": "$self.blur();$self.focus();submit()" if not field_style.disabled and not is_text_area_field  and "submit" in cform._config.component_actions else false,
-        "jmb-on:keydown.ctrl.enter": "$self.blur();$self.focus();submit()" if not field_style.disabled and is_text_area_field  and "submit" in cform._config.component_actions else false,
+        "jmb-on:change-date.camel{}".format(".defer" if field_style.on_change_defer else ""): jmb_on_action if jmb_on_action  else false, 
+
+        "jmb-on:keydown.enter": "$self.blur();$self.focus();submit()" if not field_style.disabled  and "submit" in cform._config.component_actions else false,
+
+        "jmb-on:ready.once": "if($self.__datepicker === undefined){{$self.__datepicker = new Datepicker($self, {{format:'{}', language:'{}', container:'body'}})}}".format(
+                jembeui_get_js_date_format('datepicker'), jembeui_get_locale_code('-'), field_id
+            ) if  not field_style.disabled else false,
+        "jmb-on-remove": "if($self.__datepicker !== undefined){$self.__datepicker.destroy()}" if not field_style.disabled else false,
+        "type":"text", 
+        "value": field.data|dateformat if field.data else "", 
 
     } %}
     {{ field(**field_attrs) }}
