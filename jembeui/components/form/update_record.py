@@ -9,6 +9,7 @@ from typing import (
     Dict,
     Tuple,
 )
+from markupsafe import Markup
 from flask_sqlalchemy import Model
 from flask_babel import lazy_gettext as _
 
@@ -41,6 +42,7 @@ class CUpdateRecord(CForm):
             get_record: Optional[
                 Callable[["jembeui.CForm"], Union["Model", dict]]
             ] = None,
+            get_record_version: Optional[Callable[[Union["Model", dict]], str]] = None,
             menu: Optional[
                 Union["jembeui.Menu", Sequence[Union["jembeui.Link", "jembeui.Menu"]]]
             ] = None,
@@ -72,6 +74,8 @@ class CUpdateRecord(CForm):
                     ),
                     Link("cancel()", _("Cancel"), style="btn-ghost", as_button=True),
                 ]
+            self.get_record_version = get_record_version
+
             super().__init__(
                 form,
                 get_record,
@@ -98,6 +102,7 @@ class CUpdateRecord(CForm):
         record_id: int,
         form: Optional[Form] = None,
         modified_fields: Tuple[str, ...] = (),
+        record_version: Optional[str] = None,
         _record: Optional[Union[Model, dict]] = None,
         wdb: Optional[WDB] = None,
     ):
@@ -107,7 +112,41 @@ class CUpdateRecord(CForm):
             else _record.id == record_id
         ):
             self.record = _record
+        if record_version is None:
+            self.state.record_version = self.record_version
         super().__init__()
+
+    @property
+    def record_version(self) -> str:
+        """Record version is used as protectio of multiple simultanus updates by different users/sessions"""
+        record = self.record
+        if self._config.get_record_version is not None:
+            return self._config.get_record_version(record)
+
+        if isinstance(record, dict):
+            return str(record.get("version", 0))
+        else:
+            return str(getattr(record, "version", 0))
+
+    def before_form_submit(self) -> None:
+        # check if record is modified by other user/session/request in meantime
+        if self.state.record_version != self.record_version:
+            self.jui.push_page_message(
+                _("Can't save the changes!"),
+                Markup(
+                    _(
+                        "<div class='prose'>"
+                        "<p>Saving your changes will erase changes already made by another user.</p>"
+                        "<p><strong>Cancel the update and start again.</strong></p>"
+                        "</div>"
+                    )
+                ),
+                "error",
+            )
+            raise ValueError(
+                _("Concurrent update detected. Can't save changes!")
+            )
+        return super().before_form_submit()
 
     def push_page_alert_on_form_submit(self):
         self.jui.push_page_alert(_("{} updated.").format(self.title), "success")
