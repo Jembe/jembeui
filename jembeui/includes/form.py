@@ -561,7 +561,7 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
 
         self.populate_obj(record)
         self.cform.session.add(record)
-        self.cform.session.commit()
+        # self.cform.session.commit()
         return record
 
     def cancel(self, record: Union["Model", dict]):
