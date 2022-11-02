@@ -351,9 +351,7 @@ class CForm(Component):
                     self.state.wdb = None
 
                 # submit form
-                submited_record = self.form.submit(self.record)
-
-                self.after_form_submit()
+                submited_record = self.call_form_submit(self.record)
 
                 # commit database session
                 if not isinstance(self.record, dict) and not is_dataclass(self.record):
@@ -386,6 +384,10 @@ class CForm(Component):
             print("Validation Errors: ", self.form.errors)
 
         return True
+
+    def call_form_submit(self, record: Union["Model", dict]) -> Optional[Union["Model", dict]]:
+        """Etract actual call to form submit from submit acction for easy overriden and changing behaviors"""
+        return self.form.submit(self.record)
 
     @action
     def cancel(self, confirmed: bool = False):
@@ -459,9 +461,6 @@ class CForm(Component):
 
     def before_form_submit(self) -> None:
         """Hook called before form submit but after form is validated"""
-
-    def after_form_submit(self) -> None:
-        """Hook called after form submit but before session is commited"""
 
     def on_form_submited(
         self, submited_record: Optional[Union["Model", dict]]
