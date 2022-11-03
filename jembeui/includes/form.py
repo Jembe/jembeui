@@ -301,7 +301,7 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
 
             return field_style
 
-        def field_style(self, field_name:str) ->"jembeui.Form.FieldStyle":
+        def field_style(self, field_name: str) -> "jembeui.Form.FieldStyle":
             """Return field style for field name"""
             if not self._form:
                 raise ValueError("FormStyle is not mounted")
@@ -314,9 +314,16 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
                     self.fields = {field_name: field_style}
             else:
                 field_style = self.fields[field_name]
-                if field_style.field is not None and field_style.field.name == field_name:
+                if (
+                    field_style.field is not None
+                    and field_style.field.name == field_name
+                ):
                     return field_style
             field = getattr(self._form, field_name)
+            if field is None:
+                raise ValueError(
+                    f"field {field_name} does not exist in form {self._form}"
+                )
             field_style.mount(field, self)
 
             if self.disabled:
@@ -375,6 +382,9 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
             ctx = {
                 "form": self._form,
                 "form_style": self.updated_from_dict(**kwargs),
+                "has_field": lambda field_name: (
+                    field_name in self._form if self._form else False
+                ),
                 "field_style": lambda field_name: self.field_style(field_name),
                 "component": self._form.cform._jinja2_component if self._form else None,
                 "component_reset": self._form.cform._jinja2_component_reset
