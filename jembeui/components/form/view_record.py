@@ -100,10 +100,19 @@ class CViewRecord(CForm):
         ):
             self.record = _record
 
+        # self.form = (
+        #     self._config.form(data=self.record, disabled=True)
+        #     if isinstance(self.record, dict)
+        #     else self._config.form(obj=self.record, disabled=True)
+        # )
+        # self.form.mount(self)
+        super().__init__()
+
+    def hydrate(self):
         self.form = (
             self._config.form(data=self.record, disabled=True)
             if isinstance(self.record, dict)
             else self._config.form(obj=self.record, disabled=True)
         )
         self.form.mount(self)
-        super().__init__()
+        return super().hydrate()
