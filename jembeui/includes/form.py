@@ -143,8 +143,9 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
 
         DEFAULT_TEMPLATE = "jembeui/includes/input.html"
         TEMPLATE_BY_CLASS_NAME = {
-            "HiddenField": "jembeui/includes/hidden.html",
-            "DateField": "jembeui/includes/date.html",
+            # "HiddenField": "jembeui/includes/input_hidden.html",
+            "DateField": "jembeui/includes/input_date.html",
+            "LovField": "jembeui/includes/input_lov.html",
         }  # type:ignore
 
         def mount(
@@ -644,7 +645,12 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
         # get fields from form dummy instance
         for field in self:
             if isinstance(field, FieldMixin):
-                components.update(field.get_jembeui_components())
+                components.update(
+                    {
+                        field.get_jembeui_component_name(n): c
+                        for n, c in field.get_jembeui_components().items()
+                    }
+                )
 
         return components
 

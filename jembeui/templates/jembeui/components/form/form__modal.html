@@ -6,7 +6,9 @@
 
         <h3 class="flex items-center gap-4 text-lg font-bold">{{ title }}</h3>
         {% block content %}
+        <div class="mt-4">
         {{ form() }}
+        </div>
         {% endblock content %}
 
         {%- if menu %}

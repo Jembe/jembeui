@@ -21,11 +21,11 @@ class FieldMixin:
     FieldMixin must be used inside CForm in order to provide additional functionalities
     """
 
-    _cform: "jembeui.CBaseForm"
+    _cform: "jembeui.CForm"
     _form: "jembeui.Form"
 
     @property
-    def cform(self) -> "jembeui.CBaseForm":
+    def cform(self) -> "jembeui.CForm":
         """Parent CForm component instance"""
         try:
             return self._cform
