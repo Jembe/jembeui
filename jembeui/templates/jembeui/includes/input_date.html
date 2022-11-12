@@ -38,7 +38,6 @@
         "jmb-on-remove": "if($self.__datepicker !== undefined){$self.__datepicker.destroy()}" if not field_style.disabled else false,
         "type":"text", 
         "value": field.data|dateformat if field.data else "", 
-
     } %}
     {{ field(**field_attrs) }}
 {% endmacro %}
