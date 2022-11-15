@@ -195,6 +195,8 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
             # support select
             if self.field and isinstance(self.field.widget, wtf.widgets.Select):
                 self._base_class = "select"
+            elif self.field and isinstance(self.field.widget, wtf.widgets.TextArea):
+                self._base_class = "textarea"
 
             return self
 
