@@ -32,7 +32,7 @@
 
         "jmb-on:keydown.enter": "$self.blur();$self.focus();submit()" if not field_style.disabled  and "submit" in cform._config.component_actions else false,
 
-        "jmb-on:ready.once": "if($self.__datepicker === undefined){{$self.__datepicker = new Datepicker($self, {{format:'{}', language:'{}', container:'body'}})}}".format(
+        "jmb-on:ready": "if($self.__datepicker === undefined){{$self.__datepicker = new Datepicker($self, {{format:'{}', language:'{}', container:'body .datepickers'}})}}".format(
                 jembeui_get_js_date_format('datepicker'), jembeui_get_locale_code('-'), field_id
             ) if  not field_style.disabled else false,
         "jmb-on-remove": "if($self.__datepicker !== undefined){$self.__datepicker.destroy()}" if not field_style.disabled else false,

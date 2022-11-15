@@ -14,7 +14,7 @@
     "concurrently": "^7.4.0",
     "cp-cli": "^2.0.0",
     "cssnano": "^5.1.13",
-    "daisyui": "^2.24.0",
+    "daisyui": "^2.40.1",
     "del-cli": "^5.0.0",
     "ini": "^3.0.1",
     "nprogress": "^0.2.0",

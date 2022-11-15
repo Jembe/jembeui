@@ -1,5 +1,5 @@
 {% from "jembeui/macros/icons.html" import display_icon %}
-{# input input-bordered input-error input-lg input-md input-sm input-xs select select-bordered select-error select-lg select-sm select-xs select-md #}
+{# input input-bordered input-error input-lg input-md input-sm input-xs select select-bordered select-error select-lg select-sm select-xs select-md textarea textarea-bordered #}
 {% set field_id = "{}--{}".format(cform.exec_name.strip("/").replace("/","-").replace(".","_"), field.name) %}
 {% set is_text_area_field = field.__class__.__name__ == "TextAreaField" %}
 

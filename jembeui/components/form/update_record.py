@@ -118,7 +118,7 @@ class CUpdateRecord(CForm):
 
     @property
     def record_version(self) -> str:
-        """Record version is used as protectio of multiple simultanus updates by different users/sessions"""
+        """Record version is used as protection of multiple simultanus updates by different users/sessions"""
         record = self.record
         if self._config.get_record_version is not None:
             return self._config.get_record_version(record)
@@ -147,6 +147,11 @@ class CUpdateRecord(CForm):
                 _("Concurrent update detected. Can't save changes!")
             )
         return super().before_form_submit()
+    def on_form_submited(self, submited_record: Optional[Union["Model", dict]]) -> Optional[bool]:
+        if submited_record:
+            self.record = submited_record
+            self.state.record_version = self.record_version
+        return super().on_form_submited(submited_record)
 
     def push_page_alert_on_form_submit(self):
         self.jui.push_page_alert(_("{} updated.").format(self.title), "success")
