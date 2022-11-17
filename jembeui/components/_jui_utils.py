@@ -13,6 +13,11 @@ class JuiUtils:
         self._component = component
 
     def push_page_message(self, title: str, message: str, variant: str = ""):
+        """
+        - title (Optional[str], optional): Title of the message box. Defaults to None.
+        - message (Optional[str], optional): Actual message. Defaults to None.
+        - mvariant (Optional[str], optional): Color varinat (error, warning, primary, etc.). Defaults to None.
+        """
         self._component.emit(
             "pushPageMessage", title=title, message=message, variant=variant
         )
