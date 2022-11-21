@@ -1,0 +1,131 @@
+{% macro display_input_widget(form, field, field_style, field_id) %}
+    {% set cform = form.cform %}
+
+    {% set is_boolean_field = field.__class__.__name__ == "BooleanField" %}
+    {% set is_text_area_widget = field.widget.__class__.__name__ == "TextArea" %}
+    {% set is_select_widget = field.widget.__class__.__name__ == "Select" %}
+
+    {%- set base_class %}
+        {%- if is_text_area_widget %}
+            textarea
+        {%- elif is_select_widget %}
+            select
+        {%- else %}
+            input
+        {%- endif %}
+    {%- endset %}
+
+    {%- set jmb_on_action = false %}
+
+    {%- if not field_style.disabled %}
+        {%- set jmb_on_action %}
+            {%- if is_boolean_field %}
+            {{ cform._config.form_state_name }}.{{ field.name }} = $self.checked;
+            {%- else %}
+            {{ cform._config.form_state_name }}.{{ field.name }} = $self.value;
+            {%- endif %}
+            {%- if "modified_fields" in cform.state %}
+            if (modified_fields.indexOf('{{ field.name }}') === -1 ) { modified_fields.push('{{ field.name }}')};
+            {%- endif %}
+            {%- if field_style.on_change_submit and "submit" in cform._config.component_actions %}
+            submit(); 
+            {%- endif %}
+            {%- if field_style.on_change_validate and "validate" in cform._config.component_actions %}
+            validate(); 
+            {%- endif %}
+        {%- endset %}
+    {%- endif %}
+
+    {%- set field_attrs = {
+        "id": field_id,
+        "disabled": field_style.disabled,
+        "placeholder": field.label.text if field_style.is_compact else false0,
+        "class": " ".join([
+            "{bc} {bc}-bordered".format(bc=base_class),
+            "{bc}-error".format(bc=base_class) if field.errors else "",
+            "{bc}-".format(bc=base_class) + field_style.size if field_style.size is not none else "",
+        ]),
+        "jmb-on:change{}".format(".defer" if field_style.on_change_defer else ""): jmb_on_action  if jmb_on_action  else false,
+        "jmb-on:keydown.enter": "$self.blur();$self.focus();submit()" if not field_style.disabled and not is_text_area_widget  and "submit" in cform._config.component_actions else false,
+        "jmb-on:keydown.ctrl.enter": "$self.blur();$self.focus();submit()" if not field_style.disabled and is_text_area_widget  and "submit" in cform._config.component_actions else false,
+    } %}
+
+    {{ field(**field_attrs) }}
+{% endmacro %}
+
+{% macro display_date_widget(form, field, field_style, field_id) %}
+    {% set cform = form.cform %}
+
+    {%- set jmb_on_action = false %}
+
+    {%- if not field_style.disabled %}
+        {%- set jmb_on_action %}
+            {{ cform._config.form_state_name }}.{{ field.name }} = $self.__datepicker.getDate('yyyy-mm-dd');
+
+            {%- if "modified_fields" in cform.state %}
+            if (modified_fields.indexOf('{{ field.name }}') === -1 ) { modified_fields.push('{{ field.name }}')};
+            {%- endif %}
+            {%- if field_style.on_change_submit and "submit" in cform._config.component_actions %}
+            submit(); 
+            {%- endif %}
+            {%- if field_style.on_change_validate and "validate" in cform._config.component_actions %}
+            validate(); 
+            {%- endif %}
+        {%- endset %}
+    {%- endif %}
+
+    {%- set field_attrs = {
+        "id": field_id,
+        "disabled": field_style.disabled,
+        "placeholder": field.label.text if field_style.is_compact else false,
+        "class": " ".join([
+            "input input-bordered",
+            "input-error" if field.errors else "",
+            "input-" + field_style.size if field_style.size is not none else "",
+            "input-datepicker",
+        ]),
+        "jmb-on:change-date.camel{}".format(".defer" if field_style.on_change_defer else ""): jmb_on_action if jmb_on_action  else false, 
+
+        "jmb-on:keydown.enter": "$self.blur();$self.focus();submit()" if not field_style.disabled  and "submit" in cform._config.component_actions else false,
+
+        "jmb-on:ready": "if($self.__datepicker === undefined){{$self.__datepicker = new Datepicker($self, {{format:'{}', language:'{}', container:'body .datepickers'}})}}".format(
+                jembeui_get_js_date_format('datepicker'), jembeui_get_locale_code('-'), field_id
+            ) if  not field_style.disabled else false,
+        "jmb-on-remove": "if($self.__datepicker !== undefined){$self.__datepicker.destroy()}" if not field_style.disabled else false,
+        "type":"text", 
+        "value": field.data|dateformat if field.data else "", 
+    } %}
+    {{ field(**field_attrs) }}
+{% endmacro %}
+
+{% macro display_lov_widget(form, field, field_style, field_id) %}
+    {% set cform = form.cform %}
+
+    {%- set jmb_on_action = false %}
+    
+    {%- if not field_style.disabled %}
+        {%- set jmb_on_action %}
+            {{ cform._config.form_state_name }}.{{ field.name }} = $event.detail.selected;
+
+            {%- if "modified_fields" in cform.state %}
+            if (modified_fields.indexOf('{{ field.name }}') === -1 ) { modified_fields.push('{{ field.name }}')};
+            {%- endif %}
+            {%- if field_style.on_change_submit and "submit" in cform._config.component_actions %}
+            submit(); 
+            {%- endif %}
+            {%- if field_style.on_change_validate and "validate" in cform._config.component_actions %}
+            validate(); 
+            {%- endif %}
+        {%- endset %}
+    {%- endif %}
+    {%- set field_attrs = {
+        "id": field_id,
+        "jmb-on:select-option-changed.prevent.stop{}".format(".defer" if field_style.on_change_defer else ""): jmb_on_action if jmb_on_action  else false, 
+
+        "jmb-on:select-option-submit.prevent.stop": "submit()" if not field_style.disabled  and "submit" in cform._config.component_actions else false,
+
+    } %}
+    <div {% for name,value in field_attrs.items() %}{% if value is not false -%}{{ name }}="{{ value }}" {% endif %}{% endfor %}>
+        {{ field.jembeui_component("lov", selected=field.data|string if field.data else none, is_disabled=field_style.disabled)}}
+    </div>
+{% endmacro %}

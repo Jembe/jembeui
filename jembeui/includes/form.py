@@ -139,14 +139,7 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
         _field: Optional["wtf.Field"] = None
         _form_style: Optional["jembeui.Form.Style"] = None
 
-        _base_class: str = "input"
-
-        DEFAULT_TEMPLATE = "jembeui/includes/input.html"
-        TEMPLATE_BY_CLASS_NAME = {
-            # "HiddenField": "jembeui/includes/input_hidden.html",
-            "DateField": "jembeui/includes/input_date.html",
-            "LovField": "jembeui/includes/input_lov.html",
-        }  # type:ignore
+        DEFAULT_TEMPLATE = "jembeui/includes/form_field.html"
 
         def mount(
             self, field: "wtf.Field", form_style: "jembeui.Form.Style"
@@ -188,15 +181,7 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
                     self.on_change_defer = True
 
             if self.template is None:
-                self.template = self.TEMPLATE_BY_CLASS_NAME.get(
-                    field.__class__.__name__, self.DEFAULT_TEMPLATE
-                )
-
-            # support select
-            if self.field and isinstance(self.field.widget, wtf.widgets.Select):
-                self._base_class = "select"
-            elif self.field and isinstance(self.field.widget, wtf.widgets.TextArea):
-                self._base_class = "textarea"
+                self.template = self.DEFAULT_TEMPLATE
 
             return self
 
@@ -207,6 +192,12 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
             if self._form_style.form is None:
                 raise JembeUIError("Form is not mounted")
             ctx = {
+                "field_id": "{}--{}".format(
+                    self._form_style.form.cform.exec_name.strip("/")
+                    .replace("/", "-")
+                    .replace(".", "_"),
+                    self._field.name,
+                ),
                 "field": self._field,
                 "field_style": self,
                 "form": self._form_style.form,

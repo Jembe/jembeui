@@ -1,0 +1,57 @@
+{% from "jembeui/macros/icons.html" import display_icon %}
+{% import "jembeui/macros/field_widgets.html" as widgets %}
+{# input input-bordered input-error input-lg input-md input-sm input-xs select select-bordered select-error select-lg select-sm select-xs select-md textarea textarea-bordered #}
+
+{%- if field.__class__.__name__ == "DateField" %}
+    {%- set macro_name = "display_date_widget" %}
+{%- elif field.__class__.__name__ == "LovField" %}
+    {%- set macro_name = "display_lov_widget" %}
+{%- else %}
+    {%- set macro_name = "display_input_widget" %}
+{%- endif %}
+
+{%- if field_style.is_compact %}
+    {# field label in placeholder #}
+    <div class="w-full form-control">
+        {{ widgets[macro_name](form, field, field_style, field_id)}}
+        {%- if field.errors %}
+            <label class="label">
+                <span class="text-red-700 label-text-alt">
+                    {%- for error in field.errors %}{{ error }}{% endfor %}
+                    </span>
+                </label>
+            {%- endif %}
+        </div>
+    {%- else %}
+        {# field label on top #}
+        <div class="w-full form-control">
+            <label class="label">
+                <span class="label-text">
+                    {{ field.label.text }}
+                    {%- if not field_style.disabled and field_style.mark_if_required and field.flags.required -%}
+                        <span class="text-sm text-error"
+                              title="{%- trans -%}Required{%- endtrans -%}">*</span>
+                    {%- endif -%}
+                </span>
+                {%- if field.description or ( field_style.mark_if_optional and not field.flags.required and not field_style.disabled) %}
+                    <span class="flex items-center gap-2 label-text-alt">
+                        {%- if field_style.mark_if_optional and not field.flags.required and not field_style.disabled %}<span class="text-opacity-60">{% trans %}Optional{% endtrans %}</span>
+                    {% endif %}
+                    {%- if field.description %}
+                        <div class="z-10 tooltip tooltip-left" data-tip="{{ field.description }}">
+                            {{ display_icon("question-mark-circle", class="w-5 h-5")}}
+                        </div>
+                    {% endif %}
+                </span>
+            {%- endif %}
+        </label>
+        {{ widgets[macro_name](form, field, field_style, field_id)}}
+        {%- if field.errors %}
+            <label class="label">
+                <span class="text-red-700 label-text-alt">
+                    {%- for error in field.errors %}{{ error }}{% endfor %}
+                    </span>
+                </label>
+            {%- endif %}
+        </div>
+    {%- endif %}
