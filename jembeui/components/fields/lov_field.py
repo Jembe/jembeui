@@ -68,6 +68,8 @@ class CLovField(Component):
         if _form is None:
             raise JembeUIError("CLovField must have _form parameter injected")
         self._form = _form
+        if is_disabled:
+            self.state.search = None
 
         super().__init__()
 
@@ -162,13 +164,16 @@ class CLovField(Component):
         if id_column is None:
             id_column = query.column_descriptions[0]["expr"]
         return id_column
-    
+
     @listener(event="cancel", source=("view", "update", "create"))
     def on_child_cancel(self, event: "jembe.Event"):
         self.remove_component(event.source_name)
 
     @listener(event="submit", source=("update", "create"))
     def on_child_submit(self, event: "jembe.Event"):
+        if self.state.is_disabled:
+            return None
+
         if event.source_name == "update":
             if not event.source._config.redisplay_on_submit:
                 self.remove_component(event.source_name)

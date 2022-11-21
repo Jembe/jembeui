@@ -126,6 +126,7 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
         """
 
         disabled: bool = False
+        classes: Optional[str] = None
 
         is_compact: bool = False
         size: Optional[str] = None
@@ -192,16 +193,7 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
             if self._form_style.form is None:
                 raise JembeUIError("Form is not mounted")
             ctx = {
-                "field_id": "{}--{}".format(
-                    self._form_style.form.cform.exec_name.strip("/")
-                    .replace("/", "-")
-                    .replace(".", "_"),
-                    self._field.name,
-                ),
-                "field": self._field,
                 "field_style": self,
-                "form": self._form_style.form,
-                "cform": self._form_style.form.cform,
             }
             return Markup(render_template(self.template, **ctx))  # type:ignore
 
@@ -239,6 +231,47 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
         def field(self) -> Optional["wtf.Field"]:
             """Return Field to which tish field style is attached to"""
             return self._field
+
+        @property
+        def form(self) -> Optional["wtf.Form"]:
+            """Return form instance to which this field is attached to"""
+            if self._form_style and self._form_style._form:
+                return self._form_style._form
+            return None
+
+        @property
+        def field_id(self) -> Optional[str]:
+            """Return field id for widget HTML"""
+            if self._form_style and self._form_style.form and self._field:
+                return "{}--{}".format(
+                    self._form_style.form.cform.exec_name.strip("/")
+                    .replace("/", "-")
+                    .replace(".", "_"),
+                    self._field.name,
+                )
+            else:
+                return None
+
+        def updated_from_dict(self, **kwargs) -> "jembeui.Form.FieldStyle":
+            """Create new style from this one where settings are updated form dict"""
+
+            def update_ostr(k, check_value=lambda x: len(x) > 0):
+                if k in kwargs and check_value(v := kwargs[k]):
+                    if getattr(new_style, k) is None:
+                        setattr(new_style, k, str(v))
+                    else:
+                        setattr(new_style, k, " ".join((getattr(new_style, k), str(v))))
+
+            def update_bool(k, check_value=lambda x: True):
+                if k in kwargs and check_value(v := kwargs[k]):
+                    setattr(new_style, k, bool(v))
+
+            new_style = copy(self)
+            update_bool("disabled")
+            update_bool("is_compact")
+            update_ostr("classes")
+            update_ostr("size")
+            return new_style
 
     @dataclass
     class Style:

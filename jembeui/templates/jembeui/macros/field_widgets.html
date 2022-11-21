@@ -10,6 +10,8 @@
             textarea
         {%- elif is_select_widget %}
             select
+        {%- elif is_boolean_field %}
+            checkbox
         {%- else %}
             input
         {%- endif %}
@@ -39,11 +41,13 @@
     {%- set field_attrs = {
         "id": field_id,
         "disabled": field_style.disabled,
-        "placeholder": field.label.text if field_style.is_compact else false0,
+        "placeholder": field.label.text if field_style.is_compact and not is_boolean_field else false,
+        "title": field.label.text if field_style.is_compact and is_boolean_field else false,
         "class": " ".join([
             "{bc} {bc}-bordered".format(bc=base_class),
             "{bc}-error".format(bc=base_class) if field.errors else "",
             "{bc}-".format(bc=base_class) + field_style.size if field_style.size is not none else "",
+            field_style.classes|default("",true)
         ]),
         "jmb-on:change{}".format(".defer" if field_style.on_change_defer else ""): jmb_on_action  if jmb_on_action  else false,
         "jmb-on:keydown.enter": "$self.blur();$self.focus();submit()" if not field_style.disabled and not is_text_area_widget  and "submit" in cform._config.component_actions else false,
@@ -83,6 +87,7 @@
             "input-error" if field.errors else "",
             "input-" + field_style.size if field_style.size is not none else "",
             "input-datepicker",
+            field_style.classes|default("",true)
         ]),
         "jmb-on:change-date.camel{}".format(".defer" if field_style.on_change_defer else ""): jmb_on_action if jmb_on_action  else false, 
 
@@ -102,7 +107,6 @@
     {% set cform = form.cform %}
 
     {%- set jmb_on_action = false %}
-    
     {%- if not field_style.disabled %}
         {%- set jmb_on_action %}
             {{ cform._config.form_state_name }}.{{ field.name }} = $event.detail.selected;

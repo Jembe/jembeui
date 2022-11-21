@@ -3,157 +3,163 @@
      jmb-on:click.away="juiLov.closeListbox($context)"
      jmb-on:keydown.escape="juiLov.closeListbox($context)"
      class="relative">
-    <button jmb-ref="button"
-            jmb-on:ready="if($local.focusedOptionId!==null){$self.focus()}"
-            jmb-on:click="juiLov.toggleListboxVisibility($context)"
-            jmb-on:keydown.space.prevent="{% if is_open %} search = search + ' ' {% endif %}"
-            {%- if not is_open %}
-                jmb-on:keydown.arrow-down.prevent="juiLov.toggleListboxVisibility($context)"
-            {%- endif %}
-            class="w-full {{ ' '.join([ 'select select-bordered', 'select-error' if field.errors else '', 'select-' + field_style.size if field_style.size is not none else '', ]) }}">
-        {% if not is_open %}
-            <span class="flex items-center h-full font-normal truncate text-base-content
-                         {% if selected_title is none %}
-                             text-opacity-50
-                         {% endif %} ">
-                {{ selected_title if selected_title is not none else input_placeholder|default("", true) }}
-            </span>
-        {% else %}
-            <input jmb-on:ready="$self.value=search;$self.focus()"
-                   jmb-on:keydown.arrow-up.prevent="juiLov.focusPrev($context)"
-                   jmb-on:keydown.arrow-down.prevent="juiLov.focusNext($context)"
-                   jmb-on:keydown.enter.stop.prevent="juiLov.selectOption($context, $dispatch)"
-                   jmb-on:input.nonblocking.debounce.450ms.prevent.stop="search=$self.value"
-                   class="w-full h-full px-0 font-normal input input-ghost hover:outline-none focus:outline-none "/>
-        {% endif %}
-        {# {% if is_disabled %} disabled{% endif %} #}
-    </button>
-    {# TODO disabled #}
-    {# TODO display dropdown attached to body not to this position DOM element for use in modals #}
-    {# TODO view, update, delete?? #}
-    {% if is_open %}
-        <div class="absolute w-full mt-1 ">
-            {% if _config.choice_columns|length == 1 %}
-                <ul class="overflow-auto border rounded-lg shadow-md max-h-64 menu menu-compact bg-base-100 border-base-300">
-                    {% if not search and choices|length > 0 %}
-                    <li option-id="">
-                        <a jmb-bind:class="{'active': $local.focusedOptionId === ''}"
-                           jmb-on:mouseenter="$local.focusedOptionId = ''"
-                           jmb-on:mouseleave="$local.focusedOptionId = null"
-                           jmb-on:click.stop.prevent="juiLov.selectOption($context, $dispatch)"
-                           class="flex items-center justify-between">
-                            &nbsp;
-                            {% if selected == none %}{{ display_icon("check", class="w-5 h-5")}}{% endif %}
-                        </a>
-                    </li>
-                    {% endif %}
-                    {% for choice_id, choice_record in choices %}
-                        <li option-id="{{ choice_id }}">
-                            <a jmb-bind:class="{'active': $local.focusedOptionId === '{{ choice_id }}'}"
-                               jmb-on:mouseenter="$local.focusedOptionId = '{{ choice_id }}'"
-                               jmb-on:mouseleave="$local.focusedOptionId = null"
-                               jmb-on:click.stop.prevent="juiLov.selectOption($context, $dispatch)"
-                               class="flex items-center justify-between">
-                                {{ choice_record[0] }}
-                                {% if selected == choice_id %}{{ display_icon("check", class="w-5 h-5")}}{% endif %}
-                            </a>
-                        </li>
-                    {% endfor %}
-                    {# {% if (search or choices|length == 0) and has_create and component("create").is_accessible %} #}
-                    {% if has_create and component("create").is_accessible %}
-                        <li option-id="___createnew">
-                            <a class="flex items-center justify-center gap-2"
-                               jmb-bind:class="{'active': $local.focusedOptionId === '___createnew'}"
-                               jmb-on:mouseenter="$local.focusedOptionId = '___createnew'"
-                               jmb-on:mouseleave="$local.focusedOptionId = null" 
-                               jmb-on:click.prevent="{{ component().jrl }}">
-                                {{ display_icon("plus", class="w-5 h-5")}}
-                                {% trans %}Create New{% endtrans %}
-                            </a>
-                        </li>
-                    {% endif %}
-                    {% if choices|length == 0 %}
-                        <li option-id="" class="disabled">
-                            <a class="block text-center">
-                                {% if search %}
-                                    {% trans %}No results match your search{% endtrans %}
-                                {% else %}
-                                    {% trans %}No data exist{% endtrans %}
-                                {% endif %}
-                            </a>
-                        </li>
-                    {% endif %}
-                </ul>
+    {% if is_disabled %}
+        <input class="w-full {{ ' '.join([ 'select select-bordered',  'select-' + field_style.size if field_style.size is not none else '', ]) }}" disabled {% if input_placeholder %}placeholder="{{ input_placeholder }}"{% endif %} value="{{ selected_title if selected_title is not none else '' }}">
+    {% else %}
+        <button jmb-ref="button"
+                jmb-on:ready="if($local.focusedOptionId!==null){$self.focus()}"
+                jmb-on:click="juiLov.toggleListboxVisibility($context)"
+                jmb-on:keydown.space.prevent="{% if is_open %}
+                                                  search = search + ' '
+                {% endif %}"
+                {%- if not is_open %}
+                    jmb-on:keydown.arrow-down.prevent="juiLov.toggleListboxVisibility($context)"
+                {%- endif %}
+                class="w-full {{ ' '.join([ 'select select-bordered', 'select-error' if field.errors else '', 'select-' + field_style.size if field_style.size is not none else '', ]) }}">
+            {% if not is_open %}
+                <span class="flex items-center h-full font-normal truncate text-base-content
+                             {% if selected_title is none %}
+                                 text-opacity-50
+                             {% endif %} ">
+                    {{ selected_title if selected_title is not none else input_placeholder|default("", true) }}
+                </span>
             {% else %}
-                <div class="overflow-auto border rounded-lg shadow-md max-h-64 bg-base-100 border-base-300">
-                    <table class="table w-full table-compact">
-                        <thead>
-                            <tr>
-                                <th class="sticky top-0 w-5">&nbsp;</th>
-                                {% for column in _config.choice_columns %}<th class="sticky top-0">{{ column }}</th>{% endfor %}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% if not search and choices|length > 0 %}
-                                <tr option-id=""
-                                    jmb-bind:class="{'active': $local.focusedOptionId === '' }"
-                                    jmb-on:mouseenter="$local.focusedOptionId = ''"
-                                    jmb-on:mouseleave="$local.focusedOptionId = null"
-                                    jmb-on:click.stop.prevent="juiLov.selectOption($context, $dispatch)">
-                                    <td>
-                                        <button class="btn btn-ghost btn-sm btn-square"
-                                                jmb-on:click.stop.prevent="juiLov.selectOption($context, $dispatch)">
-                                            {% if selected == none %}
-                                                {{ display_icon("check", class="w-4 h-4 text-primary")}}
-                                            {% else %}
-                                                {{ display_icon("minus", class="w-4 h-4 opacity-50")}}
-                                            {% endif %}
-                                        </button>
-                                    </td>
-                                    <td colspan="{{ _config.choice_columns|length }}">&nbsp;</td>
-                                </tr>
-                            {% endif %}
-                            {% for choice_id, choice_record in choices %}
-                                <tr option-id="{{ choice_id }}"
-                                    jmb-bind:class="{'active': $local.focusedOptionId === '{{ choice_id }}'}"
-                                    jmb-on:mouseenter="$local.focusedOptionId = '{{ choice_id }}'"
-                                    jmb-on:mouseleave="$local.focusedOptionId = null"
-                                    jmb-on:click.stop.prevent="juiLov.selectOption($context, $dispatch)">
-                                    <td>
-                                        {# <input type="checkbox"
-                                                class="checkbox checkbox-sm "
-                                                {% if selected == choice_id %}
-                                                    checked
-                                                {% endif %}
-                                                jmb-on:click.stop.prevent="juiLov.selectOption($context, $dispatch)"/> #}
-                                        <button class="btn btn-ghost btn-sm btn-square"
-                                                jmb-on:click.stop.prevent="juiLov.selectOption($context, $dispatch)">
-                                            {% if selected == choice_id %}
-                                                {{ display_icon("check", class="w-4 h-4 text-primary")}}
-                                            {% else %}
-                                                {{ display_icon("minus", class="w-4 h-4 opacity-50")}}
-                                            {% endif %}
-                                        </button>
-                                    </td>
-                                    {% for value in choice_record %}<td>{{ value }}</td>{% endfor %}
-                                </tr>
-                            {% else %}
-                                <tr>
-                                    <td colspan="{{ _config.choice_columns|length + 1 }}" class="text-center">
-                                        {% if search %}
-                                            {% trans %}No results match your search{% endtrans %}
-                                        {% else %}
-                                            {% trans %}No data exist{% endtrans %}
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+                <input jmb-on:ready="$self.value=search;$self.focus()"
+                       jmb-on:keydown.arrow-up.prevent="juiLov.focusPrev($context)"
+                       jmb-on:keydown.arrow-down.prevent="juiLov.focusNext($context)"
+                       jmb-on:keydown.enter.stop.prevent="juiLov.selectOption($context, $dispatch)"
+                       jmb-on:input.nonblocking.debounce.450ms.prevent.stop="search=$self.value"
+                       class="w-full h-full px-0 font-normal input input-ghost hover:outline-none focus:outline-none "/>
             {% endif %}
-            {# TODO display info that not all records are displayed when "Use search to access more data" #}
-        </div>
+            {# {% if is_disabled %} disabled{% endif %} #}
+        </button>
+        {# TODO disabled #}
+        {# TODO display dropdown attached to body not to this position DOM element for use in modals #}
+        {# TODO view, update, delete?? #}
+        {% if is_open %}
+            <div class="absolute z-10 w-full mt-1 ">
+                {% if _config.choice_columns|length == 1 %}
+                    <ul class="overflow-auto border rounded-lg shadow-md max-h-64 menu menu-compact bg-base-100 border-base-300">
+                        {% if not search and choices|length > 0 %}
+                            <li option-id="">
+                                <a jmb-bind:class="{'active': $local.focusedOptionId === ''}"
+                                   jmb-on:mouseenter="$local.focusedOptionId = ''"
+                                   jmb-on:mouseleave="$local.focusedOptionId = null"
+                                   jmb-on:click.stop.prevent="juiLov.selectOption($context, $dispatch)"
+                                   class="flex items-center justify-between">
+                                    &nbsp;
+                                    {% if selected == none %}{{ display_icon("check", class="w-5 h-5")}}{% endif %}
+                                </a>
+                            </li>
+                        {% endif %}
+                        {% for choice_id, choice_record in choices %}
+                            <li option-id="{{ choice_id }}">
+                                <a jmb-bind:class="{'active': $local.focusedOptionId === '{{ choice_id }}'}"
+                                   jmb-on:mouseenter="$local.focusedOptionId = '{{ choice_id }}'"
+                                   jmb-on:mouseleave="$local.focusedOptionId = null"
+                                   jmb-on:click.stop.prevent="juiLov.selectOption($context, $dispatch)"
+                                   class="flex items-center justify-between">
+                                    {{ choice_record[0] }}
+                                    {% if selected == choice_id %}{{ display_icon("check", class="w-5 h-5")}}{% endif %}
+                                </a>
+                            </li>
+                        {% endfor %}
+                        {# {% if (search or choices|length == 0) and has_create and component("create").is_accessible %} #}
+                        {% if has_create and component("create").is_accessible %}
+                            <li option-id="___createnew">
+                                <a class="flex items-center justify-center gap-2"
+                                   jmb-bind:class="{'active': $local.focusedOptionId === '___createnew'}"
+                                   jmb-on:mouseenter="$local.focusedOptionId = '___createnew'"
+                                   jmb-on:mouseleave="$local.focusedOptionId = null"
+                                   jmb-on:click.prevent="{{ component().jrl }}">
+                                    {{ display_icon("plus", class="w-5 h-5")}}
+                                    {% trans %}Create New{% endtrans %}
+                                </a>
+                            </li>
+                        {% endif %}
+                        {% if choices|length == 0 %}
+                            <li option-id="" class="disabled">
+                                <a class="block text-center">
+                                    {% if search %}
+                                        {% trans %}No results match your search{% endtrans %}
+                                    {% else %}
+                                        {% trans %}No data exist{% endtrans %}
+                                    {% endif %}
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                {% else %}
+                    <div class="overflow-auto border rounded-lg shadow-md max-h-64 bg-base-100 border-base-300">
+                        <table class="table w-full table-compact">
+                            <thead>
+                                <tr>
+                                    <th class="sticky top-0 w-5">&nbsp;</th>
+                                    {% for column in _config.choice_columns %}<th class="sticky top-0">{{ column }}</th>{% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if not search and choices|length > 0 %}
+                                    <tr option-id=""
+                                        jmb-bind:class="{'active': $local.focusedOptionId === '' }"
+                                        jmb-on:mouseenter="$local.focusedOptionId = ''"
+                                        jmb-on:mouseleave="$local.focusedOptionId = null"
+                                        jmb-on:click.stop.prevent="juiLov.selectOption($context, $dispatch)">
+                                        <td>
+                                            <button class="btn btn-ghost btn-sm btn-square"
+                                                    jmb-on:click.stop.prevent="juiLov.selectOption($context, $dispatch)">
+                                                {% if selected == none %}
+                                                    {{ display_icon("check", class="w-4 h-4 text-primary")}}
+                                                {% else %}
+                                                    {{ display_icon("minus", class="w-4 h-4 opacity-50")}}
+                                                {% endif %}
+                                            </button>
+                                        </td>
+                                        <td colspan="{{ _config.choice_columns|length }}">&nbsp;</td>
+                                    </tr>
+                                {% endif %}
+                                {% for choice_id, choice_record in choices %}
+                                    <tr option-id="{{ choice_id }}"
+                                        jmb-bind:class="{'active': $local.focusedOptionId === '{{ choice_id }}'}"
+                                        jmb-on:mouseenter="$local.focusedOptionId = '{{ choice_id }}'"
+                                        jmb-on:mouseleave="$local.focusedOptionId = null"
+                                        jmb-on:click.stop.prevent="juiLov.selectOption($context, $dispatch)">
+                                        <td>
+                                            {# <input type="checkbox"
+        class="checkbox checkbox-sm "
+        {% if selected == choice_id %}
+            checked
+        {% endif %}
+        jmb-on:click.stop.prevent="juiLov.selectOption($context, $dispatch)"/> #}
+                                            <button class="btn btn-ghost btn-sm btn-square"
+                                                    jmb-on:click.stop.prevent="juiLov.selectOption($context, $dispatch)">
+                                                {% if selected == choice_id %}
+                                                    {{ display_icon("check", class="w-4 h-4 text-primary")}}
+                                                {% else %}
+                                                    {{ display_icon("minus", class="w-4 h-4 opacity-50")}}
+                                                {% endif %}
+                                            </button>
+                                        </td>
+                                        {% for value in choice_record %}<td>{{ value }}</td>{% endfor %}
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="{{ _config.choice_columns|length + 1 }}" class="text-center">
+                                            {% if search %}
+                                                {% trans %}No results match your search{% endtrans %}
+                                            {% else %}
+                                                {% trans %}No data exist{% endtrans %}
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+                {# TODO display info that not all records are displayed when "Use search to access more data" #}
+            </div>
+        {% endif %}
     {% endif %}
     {% if has_view %}{{ placeholder("view") }}{% endif %}
     {% if has_update %}{{ placeholder("update") }}{% endif %}
