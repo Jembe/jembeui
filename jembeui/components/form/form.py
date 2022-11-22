@@ -569,13 +569,13 @@ class CForm(Component):
     @action
     def remove_wdb_record(self, tfcname: str, uid: str):
         """Removes record from wDB"""
-        position = next(
+        position, record_uid, record = next(
             (
-                idx
+                (idx, rec[0], rec[1])
                 for idx, rec in enumerate(self.state.wdb.get(tfcname, []))
                 if rec[0] == uid
             ),
-            None,
+            (None, None, None),
         )
         if (
             position is None
@@ -583,7 +583,13 @@ class CForm(Component):
             or position >= len(self.state.wdb.get(tfcname, []))
         ):
             return
-        del self.state.wdb[tfcname][position]
+
+        tfc = self._config.trail_forms_config[tfcname]
+        if tfc.delete_record is not None:
+            if tfc.delete_record(self, record) == True:
+                del self.state.wdb[tfcname][position]
+        else:
+            del self.state.wdb[tfcname][position]
 
     @listener(event="updateWDB", source="./*.*")
     def on_update_wdb(self, event: "jembe.Event"):

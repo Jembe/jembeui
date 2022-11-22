@@ -39,8 +39,14 @@ class TrailFormConfig:
     dataclass: "jembe.IsDataclass"
     get_records: Callable[["jembeui.CForm"], List["Model"]]
     create_record: Optional[Callable[["jembeui.CForm"], "Model"]] = None
+    delete_record: Optional[
+        Callable[["jembeui.CForm", "jembe.IsDataclass"], bool]
+    ] = None
     submit_records: Optional[
         Callable[["jembeui.CForm", List["jembe.IsDataclass"]], None]
+    ] = None
+    is_model_equal_dataclass: Optional[
+        Callable[["Model", "jembe.IsDataclass"], bool]
     ] = None
     model_to_dataclass: Callable[
         ["Model"], "jembe.IsDataclass"
@@ -49,6 +55,8 @@ class TrailFormConfig:
     def __post_init__(self):
         if self.submit_records is None and self.relationship_name is not None:
             self.submit_records = self.submit_records_default
+        if self.is_model_equal_dataclass is None:
+            self.is_model_equal_dataclass = self.is_model_equal_dataclass_default
         if self.submit_records is None and self.relationship_name is None:
             raise ValueError(
                 "Please provide submit_records or relationship_name attribute"
@@ -56,14 +64,24 @@ class TrailFormConfig:
         if self.create_record is None:
             self.create_record = lambda c: self.model()
 
+    def is_model_equal_dataclass_default(
+        self, record: "Model", record_dc: "jembe.IsDataclass"
+    ) -> bool:
+        return record.id == record_dc.id
+
     def submit_records_default(self, c: "jembeui.CForm", records_dc: List[IsDataclass]):
         if self.relationship_name is None:
             raise ValueError("reltionship_name must be set")
+        if self.is_model_equal_dataclass is None:
+            raise ValueError("is_model_equal_dataclass must be set")
 
         records = list(self.get_records(c))
         # update or delete existing records in database
         for record in records:
-            record_dc = next((r for r in records_dc if r.id == record.id), None)
+            record_dc = next(
+                (r for r in records_dc if self.is_model_equal_dataclass(record, r)),
+                None,
+            )
             if record_dc:
                 # update record
                 updated = False
@@ -76,7 +94,7 @@ class TrailFormConfig:
             else:
                 c.session.delete(record)
         # create new records in database
-        for record_dc in records_dc:
+        for record_dc in reversed(records_dc):
             if record_dc.id is None:
                 record = self.model()
                 setattr(record, self.relationship_name, c.record)

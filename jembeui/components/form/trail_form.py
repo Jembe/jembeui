@@ -124,7 +124,7 @@ class CTrailUpdateForm(CTrailFormBase):
             raise NotFound()
         self.record = self.state.record
         if self.previous_state and self.previous_state.record != self.state.record:
-            del self.form
+            self.state.form = None
         super().__init__()
 
     def push_page_alert_on_form_submit(self):
