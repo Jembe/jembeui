@@ -143,11 +143,12 @@ class CUpdateRecord(CForm):
                 ),
                 "error",
             )
-            raise ValueError(
-                _("Concurrent update detected. Can't save changes!")
-            )
+            raise ValueError(_("Concurrent update detected. Can't save changes!"))
         return super().before_form_submit()
-    def on_form_submited(self, submited_record: Optional[Union["Model", dict]]) -> Optional[bool]:
+
+    def on_form_submited(
+        self, submited_record: Optional[Union["Model", dict]]
+    ) -> Optional[bool]:
         if submited_record:
             self.record = submited_record
             self.state.record_version = self.record_version
