@@ -1,0 +1,22 @@
+input::placeholder{
+    @apply text-base-content/60;
+}
+input::placeholder {
+  @apply text-base-content/60;
+}
+.select {
+  @apply text-base font-normal;
+}
+.select-sm {
+  @apply text-sm;
+}
+.select:disabled {
+  @apply opacity-100 text-base-content;
+}                
+.label-sm {
+    @apply pb-1;
+}
+.label-sm .label-text,
+.label-sm .label-text-alt {
+    @apply text-xs;
+}

@@ -1,7 +1,4 @@
 @import url(includes/tailwind.css);
 @import url(includes/datepicker.css);
 @import url(includes/nprogress.css);
-
-input::placeholder{
-    @apply text-base-content/60;
-}
+@import url(includes/daisyui_customize.css);

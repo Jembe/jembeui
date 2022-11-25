@@ -18,7 +18,7 @@
     {%- else %}
         {# field label on top #}
         <div class="w-full form-control">
-            <label class="label">
+            <label class="label {% if field_style.size %}label-{{ field_style.size }}{% endif %}">
                 <span class="label-text">
                     {{ field.label.text }}
                     {%- if not field_style.disabled and field_style.mark_if_required and field.flags.required -%}
