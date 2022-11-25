@@ -7,22 +7,53 @@
         <div class="flex items-center justify-between">
             {# actions and filters #}
             <div></div>
-            {# search #}
-            <div >
-                {% if _config.search_filter %}
-                <input jmb-on:input.nonblocking.debounce.450ms="page=0;search=$self.value;"
-                        value="{{ search }}"
-                        type="search"
-                        placeholder="{%- trans -%}Search...{%- endtrans -%}"
-                        class="my-1.5 input input-sm input-bordered"/>
-                {% endif %}
+            <div class="flex items-center gap-1">
+                {# search #}
+                <div>
+                    {% if _config.search_filter %}
+                        <input jmb-on:input.nonblocking.debounce.450ms="page=0;search=$self.value;"
+                               value="{{ search }}"
+                               type="search"
+                               placeholder="{%- trans -%}Search...{%- endtrans -%}"
+                               class="my-1.5 input input-sm input-bordered"/>
+                    {% endif %}
+                </div>
+                {# pagination #}
+                <div class="gap-1 btn-group ">
+                    <button class="btn btn-sm btn-ghost btn-square disabled:bg-base-100" 
+                            title="{{ _('Previous page') }}"
+                            {% if page == 0 %}disabled{% endif %}
+                            jmb-on:click="page=page-1">
+                        {{ display_icon("chevron-left", class="w-4 h-4")}}
+                    </button>
+                    <div class="flex items-center gap-1">
+                        <div class="text-sm text-opacity-80 text-base-content">{{ page + 1 }} / {{ total_pages }}</div>
+                        <div class="dropdown dropdown-hover dropdown-end">
+                            <label tabindex="0" class="text-sm text-opacity-80 text-base-content">({{ _("total:") }}{{ total_records }})</label>
+                            <ul tabindex="0" class="shadow-md dropdown-content menu menu-compact rounded-box bg-base-100 whitespace-nowrap">
+                                <li class="menu-title"><span>{{ _('Page Size') }}</span></li>
+                                <li><a href="" jmb-on:click.prevent="page_size=10" {% if page_size==10 %}class="active"{% endif %}>10</a></li>
+                                <li><a href="" jmb-on:click.prevent="page_size=20" {% if page_size==20 %}class="active"{% endif %}>20</a></li>
+                                <li><a href="" jmb-on:click.prevent="page_size=50" {% if page_size==50 %}class="active"{% endif %}>50</a></li>
+                                <li><a href="" jmb-on:click.prevent="page_size=100" {% if page_size==100 %}class="active"{% endif %}>100</a></li>
+                            </ul>
+                        </div>
+                        {# <div class="text-sm text-opacity-80 text-base-content">({{ _("total:") }}{{ total_records }})</div> #}
+                    </div>
+                    <button class="btn btn-sm btn-ghost btn-square disabled:bg-base-100" 
+                            title="{{ _('Next page') }}"
+                            {% if page >= total_pages - 1 or total_pages == 0 %}disabled{% endif %}
+                            jmb-on:click="page=page+1">
+                        {{ display_icon("chevron-right", class="w-4 h-4")}}
+                    </button>
+                </div>
             </div>
         </div>
     {% endblock toolbar %}
     {% block content %}
         {# Display table #}
         <div class="overflow-x-auto">
-            <table class="table w-full">
+            <table class="table w-full {% if table_style.is_compact %}table-compact{% endif %}">
                 <!-- head -->
                 <thead>
                     <tr>

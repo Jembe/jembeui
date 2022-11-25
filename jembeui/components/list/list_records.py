@@ -11,6 +11,7 @@ from typing import (
     Union,
 )
 from datetime import datetime, date, time, timedelta
+from dataclasses import dataclass
 from markupsafe import Markup
 import sqlalchemy as sa
 from flask_babel import (
@@ -59,6 +60,9 @@ def default_field_value(component: "jembe.Component", record, field_name: str) -
 
 class CListRecords(CList):
     """Display list of records from SQLAlchemy query as HTML table"""
+    @dataclass
+    class TableStyle:
+        is_compact:bool = False
 
     class Config(CList.Config):
         """Configure how to Display list of records from sqlalchemy
@@ -89,6 +93,7 @@ class CListRecords(CList):
             ] = None,
             choice_filters: Iterable["jembeui.CList.ChoiceFilter"] = (),
             page_size: int = 0,
+            table_style:Optional["jembeui.CListRecords.TableStyle"] = None,
             menu: Optional[
                 Union["jembeui.Menu", Sequence[Union["jembeui.Link", "jembeui.Menu"]]]
             ] = None,
@@ -140,6 +145,9 @@ class CListRecords(CList):
             # record menu
             self.record_menu = record_menu
 
+            # table style
+            self.table_style = table_style if table_style else CListRecords.TableStyle()
+
             self.no_data_message = no_data_message
             super().__init__(
                 query,
@@ -172,6 +180,9 @@ class CListRecords(CList):
 
         # record menu
         self.get_record_menu = self._get_record_menu
+
+        # table_style
+        self.table_style = self._config.table_style
 
     def _get_record_menu(self, record) -> Optional["jembeui.Menu"]:
         """Method to be called on each record in template to get its action menu"""

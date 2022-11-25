@@ -39,7 +39,7 @@
         {% if is_open %}
             <div class="absolute z-10 w-full mt-1 ">
                 {% if _config.choice_columns|length == 1 %}
-                    <ul class="overflow-auto border rounded-lg shadow-md max-h-64 menu menu-compact bg-base-100 border-base-300">
+                    <ul class="overflow-auto border shadow-md rounded-box max-h-64 menu menu-compact bg-base-100 border-base-300">
                         {% if not search and choices|length > 0 %}
                             <li option-id="">
                                 <a jmb-bind:class="{'active': $local.focusedOptionId === ''}"
@@ -90,7 +90,7 @@
                         {% endif %}
                     </ul>
                 {% else %}
-                    <div class="overflow-auto border rounded-lg shadow-md max-h-64 bg-base-100 border-base-300">
+                    <div class="overflow-auto border shadow-md rounded-box max-h-64 bg-base-100 border-base-300">
                         <table class="table w-full table-compact">
                             <thead>
                                 <tr>
