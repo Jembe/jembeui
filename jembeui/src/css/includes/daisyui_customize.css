@@ -18,5 +18,5 @@ input::placeholder {
 }
 .label-sm .label-text,
 .label-sm .label-text-alt {
-    @apply text-xs;
+    @apply text-xs text-opacity-80;
 }
