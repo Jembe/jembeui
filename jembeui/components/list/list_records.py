@@ -63,6 +63,7 @@ class CListRecords(CList):
     @dataclass
     class TableStyle:
         is_compact:bool = False
+        hide_pagination:bool = False
 
     class Config(CList.Config):
         """Configure how to Display list of records from sqlalchemy

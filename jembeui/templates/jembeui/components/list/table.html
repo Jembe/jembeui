@@ -19,6 +19,7 @@
                     {% endif %}
                 </div>
                 {# pagination #}
+                {% if not table_style.hide_pagination %}
                 <div class="gap-1 btn-group ">
                     <button class="btn btn-sm btn-ghost btn-square disabled:bg-base-100" 
                             title="{{ _('Previous page') }}"
@@ -47,6 +48,7 @@
                         {{ display_icon("chevron-right", class="w-4 h-4")}}
                     </button>
                 </div>
+                {% endif %}
             </div>
         </div>
     {% endblock toolbar %}
