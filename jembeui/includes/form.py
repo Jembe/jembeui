@@ -539,7 +539,7 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
 
         return self
 
-    def set_cform(self, cform:"jembeui.CForm"):
+    def attach_to(self, cform:"jembeui.CForm"):
         if hasattr(self, "cform") and self.cform != cform: 
             raise JembeUIError(
                 f"{self.__class__.__name__} can't change associated cform once it has been set!"
