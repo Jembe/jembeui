@@ -459,9 +459,12 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
         data=None,
         meta=None,
         disabled: bool = False,
+        cform: Optional["jembeui.CForm"] = None,
         **kwargs,
     ):
         self.cform: "jembeui.CForm"
+        if cform is not None:
+            self.cform = cform
 
         self.is_disabled = disabled
 
@@ -470,9 +473,7 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
             formdata=formdata, obj=obj, prefix=prefix, data=data, meta=meta, **kwargs
         )
 
-    def mount(
-        self, cform: "jembeui.CForm", form_state_name: Optional[str] = None
-    ) -> "jembeui.Form":
+    def mount(self, cform: Optional["jembeui.CForm"] = None) -> "jembeui.Form":
         """Mounts Form inside jembeui.CForm component
 
         Args:
@@ -491,8 +492,13 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
             else:
                 # No need to mounti it again
                 return self
-
-        self.cform = cform
+        if cform is not None:
+            self.cform = cform
+        if not hasattr(self, "cform"):
+            raise JembeUIError(
+                "CForm must be supplied to form either when calling __init__ or mount"
+            )
+        form_state_name = self.cform._config.form_state_name
         self.is_mounted = True
 
         for field in self:
@@ -514,9 +520,9 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
                 # Check if new file is uploaded and previous file
                 # is in temporary storage
                 try:
-                    if form_state_name and cform.previous_state:
+                    if form_state_name and self.cform.previous_state:
                         previous_field = getattr(
-                            cform.previous_state[form_state_name], field.name
+                            self.cform.previous_state[form_state_name], field.name
                         )
                         if (
                             previous_field
@@ -532,6 +538,13 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
         self.init()
 
         return self
+
+    def set_cform(self, cform:"jembeui.CForm"):
+        if hasattr(self, "cform") and self.cform != cform: 
+            raise JembeUIError(
+                f"{self.__class__.__name__} can't change associated cform once it has been set!"
+            )
+        self.cform = cform
 
     @classmethod
     def dump_init_param(cls, value: Optional["jembeui.Form"]) -> Any:

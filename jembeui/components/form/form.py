@@ -214,7 +214,7 @@ class CForm(Component):
                 if isinstance(self.record, dict)
                 else getattr(self.record, "id", None),
                 "_record": self.record,
-                "_form": self.form,
+                "_form": self._get_form(),
             }
         return {}
 
@@ -255,7 +255,21 @@ class CForm(Component):
 
     @property
     def form(self) -> "Form":
-        """Returns form instance
+        """Returns mounted form instance"""
+        form = self._get_form()
+        if not form.is_mounted:
+            form.mount(self)
+        return form
+
+    @form.setter
+    def form(self, form: "Form"):
+        if self._config.form_state_name in self.state.keys():
+            self.state.form = form
+        else:
+            self._form = form
+
+    def _get_form(self) -> "Form":
+        """Returns form instance not mounted, usefull when injecting into sub componentds
 
         - Form instance is saved and retrived from state if 'form' state exist.
         - Form instance is created and cached localy when 'form' state does not exist."""
@@ -272,27 +286,16 @@ class CForm(Component):
 
         if self._config.form_state_name in self.state.keys():
             if self.state.form is None:
-                self.state.form = form_type(**get_form_init_params())
-
-            if not self.state.form.is_mounted:
-                self.state.form.mount(self, self._config.form_state_name)
-
+                self.state.form = form_type(**get_form_init_params(), cform=self)
+            else:
+                self.state.form.set_cform(self)
             return self.state.form
         else:
             if not hasattr(self, "_form"):
-                self._form = form_type(**get_form_init_params())
-
-            if not self._form.is_mounted:
-                self._form.mount(self, self._config.form_state_name)
-
+                self._form = form_type(**get_form_init_params(), cform=self)
+            else:
+                self.state.form.set_cform(self)
             return self._form
-
-    @form.setter
-    def form(self, form: "Form"):
-        if self._config.form_state_name in self.state.keys():
-            self.state.form = form
-        else:
-            self._form = form
 
     @property
     def is_form_modified(self) -> bool:
@@ -385,7 +388,9 @@ class CForm(Component):
 
         return True
 
-    def call_form_submit(self, record: Union["Model", dict]) -> Optional[Union["Model", dict]]:
+    def call_form_submit(
+        self, record: Union["Model", dict]
+    ) -> Optional[Union["Model", dict]]:
         """Etract actual call to form submit from submit acction for easy overriden and changing behaviors"""
         return self.form.submit(self.record)
 
