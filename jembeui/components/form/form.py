@@ -294,7 +294,7 @@ class CForm(Component):
             if not hasattr(self, "_form"):
                 self._form = form_type(**get_form_init_params(), cform=self)
             else:
-                self.state.form.set_cform(self)
+                self._form.set_cform(self)
             return self._form
 
     @property
