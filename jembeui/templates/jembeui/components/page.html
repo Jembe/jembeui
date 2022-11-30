@@ -38,7 +38,9 @@
   </head>
   <body class="box-border m-0 text-base bg-base-200 [font-kerning:normal] min-h-screen"
       {%- if _config and (_config.display_without_navbar or _config.display_without_sidebar) %}
-      jmb-on:jembe-update-page.camel.window="cnp = $jmb.componentsOnPage(); $local.hideNavbar = {{ _config.display_without_navbar|tojson|forceescape }}.filter(x => cnp.includes(x)).length > 0;$local.hideSidebar = {{ _config.display_without_sidebar|tojson|forceescape }}.filter(x => cnp.includes(x)).length > 0 "
+      jmb-on:jembe-update-page.camel.window="cnp = $jmb.componentsOnPage(); $local.hideNavbar = {{ _config.display_without_navbar|tojson|forceescape }}.filter(x => cnp.includes(x)).length > 0;$local.hideSidebar = {{ _config.display_without_sidebar|tojson|forceescape }}.filter(x => cnp.includes(x)).length > 0; $dispatch('is-page-drawer-open', {isOpen:$local.drawerOpen})"
+      {%-else %}
+      jmb-on:jembe-update-page.camel.window="$dispatch('is-page-drawer-open', {isOpen:$local.drawerOpen})"
       {%- endif %}
       jmb-on:toogle-sidebar.window="$local.hideSidebar = ! $local.hideSidebar; console.log($local.hideSidebar)">
     <!-- Application Layout -->
