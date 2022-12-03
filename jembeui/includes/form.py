@@ -204,20 +204,21 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
 
             return self
 
-        def render(self) -> str:
+        def render(self, **kwargs) -> str:
             """Renders field as HTML"""
             if self._field is None or self._form_style is None:
                 raise JembeUIError("Field is not mounted")
             if self._form_style.form is None:
                 raise JembeUIError("Form is not mounted")
+            fs = self.updated_from_dict(**kwargs) if kwargs else self
             ctx = {
-                "field_style": self,
+                "field_style": fs,
             }
-            return Markup(render_template(self.template, **ctx))  # type:ignore
+            return Markup(render_template(fs.template, **ctx))  # type:ignore
 
-        def __call__(self) -> str:
+        def __call__(self, **kwargs) -> str:
             """Renders field as HTML"""
-            return self.render()
+            return self.render(**kwargs)
 
         @property
         def is_hidden_field(self) -> bool:
@@ -539,8 +540,8 @@ class Form(JembeInitParamSupport, wtf.Form, metaclass=FormMeta):
 
         return self
 
-    def attach_to(self, cform:"jembeui.CForm"):
-        if hasattr(self, "cform") and self.cform != cform: 
+    def attach_to(self, cform: "jembeui.CForm"):
+        if hasattr(self, "cform") and self.cform != cform:
             raise JembeUIError(
                 f"{self.__class__.__name__} can't change associated cform once it has been set!"
             )

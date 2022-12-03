@@ -4,9 +4,10 @@
     {% set is_boolean_field = field.__class__.__name__ == "BooleanField" %}
     {% set is_text_area_widget = field.widget.__class__.__name__ == "TextArea" %}
     {% set is_select_widget = field.widget.__class__.__name__ == "Select" %}
+    {% set is_tiptap_widget = field.widget.__class__.__name__ == "TipTapWidget" %}
 
     {%- set base_class %}
-        {%- if is_text_area_widget %}
+        {%- if is_text_area_widget or is_tiptap_widget %}
             textarea
         {%- elif is_select_widget %}
             select
@@ -50,8 +51,8 @@
             field_style.classes|default("",true)
         ]),
         "jmb-on:change{}".format(".defer" if field_style.on_change_defer else ""): jmb_on_action  if jmb_on_action  else false,
-        "jmb-on:keydown.enter": "$self.blur();$self.focus();submit()" if not field_style.disabled and not is_text_area_widget  and "submit" in cform._config.component_actions else false,
-        "jmb-on:keydown.ctrl.enter": "$self.blur();$self.focus();submit()" if not field_style.disabled and is_text_area_widget  and "submit" in cform._config.component_actions else false,
+        "jmb-on:keydown.enter": "$self.blur();$self.focus();submit()" if not field_style.disabled and not is_text_area_widget and not is_tiptap_widget  and "submit" in cform._config.component_actions else false,
+        "jmb-on:keydown.ctrl.enter": "$self.blur();$self.focus();submit()" if not field_style.disabled and is_text_area_widget and not is_tiptap_widget and "submit" in cform._config.component_actions else false,
     } %}
 
     {{ field(**field_attrs) }}

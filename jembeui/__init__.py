@@ -13,6 +13,7 @@ from .includes.menu import Menu
 from .includes.field import FieldMixin
 from .includes.file_field import FileField
 from .includes.lov_field import LovField
+from .includes.tiptap_field import TipTapField
 from .includes.form import Form, TrailFormConfig
 from .components import (
     Component,
@@ -55,6 +56,7 @@ __all__ = (
     "FileField",
     # "ImageField",
     "LovField",
+    "TipTapField",
     "Component",
     # "ComponentWithMenu",
     "CPage",
