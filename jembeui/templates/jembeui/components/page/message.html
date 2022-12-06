@@ -5,7 +5,7 @@
         <div class="modal-action">
             <button type="button"
                     class="btn btn-outline {% if variant %}btn-{{ variant }}{% endif %}"
-                    jmb-on:click.prevent="title=null;message=null;">{% trans %}Close{% endtrans %}</button>
+                    jmb-on:click.prevent="$el.classList.remove('modal-open');title=null;message=null;">{% trans %}Close{% endtrans %}</button>
         </div>
     </div>
 </div>

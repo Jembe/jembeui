@@ -9,7 +9,7 @@
             <div></div>
             <div class="flex items-center gap-1">
                 {# search #}
-                <div>
+                <div class="basis-0">
                     {% if _config.search_filter %}
                         <input jmb-on:input.nonblocking.debounce.450ms="page=0;search=$self.value;"
                                value="{{ search }}"
@@ -20,7 +20,7 @@
                 </div>
                 {# pagination #}
                 {% if not table_style.hide_pagination %}
-                <div class="gap-1 btn-group ">
+                <div class="gap-1 btn-group flex-nowrap basis-0 whitespace-nowrap">
                     <button class="btn btn-sm btn-ghost btn-square disabled:bg-base-100" 
                             title="{{ _('Previous page') }}"
                             {% if page == 0 %}disabled{% endif %}
@@ -28,9 +28,9 @@
                         {{ display_icon("chevron-left", class="w-4 h-4")}}
                     </button>
                     <div class="flex items-center gap-1">
-                        <div class="text-sm text-opacity-80 text-base-content">{{ page + 1 }} / {{ total_pages }}</div>
+                        <div class="text-sm text-opacity-80 text-base-content whitespace-nowrap">{{ page + 1 }} / {{ total_pages }}</div>
                         <div class="dropdown dropdown-hover dropdown-end">
-                            <label tabindex="0" class="text-sm text-opacity-80 text-base-content">({{ _("total:") }}{{ total_records }})</label>
+                            <label tabindex="0" class="text-sm text-opacity-80 text-base-content">(<span class="hidden md:inline-block">{{ _("total:") }}</span>{{ total_records }})</label>
                             <ul tabindex="0" class="shadow-md dropdown-content menu menu-compact rounded-box bg-base-100 whitespace-nowrap">
                                 <li class="menu-title"><span>{{ _('Page Size') }}</span></li>
                                 <li><a href="" jmb-on:click.prevent="page_size=10" {% if page_size==10 %}class="active"{% endif %}>10</a></li>
@@ -98,19 +98,23 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for record in records %}
+                    {%- for record in records %}
                         <tr>
-                            {% for field_name in _config.fields.keys() %}
+                            {%- for field_name in _config.fields.keys() %}
+                                {%- if loop.first %}
+                                <th>{{ field_values[field_name](record, field_name)|default("", true) }}</th>
+                                {%- else %}
                                 <td>{{ field_values[field_name](record, field_name)|default("", true) }}</td>
-                            {% endfor %}
-                            {% if _config.record_menu %}<td>{{ get_record_menu(record)() }}</td>{% endif %}
+                                {%- endif %}
+                            {%- endfor %}
+                            {%- if _config.record_menu %}<td>{{ get_record_menu(record)() }}</td>{% endif %}
                         </tr>
-                    {% else %}
+                    {%- else %}
                         <tr>
                             <td colspan="{{ _config.fields.keys()|length }}"
                                 class="text-center opacity-75">{{ _config.no_data_message }}</td>
                         </tr>
-                    {% endfor %}
+                    {%- endfor %}
                 </tbody>
             </table>
         </div>

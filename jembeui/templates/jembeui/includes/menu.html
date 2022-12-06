@@ -327,7 +327,7 @@
                             {% if mi.icon and not mi.icon.display_last %}{{ btnicon(mi.icon, mi.style.classes) }}{% endif %}{% if mi.title is not none and not mi.style.title_hidden %}{{ mi.title }}{% endif %}{% if mi.icon and mi.icon.display_last %}{{ btnicon(mi.icon, mi.style.classes) }}{% endif %}
                         </{{ btn_tag }}>
                     {%- elif not mi.is_link %}
-                        <li class="menu-title {% if menu_loop.depth0 == 2 %}ml-5{% elif menu_loop.depth0 == 3 %}ml-10{% elif menu_loop.depth0 >= 4 %}ml-16{% endif %} border-t" style="border-color: hsl(var(--bc)/0.4);">
+                        <li class="menu-title {% if menu_loop.depth0 == 2 %}ml-5{% elif menu_loop.depth0 == 3 %}ml-10{% elif menu_loop.depth0 >= 4 %}ml-16{% endif %}">
                             <span {% if mi.icon and mi.icon.display_last %}class="flex justify-between"{% endif %}>{% if mi.icon and not mi.icon.display_last %}{{ menuicon(mi.icon) }}{% endif %}{{ mi.title }}{% if mi.icon and mi.icon.display_last %}{{ menuicon(mi.icon) }}{% endif %}</span>
                         </li>
                         {%- if mi.header %}{{ mi.header }}{% endif %}

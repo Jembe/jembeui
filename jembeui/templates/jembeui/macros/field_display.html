@@ -32,7 +32,11 @@
                     {% endif %}
                     {%- if field.description %}
                         <div class="z-10 tooltip tooltip-left" data-tip="{{ field.description }}">
+                            {% if field_style.size == "sm" %}
+                            {{ display_icon("question-mark-circle", "mini", class="w-4 h-4 text-base-300")}}
+                            {% else %}
                             {{ display_icon("question-mark-circle", class="w-5 h-5")}}
+                            {% endif %}
                         </div>
                     {% endif %}
                 </span>
