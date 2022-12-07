@@ -102,7 +102,7 @@ class LovField(FieldMixin, wtf.Field):
     @property
     def choices(self):
         return [
-            self._get_choice_id(choice) for choice in self._choices(self, self.form, "")
+            self._get_choice_id(choice) for choice in self._choices(self, self.form.cform, "")
         ]
 
     def process_data(self, value):
@@ -127,8 +127,9 @@ class LovField(FieldMixin, wtf.Field):
 
     def pre_validate(self, form):
         if self.data:
+            print(self.form ,form)
             valid_choices = {
-                self._get_choice_id(choice) for choice in self._choices(self, form, "")
+                self._get_choice_id(choice) for choice in self._choices(self, self.form.cform, "")
             }
             if str(self.data) not in valid_choices:
                 raise ValueError(
