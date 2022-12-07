@@ -127,7 +127,6 @@ class LovField(FieldMixin, wtf.Field):
 
     def pre_validate(self, form):
         if self.data:
-            print(self.form ,form)
             valid_choices = {
                 self._get_choice_id(choice) for choice in self._choices(self, self.form.cform, "")
             }
