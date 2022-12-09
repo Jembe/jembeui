@@ -1,7 +1,7 @@
 {% from "/jembeui/macros/icons.html" import display_icon %}
 <!DOCTYPE html>
 <html lang="en"
-      jmb-local="{theme: localStorage.getItem('jui_page_theme')?localStorage.getItem('jui_page_theme'):'light', drawerOpen: localStorage.getItem('jui_page_drawer_open') === 'true', hideNavbar:false, hideSidebar:false}"
+      jmb-local="{theme: localStorage.getItem('jui_page_theme')?localStorage.getItem('jui_page_theme'):'light', drawerOpen: localStorage.getItem('jui_page_drawer_open') === 'true', hideNavbar:false, hideNavbarScroll:false, hideSidebar:false}"
       jmb-init="$nextTick(()=>{$dispatch('is-page-drawer-open', {isOpen:$local.drawerOpen})});$watch('$local.drawerOpen', ()=> {$dispatch('is-page-drawer-open', {isOpen:$local.drawerOpen})});$watch('$local.hideSidebar', () => {$dispatch('is-page-drawer-open', {isOpen:$local.drawerOpen})})"
       jmb-bind:data-theme="$local.theme">
   <head>
@@ -47,10 +47,10 @@
     <div class="drawer"
          jmb-bind:class="{'drawer-mobile': $local.drawerOpen}">
       <input type="checkbox" class="drawer-toggle" id="page-drawer"/>
-      <div class="drawer-content bg-base-100 scroll-pt-20 scroll-smooth">
+      <div class="drawer-content bg-base-100 scroll-pt-20 scroll-smooth" jmb-on:scroll.passive="if($self.scrollTop < $self.oldScrollTop){$local.hideNavbarScroll=false} else {$local.hideNavbarScroll=true}; $self.oldScrollTop=$self.scrollTop;">
         <!-- Drawer Content -->
         <!-- Sticky on top for navigation -->
-        <div class="sticky top-0 z-30 w-full transition-all duration-100 shadow-sm bg-opacity-60 bg-base-100 text-base-content backdrop-blur ">
+        <div class="sticky top-0 z-30 w-full transition-all duration-300 shadow-sm bg-opacity-60 bg-base-100 text-base-content backdrop-blur" jmb-bind:class="{'-top-16 invisible': $local.hideNavbarScroll}">
           <!-- Navbar -->
           <nav class="navbar" jmb-show="!$local.hideNavbar" jmb-cloak>
             <div class="flex flex-1 md:gap-1 lg:gap-2">
