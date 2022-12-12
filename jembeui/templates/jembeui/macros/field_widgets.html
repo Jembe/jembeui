@@ -125,8 +125,8 @@
     {%- endif %}
     {%- set field_attrs = {
         "id": field_id,
+        "class": "w-full",
         "jmb-on:select-option-changed.prevent.stop{}".format(".defer" if field_style.on_change_defer else ""): jmb_on_action if jmb_on_action  else false, 
-
         "jmb-on:select-option-submit.prevent.stop": "submit()" if not field_style.disabled  and "submit" in cform._config.component_actions else false,
 
     } %}

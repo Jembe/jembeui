@@ -17,7 +17,7 @@
                 {%- endif %}
                 class="w-full {{ ' '.join([ 'select select-bordered', 'select-error' if field.errors else '', 'select-' + field_style.size if field_style.size is not none else '', ]) }}">
             {% if not is_open %}
-                <span class="flex items-center h-full font-normal truncate text-base-content
+                <span class="flex w-full items-center h-full font-normal truncate text-base-content px-0 !bg-transparent
                              {% if selected_title is none %}
                                  text-opacity-50
                              {% endif %} ">
