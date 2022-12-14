@@ -156,7 +156,7 @@ class Menu:
             for item in (
                 self._items
                 if isinstance(self._items, (tuple, list))
-                else self.items(component)  # type:ignore
+                else self._items(component)  # type:ignore
             )
         ]
         bmenu._icon = copy(self._icon)
