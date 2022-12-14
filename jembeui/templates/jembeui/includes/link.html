@@ -53,5 +53,5 @@
         {%- endif %}
         {%- if description %} title="{{ description }}"{% endif %}
     {%- endset %}
-    <a {{ href_attrs }}>{% if icon and not icon.display_last %}{{ hreficon(icon) }}{% endif %}{{ title|default("", true) }}{% if icon and icon.display_last %}{{ hreficon(icon) }}{% endif %}</a>
+    <a {{ href_attrs }}>{% if icon and not icon.display_last %}{{ hreficon(icon) }}{% endif %}{% if title is not none and not style.title_hidden %}{{ title }}{% endif %}{% if icon and icon.display_last %}{{ hreficon(icon) }}{% endif %}</a>
 {% endif %}

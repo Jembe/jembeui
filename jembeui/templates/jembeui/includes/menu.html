@@ -93,7 +93,7 @@
                                 {% endif %}
                                 {%- if mi.description %} title="{{ mi.description }}"{% endif %}
                             {%- endset %}
-                            <a {{ a_attr }}>{% if mi.icon and not mi.icon.display_last %}{{ menuicon(mi.icon) }}{% endif %}{{ mi.title }}{% if mi.icon and mi.icon.display_last %}{{ menuicon(mi.icon) }}{% endif %}</a>
+                            <a {{ a_attr }}>{% if mi.icon and not mi.icon.display_last %}{{ menuicon(mi.icon) }}{% endif %}{% if title is not none and not mi.style.title_hidden %}{{ mi.title }}{% endif %}{% if mi.icon and mi.icon.display_last %}{{ menuicon(mi.icon) }}{% endif %}</a>
                         </li>
                     {%- elif not mi.is_link %}
                         {%- if menu_loop.depth0 == 0 %}
