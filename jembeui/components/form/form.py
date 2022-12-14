@@ -430,7 +430,10 @@ class CForm(Component):
             return redisplay
         else:
             self.jui.ask_for_action_confirmation(
-                "cancel", _("Unsaved changes"), self.get_confirm_cancel_question()
+                "cancel",
+                _("Unsaved changes"),
+                self.get_confirm_cancel_question(),
+                is_danger=True,
             )
 
     @action
