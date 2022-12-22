@@ -1,5 +1,6 @@
 import { Editor } from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
+import Higthlight from "@tiptap/extension-highlight";
 
 const TipTap = {
   start: function (el, is_disabled) {
@@ -8,7 +9,7 @@ const TipTap = {
 
     return new Editor({
       element: el,
-      extensions: [StarterKit],
+      extensions: [StarterKit, Higthlight],
       editable: !is_disabled,
 
       editorProps: {
