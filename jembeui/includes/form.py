@@ -86,9 +86,13 @@ class TrailFormConfig:
                 # update record
                 updated = False
                 for k, v in asdict(record_dc).items():
-                    if hasattr(record, k) and getattr(record, k) != v:
-                        setattr(record, k, v)
-                        updated = True
+                    try:
+                        if hasattr(record, k) and getattr(record, k) != v:
+                            setattr(record, k, v)
+                            updated = True
+                    except AttributeError:
+                        pass
+
                 if updated:
                     c.session.add(record)
             else:
