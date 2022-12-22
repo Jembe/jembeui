@@ -28,7 +28,7 @@
                 </span>
                 {%- if field.description or ( field_style.mark_if_optional and not field.flags.required and not field_style.disabled) %}
                     <span class="flex items-center gap-2 label-text-alt">
-                        {%- if field_style.mark_if_optional and not field.flags.required and not field_style.disabled %}<span class="text-opacity-60">{% trans %}Optional{% endtrans %}</span>
+                        {%- if field_style.mark_if_optional and not field.flags.required and not field_style.disabled and not field_style.field.__class__.__name__ == "BooleanField" %}<span class="text-opacity-60">{% trans %}Optional{% endtrans %}</span>
                     {% endif %}
                     {%- if field.description %}
                         <div class="z-10 tooltip tooltip-left" data-tip="{{ field.description }}">
